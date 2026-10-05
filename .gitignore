@@ -17,3 +17,11 @@
 /docs/
 /doc/
 /horizen-agent-web/design-qa.md
+.ssh/
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa*
+id_ed25519*

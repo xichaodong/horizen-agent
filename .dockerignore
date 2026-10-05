@@ -1,0 +1,26 @@
+# 构建镜像时只使用公开源码，不发送本地配置、过程文档和开发历史。
+.git
+.env*
+!.env.yml.example
+docs
+doc
+horizen-agent-web/design-qa.md
+.ssh
+.idea
+.vscode
+.agentscope
+**/target
+**/node_modules
+**/dist
+**/__pycache__
+**/*.pyc
+**/*.log
+**/*.jsonl
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.jks
+**/id_rsa*
+**/id_ed25519*
+**/.DS_Store
