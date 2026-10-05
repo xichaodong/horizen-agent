@@ -1,0 +1,2 @@
+-- Retired: the complete publication is owned by ha_session.
+-- See mysql-session-workspace-release.sql. Do not bind an individual Skill bundle.

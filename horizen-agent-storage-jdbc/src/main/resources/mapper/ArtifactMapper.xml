@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.horizen.agent.storage.jdbc.mapper.ArtifactMapper">
+  <insert id="updateCreate" >
+    INSERT INTO ha_artifact (
+    owner_key, artifact_id, kind, status, title, media_type, content_ref,
+    size_bytes, checksum_sha256, parent_artifact_id, source, source_ref,
+    expires_at, created_at, updated_at, deleted_at, version
+) VALUES (#{ownerKey}, #{artifactId}, #{kind}, #{status}, #{title}, #{mediaType}, #{contentRef}, #{sizeBytes}, #{checksumSha256}, #{parentArtifactId}, #{source}, #{sourceRef}, #{expiresAt}, #{createdAt}, #{updatedAt}, #{deletedAt}, 0)
+  </insert>
+
+  <select id="selectFind" resultType="dev.horizen.agent.storage.jdbc.model.ArtifactRow">
+    SELECT * FROM ha_artifact WHERE owner_key = #{ownerKey} AND artifact_id = #{artifactId}
+  </select>
+
+  <update id="updateUpdate" >
+    UPDATE ha_artifact
+SET kind = #{kind}, status = #{status}, title = #{title}, media_type = #{mediaType}, content_ref = #{contentRef},
+    size_bytes = #{sizeBytes}, checksum_sha256 = #{checksumSha256}, parent_artifact_id = #{parentArtifactId}, source = #{source},
+    source_ref = #{sourceRef}, expires_at = #{expiresAt}, updated_at = #{updatedAt}, deleted_at = #{deletedAt},
+    version = version + 1
+WHERE owner_key = #{ownerKey} AND artifact_id = #{artifactId} AND version = #{version}
+  </update>
+
+  <insert id="updateAddReference" >
+    INSERT INTO ha_conversation_history (
+    owner_key, session_id, turn_id, record_type, record_id, artifact_id, artifact_role,
+    payload_json, created_at, updated_at
+) VALUES (#{ownerKey}, #{sessionId}, #{turnId}, 'ARTIFACT_REFERENCE', #{recordId}, #{artifactId}, #{artifactRole}, #{payloadJson}, #{createdAt}, #{updatedAt})
+  </insert>
+
+  <select id="selectAddReference" resultType="dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow">
+    SELECT * FROM ha_conversation_history
+WHERE owner_key = #{ownerKey} AND record_type = 'ARTIFACT_REFERENCE' AND record_id = #{recordId}
+  </select>
+
+  <resultMap id="selectAttachToUserMessageResult" type="java.util.LinkedHashMap" autoMapping="true">
+    <result column="history_sequence" property="history_sequence" javaType="java.lang.Long"/>
+    <result column="owner_key" property="owner_key" javaType="java.lang.String"/>
+    <result column="session_id" property="session_id" javaType="java.lang.String"/>
+    <result column="turn_id" property="turn_id" javaType="java.lang.String"/>
+    <result column="record_type" property="record_type" javaType="java.lang.String"/>
+    <result column="record_id" property="record_id" javaType="java.lang.String"/>
+    <result column="payload_json" property="payload_json" javaType="java.lang.String"/>
+  </resultMap>
+
+  <select id="selectAttachToUserMessage" resultMap="selectAttachToUserMessageResult">
+    SELECT history_sequence, record_id, payload_json FROM ha_conversation_history
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND turn_id = #{turnId} AND record_type = 'MESSAGE'
+ORDER BY history_sequence
+  </select>
+
+  <select id="selectAttachToUserMessage2" resultType="java.lang.String">
+    SELECT payload_json FROM ha_conversation_history
+WHERE history_sequence = #{historySequence} AND owner_key = #{ownerKey} AND record_type = 'MESSAGE' FOR UPDATE
+  </select>
+
+  <update id="updateAttachToUserMessage" >
+    UPDATE ha_conversation_history SET payload_json = #{payloadJson}
+WHERE owner_key = #{ownerKey} AND record_type = 'MESSAGE' AND record_id = #{recordId}
+  </update>
+
+  <select id="selectListReferences" resultType="dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow">
+    SELECT * FROM ha_conversation_history
+WHERE owner_key = #{ownerKey} AND artifact_id = #{artifactId} AND record_type = 'ARTIFACT_REFERENCE'
+ORDER BY created_at, record_id
+  </select>
+
+  <select id="selectListReferencesForSession" resultType="dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow">
+    SELECT * FROM ha_conversation_history
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND record_type = 'ARTIFACT_REFERENCE'
+ORDER BY created_at, record_id
+  </select>
+  <select id="selectReady" resultType="dev.horizen.agent.storage.jdbc.model.ArtifactRow" >
+SELECT a.* FROM ha_artifact a JOIN (
+SELECT artifact_id, MAX(created_at) AS last_used FROM ha_conversation_history
+WHERE owner_key=#{p0} AND session_id=#{p1} AND record_type='ARTIFACT_REFERENCE'
+<if test="outputsOnly">AND artifact_role='OUTPUT'</if>
+GROUP BY artifact_id) h ON a.artifact_id=h.artifact_id
+WHERE a.owner_key=#{p2} AND a.status=#{p3}
+ORDER BY h.last_used DESC,a.artifact_id DESC LIMIT #{p4} OFFSET #{p5}
+  </select>
+</mapper>

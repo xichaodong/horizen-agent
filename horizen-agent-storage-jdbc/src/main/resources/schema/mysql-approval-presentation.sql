@@ -1,0 +1,2 @@
+-- Retired: approval presentation is now part of ha_interaction.request_json.
+-- Existing installations: see mysql-interaction.sql and mysql-interaction-upgrade.sql.

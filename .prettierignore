@@ -1,0 +1,23 @@
+.git/
+.idea/
+.vscode/
+.agentscope/
+**/.agentscope/
+.env
+.env.*
+**/.env
+**/.env.*
+**/target/
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/package-lock.json
+**/*.md
+**/*.svg
+LICENSE
+NOTICE
+mvnw
+mvnw.cmd
+# Dynamic MyBatis SQL text is not handled by the generic XML formatter.
+**/src/main/resources/mapper/*.xml
+!/.env.yml.example

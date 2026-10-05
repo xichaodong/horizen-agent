@@ -1,0 +1,29 @@
+name: Bug report
+description: Report reproducible behavior using synthetic data.
+title: '[Bug] '
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Use synthetic data. Do not include API keys, private endpoints or user transcripts.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Version and environment
+      description: Commit/tag, OS, JDK, Node.js and relevant adapter mode.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized diagnostics
+      description: Remove credentials and personal data before sharing logs.

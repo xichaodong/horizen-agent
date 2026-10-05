@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>dev.horizen</groupId>
+        <artifactId>horizen-agent-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>horizen-agent-examples</artifactId>
+    <name>Horizen Agent :: Examples</name>
+    <properties>
+        <trace.file>${maven.multiModuleProjectDirectory}/target/traces/demo.jsonl</trace.file>
+        <demo.mode>success</demo.mode>
+        <demo.mainClass>dev.horizen.agent.examples.ObservabilityDemo</demo.mainClass>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>dev.horizen</groupId>
+            <artifactId>horizen-agent-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>dev.horizen</groupId>
+            <artifactId>horizen-agent-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.horizen</groupId>
+            <artifactId>horizen-agent-observability-horizen</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.agentscope</groupId>
+            <artifactId>agentscope-extensions-model-openai</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.17</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <!-- 使用独立 JVM，避免 AgentScope 关闭钩子依赖 Maven 的类加载器。 -->
+                    <executable>${java.home}/bin/java</executable>
+                    <arguments>
+                        <argument>-classpath</argument>
+                        <classpath />
+                        <argument>${demo.mainClass}</argument>
+                        <argument>${trace.file}</argument>
+                        <argument>${demo.mode}</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

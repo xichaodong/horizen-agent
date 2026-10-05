@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.horizen.agent.storage.jdbc.mapper.SessionWorkspaceReleaseMapper">
+  <update id="updateBindIfAbsent" >
+    UPDATE ha_session
+SET project_id = #{projectId}, agent_key = #{agentKey}, workspace_release_id = #{workspaceReleaseId}, workspace_release_hash = #{workspaceReleaseHash},
+    version = version + 1
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND status = 'ACTIVE'
+  AND project_id IS NULL AND agent_key IS NULL
+  AND workspace_release_id IS NULL AND workspace_release_hash IS NULL
+  </update>
+  <select id="selectBinding" resultType="dev.horizen.agent.storage.jdbc.model.SessionRow" >
+SELECT project_id,agent_key,workspace_release_id,workspace_release_hash FROM ha_session WHERE owner_key=#{ownerKey} AND session_id=#{sessionId}
+  </select>
+</mapper>

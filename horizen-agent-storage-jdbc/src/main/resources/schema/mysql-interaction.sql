@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS ha_interaction (
+    owner_key VARCHAR(191) NOT NULL,
+    interaction_type VARCHAR(32) NOT NULL,
+    interaction_id VARCHAR(191) NOT NULL,
+    session_id VARCHAR(191) NOT NULL,
+    turn_id VARCHAR(191) NOT NULL,
+    reply_id VARCHAR(191),
+    tool_call_id VARCHAR(191) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    request_json LONGTEXT NOT NULL,
+    response_json LONGTEXT NOT NULL,
+    expires_at TIMESTAMP(6),
+    resolved_at TIMESTAMP(6),
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
+    PRIMARY KEY (owner_key, interaction_type, interaction_id),
+    UNIQUE KEY uk_ha_interaction_tool (owner_key, turn_id, interaction_type, tool_call_id),
+    KEY idx_ha_interaction_pending (owner_key, session_id, turn_id, interaction_type, status, created_at)
+);

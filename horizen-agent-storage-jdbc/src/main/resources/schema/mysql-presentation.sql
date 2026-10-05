@@ -1,0 +1,4 @@
+-- Retired: messages, timeline facts and cards now share ha_conversation_history.
+-- New databases: run mysql.sql.
+-- Existing databases: run mysql-conversation-history.sql then mysql-conversation-history-upgrade.sql
+-- with all Agent instances stopped.

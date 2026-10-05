@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.horizen.agent.storage.jdbc.mapper.WorkspaceDocumentMapper">
+  <select id="selectMetadata" resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceFileRow">
+    SELECT * FROM ha_workspace_file WHERE owner_key=#{ownerKey} AND agent_key=#{agentKey} AND scope_key=#{scopeKey} AND path_hash=#{pathHash}
+  </select>
+
+  <select id="selectList" resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceFileRow">
+    SELECT * FROM ha_workspace_file WHERE owner_key=#{ownerKey} AND agent_key=#{agentKey} AND scope_key=#{scopeKey}
+AND file_path LIKE #{filePath} ORDER BY file_path LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <select id="selectHasAppendOperation" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM ha_workspace_operation WHERE owner_key=#{ownerKey} AND agent_key=#{agentKey} AND scope_key=#{scopeKey} AND path_hash=#{pathHash} AND operation_id=#{operationId}
+  </select>
+
+  <delete id="updateDelete" >
+    DELETE FROM ha_workspace_file WHERE owner_key=#{ownerKey} AND agent_key=#{agentKey} AND scope_key=#{scopeKey} AND path_hash=#{pathHash} AND version=#{version}
+  </delete>
+
+  <insert id="updateInsert" >
+    INSERT INTO ha_workspace_file (owner_key,agent_key,scope_key,workspace_area,file_kind,write_policy,
+    path_hash,file_path,content_ref,checksum_sha256,size_bytes,version,created_at,updated_at)
+VALUES (#{ownerKey},#{agentKey},#{scopeKey},#{workspaceArea},#{fileKind},#{writePolicy},#{pathHash},#{filePath},#{contentRef},#{checksumSha256},#{sizeBytes},1,#{createdAt},#{updatedAt})
+  </insert>
+
+  <update id="updateUpdate" >
+    UPDATE ha_workspace_file SET content_ref=#{contentRef},checksum_sha256=#{checksumSha256},size_bytes=#{sizeBytes},version=version+1,updated_at=#{updatedAt}
+WHERE owner_key=#{ownerKey} AND agent_key=#{agentKey} AND scope_key=#{scopeKey} AND path_hash=#{pathHash} AND version=#{version}
+  </update>
+
+  <insert id="updateLog" >
+    INSERT INTO ha_workspace_operation (owner_key,agent_key,scope_key,path_hash,file_path,operation_id,
+    operation_type,actor_type,session_id,turn_id,tool_call_id,change_json,applied_version,created_at,
+    actor_id,before_version,after_version,before_ref,after_ref,before_checksum,after_checksum,before_size,after_size)
+VALUES (#{ownerKey},#{agentKey},#{scopeKey},#{pathHash},#{filePath},#{operationId},#{operationType},#{actorType},#{sessionId},#{turnId},#{toolCallId},#{changeJson},#{appliedVersion},#{createdAt},#{actorId},#{beforeVersion},#{afterVersion},#{beforeRef},#{afterRef},#{beforeChecksum},#{afterChecksum},#{beforeSize},#{afterSize})
+  </insert>
+</mapper>

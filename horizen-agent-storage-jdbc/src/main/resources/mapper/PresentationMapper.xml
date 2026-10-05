@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.horizen.agent.storage.jdbc.mapper.PresentationMapper">
+  <insert id="updateCreateOrFind" >
+    INSERT INTO ha_conversation_history (
+    owner_key, session_id, turn_id, record_type, record_id,
+    payload_json, created_at, updated_at
+) VALUES (#{ownerKey}, #{sessionId}, #{turnId}, 'PRESENTATION', #{recordId}, #{payloadJson}, #{createdAt}, #{updatedAt})
+  </insert>
+
+  <select id="selectFind" resultType="dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow">
+    SELECT * FROM ha_conversation_history
+WHERE owner_key = #{ownerKey} AND record_type = 'PRESENTATION' AND record_id = #{recordId}
+  </select>
+
+  <select id="selectListForSession" resultType="dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow">
+    SELECT * FROM ha_conversation_history
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND record_type = 'PRESENTATION'
+ORDER BY history_sequence
+  </select>
+</mapper>

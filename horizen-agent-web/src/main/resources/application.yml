@@ -1,0 +1,202 @@
+spring:
+  config:
+    # 从仓库根目录或 Web 模块启动时读取同一份本地配置。
+    # .example 模板不会自动导入。
+    import: '${horizen.local-config:optional:file:../.env.yml,optional:file:.env.yml}'
+  servlet:
+    multipart:
+      # 单文件上限沿用 Artifact 配置；请求上限额外留出 multipart 头部空间。
+      max-file-size: '${horizen.agent.artifact.bos.max-object-bytes:104857600}B'
+      max-request-size: 105MB
+
+server:
+  address: 127.0.0.1
+  port: ${AGENT_WEB_PORT:8787}
+  tomcat:
+    # 在请求容量范围内读完被拒绝的正文，保证客户端可以收到 413。
+    max-swallow-size: '${spring.servlet.multipart.max-request-size:105MB}'
+
+horizen:
+  trace:
+    enabled: ${HORIZEN_TRACE_ENABLED:false}
+    base-url: ${HORIZEN_TRACE_BASE_URL:${HORIZEN_BASE_URL:}}
+    project-id: ${HORIZEN_TRACE_PROJECT_ID:${HORIZEN_PROJECT_ID:}}
+    token: ${HORIZEN_TRACE_TOKEN:${HORIZEN_TOKEN:}}
+    source: ${HORIZEN_TRACE_SOURCE:horizen-agent-web}
+    agent-name: ${HORIZEN_TRACE_AGENT_NAME:horizen-web-agent}
+    executor-name: ${HORIZEN_TRACE_EXECUTOR_NAME:horizen-agent-web}
+    environment: ${HORIZEN_TRACE_ENV:${HORIZEN_ENV:${HORIZEN_ENVIRONMENT:}}}
+    max-retries: ${HORIZEN_TRACE_MAX_RETRIES:2}
+    retry-initial-delay: ${HORIZEN_TRACE_RETRY_INITIAL_DELAY_MS:100}ms
+    retry-max-delay: ${HORIZEN_TRACE_RETRY_MAX_DELAY_MS:1000}ms
+    capture-content: ${HORIZEN_TRACE_CONTENT:false}
+    request-timeout: ${HORIZEN_TRACE_REQUEST_TIMEOUT:3s}
+    flush-interval: ${HORIZEN_TRACE_FLUSH_INTERVAL:${HORIZEN_TRACE_FLUSH_INTERVAL_MS:1000}ms}
+    queue-capacity: ${HORIZEN_TRACE_MAX_QUEUE_SIZE:2048}
+    shutdown-timeout: ${HORIZEN_TRACE_SHUTDOWN_TIMEOUT:3s}
+  agent:
+    workspace-management:
+      enabled: ${HORIZEN_WORKSPACE_MANAGEMENT_ENABLED:false}
+      token: ${HORIZEN_WORKSPACE_MANAGEMENT_TOKEN:}
+      project-ids: ${HORIZEN_WORKSPACE_MANAGEMENT_PROJECT_IDS:}
+    workspace-release:
+      source: ${HORIZEN_WORKSPACE_RELEASE_SOURCE:REMOTE}
+      enabled: ${HORIZEN_WORKSPACE_RELEASE_ENABLED:false}
+      endpoint: ${HORIZEN_WORKSPACE_RELEASE_ENDPOINT:}
+      project-id: ${HORIZEN_WORKSPACE_PROJECT_ID:0}
+      agent-key: horizen-web-agent
+      token: ${HORIZEN_WORKSPACE_RUNTIME_TOKEN:}
+      artifact-hosts: ${HORIZEN_WORKSPACE_ARTIFACT_HOSTS:}
+      allow-http: ${HORIZEN_WORKSPACE_ALLOW_HTTP:false}
+      request-timeout: 15s
+      cache-directory: ${HORIZEN_WORKSPACE_CACHE_DIRECTORY:.agentscope/agent-publications}
+      max-cache-bytes: 1073741824
+      max-concurrent-executions: 8
+    api-key: ${ARK_API_KEY:}
+    base-url: ${ARK_BASE_URL:https://ark.cn-beijing.volces.com/api/v3}
+    model-name: ${ARK_MODEL:deepseek-v4-1-flash-260910}
+    model-mode: ${AGENT_MODEL_MODE:REMOTE}
+    max-iters: ${AGENT_MAX_ITERS:10}
+    stream-timeout: ${AGENT_STREAM_TIMEOUT:10m}
+    idle-timeout: ${AGENT_IDLE_TIMEOUT:2m}
+    sse:
+      heartbeat-interval: ${AGENT_SSE_HEARTBEAT_INTERVAL:15s}
+      max-queue-wait: ${AGENT_SSE_MAX_QUEUE_WAIT:10s}
+      max-connections: ${AGENT_SSE_MAX_CONNECTIONS:512}
+      outbound-max-events: ${AGENT_SSE_OUTBOUND_MAX_EVENTS:256}
+      outbound-max-bytes: ${AGENT_SSE_OUTBOUND_MAX_BYTES:262144}
+      writer-core-threads: ${AGENT_SSE_WRITER_CORE_THREADS:4}
+      writer-max-threads: ${AGENT_SSE_WRITER_MAX_THREADS:16}
+      writer-queue-capacity: ${AGENT_SSE_WRITER_QUEUE_CAPACITY:512}
+    events:
+      read-batch-size: ${AGENT_EVENT_READ_BATCH_SIZE:256}
+      poll-interval: ${AGENT_EVENT_POLL_INTERVAL:150ms}
+      max-poll-interval: ${AGENT_EVENT_MAX_POLL_INTERVAL:1s}
+      write-timeout: ${AGENT_EVENT_WRITE_TIMEOUT:3s}
+      missing-log-empty-reads: ${AGENT_EVENT_MISSING_LOG_EMPTY_READS:3}
+      max-event-bytes: ${AGENT_EVENT_MAX_EVENT_BYTES:262144}
+      max-turn-bytes: ${AGENT_EVENT_MAX_TURN_BYTES:8388608}
+      max-turn-events: ${AGENT_EVENT_MAX_TURN_EVENTS:32768}
+    multimodal:
+      direct-image-input-enabled: ${AGENT_MULTIMODAL_DIRECT_IMAGE_INPUT_ENABLED:true}
+      max-images-per-turn: ${AGENT_MULTIMODAL_MAX_IMAGES:5}
+      max-image-bytes: ${AGENT_MULTIMODAL_MAX_IMAGE_BYTES:10485760}
+      max-total-image-bytes: ${AGENT_MULTIMODAL_MAX_TOTAL_IMAGE_BYTES:20971520}
+      image-url-expires-seconds: ${AGENT_MULTIMODAL_IMAGE_URL_EXPIRES_SECONDS:3600}
+    context:
+      compaction-enabled: ${AGENT_CONTEXT_COMPACTION_ENABLED:true}
+      model-context-window-tokens: ${AGENT_MODEL_CONTEXT_WINDOW_TOKENS:0}
+      compression-model-name: ${AGENT_COMPRESSION_MODEL:}
+      compression-model-base-url: ${AGENT_COMPRESSION_BASE_URL:}
+      compression-model-api-key: ${AGENT_COMPRESSION_API_KEY:}
+      compression-model-context-window-tokens: ${AGENT_COMPRESSION_CONTEXT_WINDOW_TOKENS:0}
+      compression-max-output-tokens: ${AGENT_COMPRESSION_MAX_OUTPUT_TOKENS:0}
+      compression-temperature: ${AGENT_COMPRESSION_TEMPERATURE:0}
+      compression-timeout: ${AGENT_COMPRESSION_TIMEOUT:30s}
+      compression-max-attempts: ${AGENT_COMPRESSION_MAX_ATTEMPTS:2}
+      workspace-context-max-tokens: ${AGENT_WORKSPACE_CONTEXT_MAX_TOKENS:8000}
+      protect-head-messages: ${AGENT_CONTEXT_PROTECT_HEAD_MESSAGES:3}
+      max-compactions-per-turn: ${AGENT_CONTEXT_MAX_COMPACTIONS_PER_TURN:1}
+      trigger-messages: ${AGENT_CONTEXT_TRIGGER_MESSAGES:30}
+      trigger-tokens: ${AGENT_CONTEXT_TRIGGER_TOKENS:0}
+      reserved-tokens: ${AGENT_CONTEXT_RESERVED_TOKENS:20000}
+      keep-messages: ${AGENT_CONTEXT_KEEP_MESSAGES:10}
+      keep-tokens: ${AGENT_CONTEXT_KEEP_TOKENS:-1}
+      keep-tokens-min: ${AGENT_CONTEXT_KEEP_TOKENS_MIN:2000}
+      keep-tokens-max: ${AGENT_CONTEXT_KEEP_TOKENS_MAX:8000}
+      keep-tokens-ratio: ${AGENT_CONTEXT_KEEP_TOKENS_RATIO:0.25}
+      flush-before-compact: ${AGENT_CONTEXT_FLUSH_BEFORE_COMPACT:false}
+      offload-before-compact: ${AGENT_CONTEXT_OFFLOAD_BEFORE_COMPACT:false}
+      abort-on-summary-failure: ${AGENT_CONTEXT_ABORT_ON_SUMMARY_FAILURE:false}
+      truncate-arguments-enabled: ${AGENT_CONTEXT_TRUNCATE_ARGUMENTS_ENABLED:false}
+      truncate-arguments-trigger-messages: ${AGENT_CONTEXT_TRUNCATE_ARGUMENTS_TRIGGER_MESSAGES:25}
+      truncate-arguments-trigger-tokens: ${AGENT_CONTEXT_TRUNCATE_ARGUMENTS_TRIGGER_TOKENS:40000}
+      truncate-arguments-keep-messages: ${AGENT_CONTEXT_TRUNCATE_ARGUMENTS_KEEP_MESSAGES:20}
+      truncate-arguments-keep-tokens: ${AGENT_CONTEXT_TRUNCATE_ARGUMENTS_KEEP_TOKENS:0}
+      truncate-arguments-max-length: ${AGENT_CONTEXT_TRUNCATE_ARGUMENTS_MAX_LENGTH:2000}
+      prune-tool-results-enabled: ${AGENT_CONTEXT_PRUNE_TOOL_RESULTS_ENABLED:true}
+      prune-protect-tokens: ${AGENT_CONTEXT_PRUNE_PROTECT_TOKENS:40000}
+      prune-minimum-tokens: ${AGENT_CONTEXT_PRUNE_MINIMUM_TOKENS:20000}
+      prune-max-output-chars: ${AGENT_CONTEXT_PRUNE_MAX_OUTPUT_CHARS:2000}
+      prune-excluded-tools: ${AGENT_CONTEXT_PRUNE_EXCLUDED_TOOLS:read_file,memory_search,memory_get,session_search}
+      tool-result-eviction-enabled: ${AGENT_CONTEXT_TOOL_RESULT_EVICTION_ENABLED:false}
+      tool-result-eviction-max-chars: ${AGENT_CONTEXT_TOOL_RESULT_EVICTION_MAX_CHARS:80000}
+      tool-result-eviction-preview-chars: ${AGENT_CONTEXT_TOOL_RESULT_EVICTION_PREVIEW_CHARS:2000}
+      tool-result-eviction-path: ${AGENT_CONTEXT_TOOL_RESULT_EVICTION_PATH:large_tool_results}
+      overflow-recovery-enabled: ${AGENT_CONTEXT_OVERFLOW_RECOVERY_ENABLED:true}
+      overflow-keep-messages: ${AGENT_CONTEXT_OVERFLOW_KEEP_MESSAGES:1}
+    identity:
+      owner-key: ${AGENT_OWNER_KEY:web-tester}
+      actor-id: ${AGENT_ACTOR_ID:web-tester}
+    storage:
+      mode: ${AGENT_STORAGE_MODE:LOCAL}
+      jdbc-url: ${AGENT_JDBC_URL:}
+      jdbc-username: ${AGENT_JDBC_USERNAME:}
+      jdbc-password: ${AGENT_JDBC_PASSWORD:}
+      jdbc-maximum-pool-size: ${AGENT_JDBC_MAX_POOL_SIZE:10}
+      redis-maximum-pool-size: ${AGENT_REDIS_MAX_POOL_SIZE:8}
+      redis-url: ${AGENT_REDIS_URL:}
+      redis-key-prefix: ${AGENT_REDIS_KEY_PREFIX:horizen-agent:}
+      instance-id: ${AGENT_INSTANCE_ID:}
+      event-ttl: ${AGENT_EVENT_TTL:15m}
+      session-state-ttl: ${AGENT_SESSION_STATE_TTL:24h}
+      lease-ttl: ${AGENT_LEASE_TTL:30s}
+      lease-heartbeat: ${AGENT_LEASE_HEARTBEAT:10s}
+      control-poll-interval: ${AGENT_CONTROL_POLL_INTERVAL:500ms}
+      lease-renewal:
+        batch-size: ${AGENT_LEASE_RENEWAL_BATCH_SIZE:50}
+        concurrency: ${AGENT_LEASE_RENEWAL_CONCURRENCY:2}
+        retries: ${AGENT_LEASE_RENEWAL_RETRIES:1}
+        retry-delay: ${AGENT_LEASE_RENEWAL_RETRY_DELAY:1s}
+        query-timeout: ${AGENT_LEASE_RENEWAL_QUERY_TIMEOUT:3s}
+        connection-acquire-timeout: ${AGENT_LEASE_RENEWAL_CONNECTION_TIMEOUT:3s}
+    workspace-storage:
+      endpoint: ${HORIZEN_BOS_ENDPOINT:${horizen.agent.artifact.bos.endpoint:}}
+      bucket: ${HORIZEN_BOS_BUCKET:${horizen.agent.artifact.bos.bucket:}}
+      access-key: ${HORIZEN_BOS_ACCESS_KEY:${horizen.agent.artifact.bos.access-key:}}
+      secret-key: ${HORIZEN_BOS_SECRET_KEY:${horizen.agent.artifact.bos.secret-key:}}
+      key-prefix: ${HORIZEN_WORKSPACE_FILES_PREFIX:agentFiles/horizen-workspace-files}
+      max-file-bytes: ${HORIZEN_WORKSPACE_FILE_MAX_BYTES:10485760}
+    artifact:
+      bos:
+        enabled: ${HORIZEN_BOS_ENABLED:false}
+        endpoint: ${HORIZEN_BOS_ENDPOINT:}
+        bucket: ${HORIZEN_BOS_BUCKET:}
+        access-key: ${HORIZEN_BOS_ACCESS_KEY:}
+        secret-key: ${HORIZEN_BOS_SECRET_KEY:}
+        key-prefix: ${HORIZEN_BOS_PREFIX:agentFiles/horizen-artifacts}
+        max-object-bytes: ${HORIZEN_BOS_MAX_OBJECT_BYTES:104857600}
+    gateway:
+      mode: ${AGENT_TOOL_GATEWAY_MODE:remote}
+      fixture-file: ${AGENT_TOOL_GATEWAY_FIXTURE:.agentscope/web-workspace/mock-gateway.json}
+      url: ${AGENT_TOOL_GATEWAY_URL:}
+      token: ${AGENT_TOOL_GATEWAY_TOKEN:}
+      timeout: ${AGENT_TOOL_GATEWAY_TIMEOUT:30s}
+      allowed-tools: ${AGENT_TOOL_GATEWAY_ALLOWED_TOOLS:}
+    skill-release:
+      enabled: ${HORIZEN_SKILL_RELEASE_ENABLED:false}
+    sandbox:
+      snapshot:
+        bos:
+          enabled: ${HORIZEN_SNAPSHOT_ENABLED:false}
+          endpoint: ${HORIZEN_BOS_ENDPOINT:${horizen.agent.artifact.bos.endpoint:}}
+          bucket: ${HORIZEN_BOS_BUCKET:${horizen.agent.artifact.bos.bucket:}}
+          access-key: ${HORIZEN_BOS_ACCESS_KEY:${horizen.agent.artifact.bos.access-key:}}
+          secret-key: ${HORIZEN_BOS_SECRET_KEY:${horizen.agent.artifact.bos.secret-key:}}
+          key-prefix: ${HORIZEN_SNAPSHOT_PREFIX:agentFiles/horizen-sandbox-snapshots}
+          max-archive-bytes: ${HORIZEN_SNAPSHOT_MAX_BYTES:67108864}
+          max-entries: ${HORIZEN_SNAPSHOT_MAX_ENTRIES:10000}
+          concurrency: ${HORIZEN_SNAPSHOT_CONCURRENCY:2}
+          timeout-seconds: ${HORIZEN_SNAPSHOT_TIMEOUT_SECONDS:120}
+      e2b:
+        enabled: ${AGENT_E2B_ENABLED:false}
+        api-key: ${AGENT_E2B_API_KEY:}
+        api-base-url: ${AGENT_E2B_API_BASE_URL:}
+        runtime-base-url-pattern: ${AGENT_E2B_RUNTIME_BASE_URL_PATTERN:}
+        template-id: ${AGENT_E2B_TEMPLATE_ID:}
+        workspace-root: ${AGENT_E2B_WORKSPACE_ROOT:/tmp/horizen-agent}
+        sandbox-timeout-seconds: ${AGENT_E2B_SANDBOX_TIMEOUT_SECONDS:300}
+        isolation-scope: ${AGENT_E2B_ISOLATION_SCOPE:SESSION}
+        connect-timeout-seconds: ${AGENT_E2B_CONNECT_TIMEOUT_SECONDS:30}
+        read-timeout-seconds: ${AGENT_E2B_READ_TIMEOUT_SECONDS:120}
+        max-output-bytes: ${AGENT_E2B_MAX_OUTPUT_BYTES:524288}

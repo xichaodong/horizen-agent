@@ -1,0 +1,4 @@
+-- Retired inline schema. New installations use mysql.sql.
+-- Existing installations create mysql-workspace-file.sql, then run the explicit Java
+-- JdbcWorkspaceFileMigration with the configured cloud content provider. The migration is
+-- restartable and preserves these source tables for verification and later archival.

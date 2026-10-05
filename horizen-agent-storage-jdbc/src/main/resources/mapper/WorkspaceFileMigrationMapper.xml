@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.horizen.agent.storage.jdbc.mapper.WorkspaceFileMigrationMapper">
+  <select id="selectMigrateBatch" resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceDocumentRow">
+    SELECT d.* FROM ha_workspace_document d
+LEFT JOIN ha_workspace_file f ON f.owner_key=d.owner_key AND f.agent_key=d.agent_key
+    AND f.scope_key=d.scope_key AND f.path_hash=d.path_hash
+WHERE f.path_hash IS NULL AND NOT (d.document_path LIKE 'memory/%' AND EXISTS (
+    SELECT 1 FROM ha_workspace_operation o WHERE o.owner_key=d.owner_key AND o.agent_key=d.agent_key
+        AND o.scope_key=d.scope_key AND o.file_path=d.document_path
+        AND o.operation_type='LEGACY_DAILY_IMPORT'))
+ORDER BY d.owner_key,d.agent_key,d.scope_key,d.document_path LIMIT #{limit}
+  </select>
+
+  <insert id="updateMigrateFile" >
+    INSERT INTO ha_workspace_file(owner_key,agent_key,scope_key,workspace_area,file_kind,write_policy,
+    path_hash,file_path,content_ref,checksum_sha256,size_bytes,version,created_at,updated_at)
+VALUES (#{ownerKey},#{agentKey},#{scopeKey},#{workspaceArea},#{fileKind},#{writePolicy},#{pathHash},#{filePath},#{contentRef},#{checksumSha256},#{sizeBytes},#{version},#{createdAt},#{updatedAt})
+  </insert>
+
+  <resultMap id="selectMigrateOperationIdsResult" type="java.util.LinkedHashMap" autoMapping="true">
+
+  </resultMap>
+
+  <select id="selectMigrateOperationIds" resultMap="selectMigrateOperationIdsResult">
+    SELECT operation_id,applied_version,created_at FROM ha_workspace_document_append
+WHERE owner_key=#{ownerKey} AND agent_key=#{agentKey} AND scope_key=#{scopeKey} AND path_hash=#{pathHash}
+  </select>
+
+  <insert id="updateMigrateOperationIds" >
+    INSERT INTO ha_workspace_operation(owner_key,agent_key,scope_key,path_hash,file_path,
+    operation_id,operation_type,actor_type,session_id,turn_id,tool_call_id,change_json,applied_version,created_at)
+VALUES (#{ownerKey},#{agentKey},#{scopeKey},#{pathHash},#{filePath},#{operationId},'LEGACY_OPERATION','SYSTEM',NULL,NULL,NULL,'{}',#{appliedVersion},#{createdAt})
+  </insert>
+
+  <insert id="updateInsertAudit" >
+    INSERT INTO ha_workspace_operation(owner_key,agent_key,scope_key,path_hash,file_path,
+    operation_id,operation_type,actor_type,session_id,turn_id,tool_call_id,change_json,applied_version,created_at)
+VALUES (#{ownerKey},#{agentKey},#{scopeKey},#{pathHash},#{filePath},#{operationId},#{operationType},'SYSTEM',NULL,NULL,NULL,#{changeJson},#{appliedVersion},#{createdAt})
+  </insert>
+</mapper>

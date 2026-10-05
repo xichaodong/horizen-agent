@@ -1,0 +1,191 @@
+CREATE TABLE ha_session (
+    owner_key VARCHAR(191) NOT NULL,
+    session_id VARCHAR(191) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    active_turn_id VARCHAR(191),
+    snapshot_id VARCHAR(160),
+    project_id BIGINT,
+    agent_key VARCHAR(128),
+    workspace_release_id BIGINT,
+    workspace_release_hash CHAR(64),
+    created_by VARCHAR(191) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    pinned BOOLEAN NOT NULL DEFAULT FALSE,
+    last_message_at TIMESTAMP(6) NOT NULL,
+    next_message_sequence BIGINT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
+    PRIMARY KEY (owner_key, session_id),
+    KEY idx_ha_session_catalog (
+        owner_key, status, pinned, last_message_at, session_id
+    )
+);
+
+CREATE TABLE ha_turn (
+    owner_key VARCHAR(191) NOT NULL,
+    turn_id VARCHAR(191) NOT NULL,
+    session_id VARCHAR(191) NOT NULL,
+    request_id VARCHAR(191) NOT NULL,
+    actor_id VARCHAR(191) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    executor_id VARCHAR(191),
+    started_at TIMESTAMP(6) NOT NULL,
+    finished_at TIMESTAMP(6),
+    deadline_at TIMESTAMP(6) NOT NULL,
+    lease_expires_at TIMESTAMP(6),
+    failure_code VARCHAR(191),
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
+    PRIMARY KEY (owner_key, turn_id),
+    UNIQUE KEY uk_ha_turn_request (owner_key, session_id, request_id),
+    KEY idx_ha_turn_session_time (owner_key, session_id, created_at),
+    KEY idx_ha_turn_lease (status, lease_expires_at)
+);
+
+CREATE TABLE ha_conversation_history (
+    history_sequence BIGINT NOT NULL AUTO_INCREMENT,
+    owner_key VARCHAR(191) NOT NULL,
+    session_id VARCHAR(191) NOT NULL,
+    turn_id VARCHAR(191) NOT NULL,
+    record_type VARCHAR(32) NOT NULL,
+    record_id VARCHAR(191) NOT NULL,
+    message_sequence BIGINT,
+    artifact_id VARCHAR(191),
+    artifact_role VARCHAR(32),
+    payload_json LONGTEXT NOT NULL,
+    timeline_sequence BIGINT,
+    timeline_payload_json LONGTEXT,
+    timeline_created_at TIMESTAMP(6),
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    PRIMARY KEY (history_sequence),
+    UNIQUE KEY uk_ha_history_record (owner_key, record_type, record_id),
+    UNIQUE KEY uk_ha_history_message (owner_key, session_id, message_sequence),
+    KEY idx_ha_history_session (owner_key, session_id, history_sequence),
+    KEY idx_ha_history_timeline (owner_key, session_id, timeline_sequence),
+    KEY idx_ha_history_turn (owner_key, turn_id, record_type),
+    KEY idx_ha_history_artifact (owner_key, artifact_id, created_at),
+    KEY idx_ha_history_artifact_session (owner_key, session_id, record_type, artifact_role, created_at)
+);
+
+CREATE TABLE ha_interaction (
+    owner_key VARCHAR(191) NOT NULL,
+    interaction_type VARCHAR(32) NOT NULL,
+    interaction_id VARCHAR(191) NOT NULL,
+    session_id VARCHAR(191) NOT NULL,
+    turn_id VARCHAR(191) NOT NULL,
+    reply_id VARCHAR(191),
+    tool_call_id VARCHAR(191) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    request_json LONGTEXT NOT NULL,
+    response_json LONGTEXT NOT NULL,
+    expires_at TIMESTAMP(6),
+    resolved_at TIMESTAMP(6),
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
+    PRIMARY KEY (owner_key, interaction_type, interaction_id),
+    UNIQUE KEY uk_ha_interaction_tool (owner_key, turn_id, interaction_type, tool_call_id),
+    KEY idx_ha_interaction_pending (owner_key, session_id, turn_id, interaction_type, status, created_at)
+);
+
+CREATE TABLE ha_artifact (
+    owner_key VARCHAR(191) NOT NULL,
+    artifact_id VARCHAR(191) NOT NULL,
+    kind VARCHAR(32) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    title VARCHAR(512) NOT NULL,
+    media_type VARCHAR(255),
+    content_ref LONGTEXT,
+    size_bytes BIGINT,
+    checksum_sha256 CHAR(64),
+    parent_artifact_id VARCHAR(191),
+    source VARCHAR(32) NOT NULL,
+    source_ref VARCHAR(512),
+    expires_at TIMESTAMP(6),
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    deleted_at TIMESTAMP(6),
+    version BIGINT NOT NULL DEFAULT 0,
+    PRIMARY KEY (owner_key, artifact_id),
+    KEY idx_ha_artifact_parent (owner_key, parent_artifact_id),
+    KEY idx_ha_artifact_expiry (status, expires_at)
+);
+
+CREATE TABLE ha_workspace_file (
+    owner_key VARCHAR(191) NOT NULL,
+    agent_key VARCHAR(128) NOT NULL,
+    scope_key VARCHAR(160) NOT NULL,
+    workspace_area VARCHAR(32) NOT NULL DEFAULT 'USER',
+    file_kind VARCHAR(32) NOT NULL DEFAULT 'DOCUMENT',
+    write_policy VARCHAR(32) NOT NULL DEFAULT 'AGENT',
+    path_hash CHAR(64) NOT NULL,
+    file_path VARCHAR(512) NOT NULL,
+    content_ref VARCHAR(1024) NOT NULL,
+    media_type VARCHAR(255) NOT NULL DEFAULT 'text/plain; charset=utf-8',
+    checksum_sha256 CHAR(64) NOT NULL,
+    size_bytes BIGINT NOT NULL,
+    version BIGINT NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    PRIMARY KEY (owner_key, agent_key, scope_key, path_hash)
+);
+
+CREATE TABLE ha_workspace_operation (
+    owner_key VARCHAR(191) NOT NULL,
+    agent_key VARCHAR(128) NOT NULL,
+    scope_key VARCHAR(160) NOT NULL,
+    path_hash CHAR(64) NOT NULL,
+    file_path VARCHAR(512) NOT NULL,
+    operation_id VARCHAR(191) NOT NULL,
+    operation_type VARCHAR(32) NOT NULL,
+    actor_type VARCHAR(32) NOT NULL DEFAULT 'AGENT',
+    audit_sequence BIGINT NOT NULL AUTO_INCREMENT,
+    actor_id VARCHAR(191),
+    before_version BIGINT,
+    after_version BIGINT,
+    before_ref VARCHAR(1024),
+    after_ref VARCHAR(1024),
+    before_checksum CHAR(64),
+    after_checksum CHAR(64),
+    before_size BIGINT,
+    after_size BIGINT,
+    media_type VARCHAR(255) NOT NULL DEFAULT 'text/plain; charset=utf-8',
+    session_id VARCHAR(191),
+    turn_id VARCHAR(191),
+    tool_call_id VARCHAR(191),
+    change_json LONGTEXT NOT NULL,
+    applied_version BIGINT NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    PRIMARY KEY (owner_key, agent_key, scope_key, path_hash, operation_id),
+    KEY idx_ha_workspace_operation_time (owner_key, agent_key, created_at),
+    UNIQUE KEY uk_ha_workspace_audit_sequence (audit_sequence),
+    KEY idx_ha_workspace_audit_file (owner_key,agent_key,scope_key,path_hash,audit_sequence),
+    KEY idx_ha_workspace_audit_scope (owner_key,agent_key,scope_key,audit_sequence)
+);
+
+CREATE TABLE ha_workspace (
+    project_id BIGINT NOT NULL,
+    agent_key VARCHAR(128) NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
+    current_release_id BIGINT,
+    updated_by VARCHAR(191) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    PRIMARY KEY(project_id,agent_key)
+);
+
+CREATE TABLE ha_workspace_release (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    project_id BIGINT NOT NULL,
+    agent_key VARCHAR(128) NOT NULL,
+    release_no BIGINT NOT NULL,
+    release_hash CHAR(64) NOT NULL,
+    manifest_json LONGTEXT NOT NULL,
+    notes VARCHAR(1000) NOT NULL DEFAULT '',
+    created_by VARCHAR(191) NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    PRIMARY KEY(id),
+    UNIQUE KEY uk_ha_workspace_release(project_id,agent_key,release_no)
+);

@@ -1,0 +1,2 @@
+-- Retired: Artifact Session indexes belong to ha_conversation_history.
+-- See mysql-artifact-history-upgrade.sql for existing databases.

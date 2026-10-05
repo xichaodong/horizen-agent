@@ -1,0 +1,12 @@
+Horizen Agent
+Copyright 2026 Horizen Agent contributors
+
+This project depends on AgentScope Java, licensed under Apache-2.0,
+and other open-source dependencies whose notices and licenses remain applicable.
+See THIRD_PARTY_NOTICES.md for dependency sources and attribution guidance.
+
+The generated Maven Wrapper scripts are distributed by the Apache Software
+Foundation under Apache-2.0 and retain their original license headers.
+
+The Horizen console stylesheet and bundled SVG artwork were created for this
+project and are distributed under the project's Apache-2.0 license.

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.horizen.agent.storage.jdbc.mapper.SessionTurnMapper">
+  <insert id="updateStartTurnInTransaction" >
+    INSERT INTO ha_turn (
+    owner_key, turn_id, session_id, request_id, actor_id, status,
+    executor_id, started_at, finished_at, deadline_at, lease_expires_at,
+    failure_code, created_at, updated_at, version
+) VALUES (#{ownerKey}, #{turnId}, #{sessionId}, #{requestId}, #{actorId}, #{status}, #{executorId}, #{startedAt}, NULL, #{deadlineAt}, #{leaseExpiresAt}, NULL, #{createdAt}, #{updatedAt}, 0)
+  </insert>
+
+  <update id="updateStartTurnInTransaction2" >
+    UPDATE ha_session
+SET active_turn_id = #{activeTurnId}, next_message_sequence = #{nextMessageSequence}, last_message_at = #{lastMessageAt},
+    updated_at = #{updatedAt}, version = version + 1
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND active_turn_id IS NULL
+  </update>
+
+  <update id="updateTransitionInTransaction" >
+    UPDATE ha_turn
+SET status = #{status}, executor_id = #{executorId}, lease_expires_at = #{leaseExpiresAt}, finished_at = #{finishedAt},
+    failure_code = #{failureCode}, updated_at = #{updatedAt}, version = version + 1
+WHERE owner_key = #{ownerKey} AND turn_id = #{turnId} AND version = #{version}
+  </update>
+
+  <update id="updateUpdateSessionAfterTransition" >
+    UPDATE ha_session
+SET active_turn_id = NULL, updated_at = #{updatedAt}, version = version + 1
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND active_turn_id = #{activeTurnId}
+  </update>
+
+  <update id="updateUpdateSessionAfterTransition2" >
+    UPDATE ha_session
+SET active_turn_id = NULL, next_message_sequence = #{nextMessageSequence}, last_message_at = #{lastMessageAt},
+    updated_at = #{updatedAt}, version = version + 1
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND active_turn_id = #{activeTurnId}
+  </update>
+
+  <update id="updateUpdateSessionAfterTransition3" >
+    UPDATE ha_session
+SET updated_at = #{updatedAt}, version = version + 1
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND active_turn_id = #{activeTurnId}
+  </update>
+
+  <select id="selectFindSession" resultType="dev.horizen.agent.storage.jdbc.model.SessionRow">
+    SELECT * FROM ha_session WHERE owner_key = #{ownerKey} AND session_id = #{sessionId}
+  </select>
+
+  <select id="selectFindTurn" resultType="dev.horizen.agent.storage.jdbc.model.TurnRow">
+    SELECT * FROM ha_turn WHERE owner_key = #{ownerKey} AND turn_id = #{turnId}
+  </select>
+
+  <select id="selectFindLatestTurn" resultType="dev.horizen.agent.storage.jdbc.model.TurnRow">
+    SELECT * FROM ha_turn
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId}
+ORDER BY created_at DESC
+LIMIT 1
+  </select>
+
+  <select id="selectListSessions" resultType="dev.horizen.agent.storage.jdbc.model.SessionRow">
+    SELECT * FROM ha_session
+WHERE owner_key = #{ownerKey} AND status = #{status}
+ORDER BY pinned DESC, last_message_at DESC, session_id DESC
+LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <update id="updateRenameSession" >
+    UPDATE ha_session
+SET title = #{title}, updated_at = #{updatedAt}, version = version + 1
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND status = #{status}
+  </update>
+
+  <update id="updateSetSessionPinned" >
+    UPDATE ha_session
+SET pinned = #{pinned}, updated_at = #{updatedAt}, version = version + 1
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND status = #{status}
+  </update>
+
+  <update id="updateArchiveSession" >
+    UPDATE ha_session
+SET status = #{status}, pinned = FALSE, updated_at = #{updatedAt}, version = version + 1
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND status = #{status2}
+  AND active_turn_id IS NULL
+  </update>
+
+  <select id="selectListFinalMessages" resultType="dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow">
+    SELECT * FROM ha_conversation_history
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND record_type = 'MESSAGE'
+ORDER BY message_sequence
+  </select>
+
+  <select id="selectFindExpiredLeases" resultType="dev.horizen.agent.storage.jdbc.model.TurnRow">
+    SELECT * FROM ha_turn
+WHERE status IN (#{status}, #{status2}) AND lease_expires_at IS NOT NULL
+  AND lease_expires_at &lt;= #{leaseExpiresAt}
+ORDER BY lease_expires_at
+LIMIT #{limit}
+  </select>
+
+  <select id="selectFindOverdueTurns" resultType="dev.horizen.agent.storage.jdbc.model.TurnRow">
+    SELECT * FROM ha_turn
+WHERE status IN (#{status}, #{status2}, #{status3}, #{status4}) AND deadline_at &lt;= #{deadlineAt}
+ORDER BY deadline_at
+LIMIT #{limit}
+  </select>
+
+  <insert id="updateEnsureSession" >
+    INSERT INTO ha_session (
+    owner_key, session_id, status, active_turn_id, created_by,
+    title, pinned, last_message_at, next_message_sequence,
+    created_at, updated_at, version
+) VALUES (#{ownerKey}, #{sessionId}, #{status}, NULL, #{createdBy}, #{title}, FALSE, #{lastMessageAt}, 1, #{createdAt}, #{updatedAt}, 0)
+  </insert>
+
+  <select id="selectLockSession" resultType="dev.horizen.agent.storage.jdbc.model.SessionRow">
+    SELECT * FROM ha_session WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} FOR UPDATE
+  </select>
+
+  <select id="selectLockTurn" resultType="dev.horizen.agent.storage.jdbc.model.TurnRow">
+    SELECT * FROM ha_turn WHERE owner_key = #{ownerKey} AND turn_id = #{turnId} FOR UPDATE
+  </select>
+
+  <select id="selectFindTurnByRequest" resultType="dev.horizen.agent.storage.jdbc.model.TurnRow">
+    SELECT * FROM ha_turn
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId} AND request_id = #{requestId}
+  </select>
+
+  <select id="selectNextMessageSequence" resultType="java.lang.Long">
+    SELECT next_message_sequence FROM ha_session
+WHERE owner_key = #{ownerKey} AND session_id = #{sessionId}
+  </select>
+
+  <insert id="updateInsertMessage" >
+    INSERT INTO ha_conversation_history (
+    owner_key, session_id, turn_id, record_type, record_id,
+    message_sequence, payload_json, created_at, updated_at
+) VALUES (#{ownerKey}, #{sessionId}, #{turnId}, 'MESSAGE', #{recordId}, #{messageSequence}, #{payloadJson}, #{createdAt}, #{updatedAt})
+  </insert>
+  <update id="renewLeases"  timeout="${leaseQueryTimeoutSeconds}">
+UPDATE ha_turn SET lease_expires_at=#{expires},updated_at=#{now},version=version+1
+WHERE executor_id=#{executor} AND status IN ('RUNNING','CANCELLING')
+AND lease_expires_at &gt; #{now} AND deadline_at &gt; #{now}
+AND <foreach collection="owners" item="ids" index="owner" open="(" close=")" separator=" OR ">
+    (owner_key=#{owner} AND turn_id IN <foreach collection="ids" item="id" open="(" close=")" separator=",">#{id}</foreach>)
+</foreach>
+  </update>
+</mapper>

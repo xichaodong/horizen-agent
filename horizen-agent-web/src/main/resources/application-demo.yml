@@ -1,0 +1,24 @@
+# 离线演示配置；scripts/demo.sh 同时禁用所有私有配置导入。
+horizen:
+  trace:
+    enabled: false
+  agent:
+    model-mode: SCRIPTED
+    storage:
+      mode: LOCAL
+    gateway:
+      mode: REMOTE
+      url: ''
+    sandbox:
+      e2b:
+        enabled: false
+      snapshot:
+        bos:
+          enabled: false
+    artifact:
+      bos:
+        enabled: false
+    workspace-management:
+      enabled: false
+    workspace-release:
+      enabled: false
