@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+import traceback
 import urllib.error
 import urllib.request
 from urllib.parse import urlsplit
@@ -144,4 +145,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            # 把实际失败断言附到检查结果，避免只留下退出码。
+            detail = traceback.format_exc()[-5000:]
+            detail = detail.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+            print('::error::Offline Web smoke failed: ' + detail, flush=True)
+        raise
