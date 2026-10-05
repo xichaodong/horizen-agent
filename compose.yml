@@ -1,0 +1,14 @@
+services:
+  agent:
+    image: ${HORIZEN_AGENT_IMAGE:-horizen-agent:local}
+    build:
+      context: .
+    ports:
+      - '127.0.0.1:${AGENT_WEB_PORT:-8787}:8787'
+    volumes:
+      - agent-data:/var/lib/horizen-agent
+    init: true
+    restart: unless-stopped
+
+volumes:
+  agent-data:

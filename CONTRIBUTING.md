@@ -18,6 +18,15 @@ npm test
 npm run build
 ```
 
+Container delivery is checked separately with a complete image:
+
+```sh
+docker build -t horizen-agent:local .
+bash scripts/smoke-container.sh horizen-agent:local
+```
+
+The smoke check covers bundled frontend assets, scripted SSE, non-root Java and the public YAML template mounted with 0600 permissions. It never loads the real local `.env.yml`. Version tags such as `v0.1.0-preview.1` run the full CI baseline before publishing AMD64/ARM64 images to GHCR and a packaged application with checksums to GitHub Releases. Prereleases receive their exact version tag rather than a `latest` image tag.
+
 Live integrations are opt-in and are not required for an ordinary contribution. Provide synthetic fixtures or deterministic local tests for new behavior. Report any relevant live verification separately, with configuration and secrets omitted.
 
 Keep development notes and process documents local. The root `docs/` and `doc/` directories and `horizen-agent-web/design-qa.md` are ignored and must not be added to the public repository. Public guides must be self-contained or link to tracked source and examples.

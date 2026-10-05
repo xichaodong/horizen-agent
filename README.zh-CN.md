@@ -17,6 +17,31 @@ AgentScope 提供模型与工具循环、Harness 策略。Horizen 在其上补�
 
 适合在 Java 应用中嵌入 Agent，也可以通过本地 Web 工作台体验。基础 Runtime 不需要公司账号或公司网络。业务流程放在 Skill 和应用适配器中。
 
+## 用 Docker 启动完整应用
+
+```sh
+docker compose up --build -d
+```
+
+打开 <http://127.0.0.1:8787/>。镜像包含构建后的前端和 Java 后端，默认启动无需凭据的脚本模型 demo。Compose 端口只绑定本机，工作区文件使用 `agent-data` 数据卷。
+
+接入真实模型时，如果还没有本地配置，先复制模板，编辑 `model-mode`、`api-key`、`base-url` 和 `model-name`，再加载配置覆盖文件：
+
+```sh
+cp -n .env.yml.example .env.yml
+docker compose -f compose.yml -f compose.configured.yml up --build -d
+```
+
+启动时只读挂载 `.env.yml`，镜像构建不会包含该文件。启动入口准备好私有权限的配置后，以 UID 10001 运行 Java。可选外部服务也在这一份 YAML 中配置。
+
+版本发布后，可以直接使用对应镜像：
+
+```sh
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.1 docker compose up -d --no-build
+```
+
+用 `docker compose logs -f agent` 查看启动状态，用 `docker compose down` 停止。文件见 [Compose](compose.yml)、[配置覆盖](compose.configured.yml) 和 [Dockerfile](Dockerfile)。
+
 ## 无需凭据，先跑起来
 
 需要 JDK 17+、Node.js 22 和 npm；仓库检查使用 Python 3.10+。Maven Wrapper 会下载 Maven 3.9.9，首次构建需要访问公开 Maven/npm 源。

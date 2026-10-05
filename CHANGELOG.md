@@ -13,4 +13,6 @@
 - Return a fixed public message for unexpected chat failures, with correlated, redacted diagnostics recorded on the server. Align multipart file limits with Artifact capacity and reject oversized uploads before reading their body, with an explicit HTTP 413 response.
 - Decouple Turn cancellation and host deadlines from blocking event persistence. Serialize observed facts, select one terminal owner, and retain the session until pending writes and local cleanup settle. Apply the configured JDBC statement budget to ordinary mapped SQL as well as lease renewal.
 
+- Package the production frontend with the Web application, add an offline-by-default container and a read-only YAML startup override, verify both container modes in CI, and publish versioned AMD64/ARM64 images and application checksums after the full baseline passes.
+
 Compatibility: Java APIs, stream contracts and persistence schemas are provisional. The Maven version remains `0.1.0-SNAPSHOT`; this entry does not declare a published release.

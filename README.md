@@ -17,6 +17,31 @@ AgentScope provides the model/tool loop and Harness capabilities. Horizen adds a
 
 Use it to embed an agent in a Java application or explore the included local HTTP/SSE host. The runtime does not require a company account or company network. Business workflows belong in Skills and application adapters.
 
+## Run the complete application with Docker
+
+```sh
+docker compose up --build -d
+```
+
+Open <http://127.0.0.1:8787/>. The image includes the production frontend and Java backend and starts the credential-free scripted demo by default. The Compose port is bound to loopback, and workspace files use the `agent-data` volume.
+
+For a real model, copy the template if you do not already have local settings, edit `model-mode`, `api-key`, `base-url` and `model-name`, then use the configured override:
+
+```sh
+cp -n .env.yml.example .env.yml
+docker compose -f compose.yml -f compose.configured.yml up --build -d
+```
+
+The override mounts `.env.yml` read-only at startup; it is excluded from the image build. The startup process prepares the configuration with private permissions, then runs Java as UID 10001. Optional external services remain controlled by the same YAML file.
+
+After a release is published, use its image without a local build:
+
+```sh
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.1 docker compose up -d --no-build
+```
+
+Use `docker compose logs -f agent` to inspect startup and `docker compose down` to stop. See [Compose](compose.yml), [configured override](compose.configured.yml) and [Dockerfile](Dockerfile).
+
 ## Try it without credentials
 
 Requirements: JDK 17+, Node.js 22, npm, and Python 3.10+ for repository checks. The Maven Wrapper downloads Maven 3.9.9. The first build needs access to public Maven/npm registries.

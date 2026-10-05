@@ -1,11 +1,13 @@
 # 构建镜像时只使用公开源码，不发送本地配置、过程文档和开发历史。
 .git
 .env*
+**/.env*
 !.env.yml.example
 docs
 doc
 horizen-agent-web/design-qa.md
 .ssh
+**/.ssh
 .idea
 .vscode
 .agentscope

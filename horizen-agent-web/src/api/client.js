@@ -1,4 +1,4 @@
-/** Shared HTTP boundary for JSON, multipart uploads and streaming responses. */
+/** 统一处理 JSON、文件上传和流式响应的 HTTP 请求入口。 */
 export function request(url, options = {}) {
     const headers = new Headers(options.headers);
     let body = options.body;

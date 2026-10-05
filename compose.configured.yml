@@ -1,0 +1,10 @@
+services:
+  agent:
+    command: ['configured']
+    volumes:
+      - type: bind
+        source: ./.env.yml
+        target: /run/horizen-agent/input.yml
+        read_only: true
+        bind:
+          create_host_path: false
