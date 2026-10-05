@@ -106,7 +106,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     jars = list((root / "horizen-agent-web/target").glob("horizen-agent-web-*.jar"))
     if len(jars) != 1:
-        raise SystemExit("Build one Web jar with ./mvnw clean verify before this check.")
+        raise RuntimeError("Build one Web jar with ./mvnw clean verify before this check.")
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
         port = listener.getsockname()[1]

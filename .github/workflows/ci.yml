@@ -37,6 +37,7 @@ jobs:
       - run: |
           mkdir -p target
           ./mvnw --batch-mode --no-transfer-progress verify 2>&1 | tee target/ci-verify.log
+        shell: bash
       - if: failure()
         run: python3 scripts/report-ci-failures.py
       - run: python3 scripts/smoke-demo.py
