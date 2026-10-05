@@ -15,4 +15,6 @@
 
 - Package the production frontend with the Web application, add an offline-by-default container and a read-only YAML startup override, verify both container modes in CI, and publish versioned AMD64/ARM64 images and application checksums after the full baseline passes.
 
+- Preserve the evaluation admission limit while handing completed worker slots to the next request. Completion callbacks can submit a successor without transient executor rejection, and shutdown settles queued handoffs.
+
 Compatibility: Java APIs, stream contracts and persistence schemas are provisional. The Maven version remains `0.1.0-SNAPSHOT`; this entry does not declare a published release.

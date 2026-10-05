@@ -13,9 +13,12 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 class EvaluationRunServiceTest {
@@ -481,6 +484,177 @@ class EvaluationRunServiceTest {
                                                             Map.of(
                                                                     "tool", "query", "times",
                                                                     -1))))));
+        }
+    }
+
+    @Test
+    void completionCallbackCanSubmitTheNextRunBeforeItsWorkerReturns() throws Exception {
+        CountDownLatch release = new CountDownLatch(1);
+        AtomicInteger calls = new AtomicInteger();
+        EvaluationHost host =
+                new FakeHost() {
+                    public void start(
+                            ExecutionIdentity owner,
+                            String session,
+                            String requestId,
+                            EvaluationProtocol.Step step,
+                            Duration timeout,
+                            Consumer<AgentRuntimeEvent> events) {
+                        if (calls.incrementAndGet() == 1) {
+                            try {
+                                release.await(5, TimeUnit.SECONDS);
+                            } catch (InterruptedException error) {
+                                Thread.currentThread().interrupt();
+                            }
+                        }
+                        events.accept(event(AgentRuntimeEvent.Type.TURN_COMPLETED, "done"));
+                    }
+                };
+        try (var service = new EvaluationRunService(host, new EvaluationSessionRegistry(), 1)) {
+            var first =
+                    service.start(
+                            identity,
+                            request(
+                                    "handoff-first",
+                                    Map.of("steps", List.of(Map.of("userInput", "first")))));
+            var next =
+                    first.thenCompose(
+                            result ->
+                                    service.start(
+                                            identity,
+                                            request(
+                                                    "handoff-next",
+                                                    Map.of(
+                                                            "steps",
+                                                            List.of(
+                                                                    Map.of(
+                                                                            "userInput",
+                                                                            "next"))))));
+            release.countDown();
+            assertEquals("COMPLETED", next.get(5, TimeUnit.SECONDS).getStatus());
+            assertEquals(2, calls.get());
+        } finally {
+            release.countDown();
+        }
+    }
+
+    @Test
+    void handoffQueueDoesNotIncreaseTheAdmissionLimit() throws Exception {
+        CountDownLatch started = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        EvaluationHost host =
+                new FakeHost() {
+                    public void start(
+                            ExecutionIdentity owner,
+                            String session,
+                            String requestId,
+                            EvaluationProtocol.Step step,
+                            Duration timeout,
+                            Consumer<AgentRuntimeEvent> events) {
+                        started.countDown();
+                        try {
+                            release.await(5, TimeUnit.SECONDS);
+                        } catch (InterruptedException error) {
+                            Thread.currentThread().interrupt();
+                        }
+                        events.accept(event(AgentRuntimeEvent.Type.TURN_COMPLETED, "done"));
+                    }
+                };
+        try (var service = new EvaluationRunService(host, new EvaluationSessionRegistry(), 1)) {
+            var first =
+                    service.start(
+                            identity,
+                            request(
+                                    "limit-first",
+                                    Map.of("steps", List.of(Map.of("userInput", "first")))));
+            assertTrue(started.await(2, TimeUnit.SECONDS));
+            assertThrows(
+                    RejectedExecutionException.class,
+                    () ->
+                            service.start(
+                                    identity,
+                                    request(
+                                            "limit-next",
+                                            Map.of(
+                                                    "steps",
+                                                    List.of(Map.of("userInput", "next"))))));
+            release.countDown();
+            assertEquals("COMPLETED", first.get(5, TimeUnit.SECONDS).getStatus());
+        } finally {
+            release.countDown();
+        }
+    }
+
+    @Test
+    void closeSettlesAQueuedHandoffWithoutExecutingIt() throws Exception {
+        CountDownLatch releaseFirst = new CountDownLatch(1);
+        CountDownLatch queued = new CountDownLatch(1);
+        CountDownLatch holdCallback = new CountDownLatch(1);
+        AtomicInteger calls = new AtomicInteger();
+        AtomicReference<CompletableFuture<EvaluationProtocol.Status>> waiting =
+                new AtomicReference<>();
+        EvaluationHost host =
+                new FakeHost() {
+                    public void start(
+                            ExecutionIdentity owner,
+                            String session,
+                            String requestId,
+                            EvaluationProtocol.Step step,
+                            Duration timeout,
+                            Consumer<AgentRuntimeEvent> events) {
+                        calls.incrementAndGet();
+                        try {
+                            releaseFirst.await(5, TimeUnit.SECONDS);
+                        } catch (InterruptedException error) {
+                            Thread.currentThread().interrupt();
+                        }
+                        events.accept(event(AgentRuntimeEvent.Type.TURN_COMPLETED, "done"));
+                    }
+                };
+        try (var service = new EvaluationRunService(host, new EvaluationSessionRegistry(), 1)) {
+            var first =
+                    service.start(
+                            identity,
+                            request(
+                                    "close-first",
+                                    Map.of("steps", List.of(Map.of("userInput", "first")))));
+            first.thenAccept(
+                    result -> {
+                        waiting.set(
+                                service.start(
+                                        identity,
+                                        request(
+                                                "close-queued",
+                                                Map.of(
+                                                        "steps",
+                                                        List.of(Map.of("userInput", "next"))))));
+                        queued.countDown();
+                        try {
+                            holdCallback.await(5, TimeUnit.SECONDS);
+                        } catch (InterruptedException error) {
+                            Thread.currentThread().interrupt();
+                        }
+                    });
+            releaseFirst.countDown();
+            assertTrue(queued.await(2, TimeUnit.SECONDS));
+            service.close();
+            assertEquals("CANCELLED", waiting.get().get(5, TimeUnit.SECONDS).getStatus());
+            assertEquals(1, calls.get());
+            assertThrows(
+                    NoSuchElementException.class, () -> service.status(identity, "close-queued"));
+            assertThrows(
+                    RejectedExecutionException.class,
+                    () ->
+                            service.start(
+                                    identity,
+                                    request(
+                                            "closed",
+                                            Map.of(
+                                                    "steps",
+                                                    List.of(Map.of("userInput", "next"))))));
+        } finally {
+            releaseFirst.countDown();
+            holdCallback.countDown();
         }
     }
 

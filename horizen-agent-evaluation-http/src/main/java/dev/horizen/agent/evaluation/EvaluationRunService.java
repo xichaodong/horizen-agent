@@ -18,10 +18,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,6 +46,12 @@ public final class EvaluationRunService implements AutoCloseable {
     /** 评测或后台工作使用的执行资源，供异步运行与关闭管理。 */
     private final ThreadPoolExecutor workers;
 
+    /** 限制尚未结算的评测数量；线程收尾期间的交接不会扩大准入容量。 */
+    private final Semaphore slots;
+
+    /** 关闭状态，由 start 和 close 共用的服务监视器保护。 */
+    private boolean closed;
+
     /** 活跃的索引映射，供按键查找或归并当前组件的数据。 */
     private final Map<String, Run> active = new ConcurrentHashMap<>();
 
@@ -59,13 +66,17 @@ public final class EvaluationRunService implements AutoCloseable {
             EvaluationHost host, EvaluationSessionRegistry registry, int concurrency) {
         this.host = host;
         this.registry = registry;
+        if (concurrency < 1)
+            throw new IllegalArgumentException("Evaluation concurrency must be positive");
+        slots = new Semaphore(concurrency);
         workers =
                 new ThreadPoolExecutor(
                         concurrency,
                         concurrency,
                         0,
                         TimeUnit.SECONDS,
-                        new SynchronousQueue<>(),
+                        // 完成回调可能立即提交下一任务，队列承接工作线程收尾时的交接。
+                        new ArrayBlockingQueue<>(concurrency),
                         r -> {
                             Thread t = new Thread(r, "agent-evaluation");
                             t.setDaemon(true);
@@ -100,6 +111,7 @@ public final class EvaluationRunService implements AutoCloseable {
      */
     public synchronized CompletableFuture<EvaluationProtocol.Status> start(
             ExecutionIdentity identity, EvaluationProtocol.Start request) {
+        if (closed) throw new RejectedExecutionException("Evaluation service is closed");
         var caseInput = EvaluationCaseParser.parse(request);
         String key = key(identity.getOwnerKey(), request.getExecutionId());
         if (JSON.valueToTree(request).toString().length() > 16 * 1024 * 1024)
@@ -116,11 +128,14 @@ public final class EvaluationRunService implements AutoCloseable {
         result.setStatus("RUNNING");
         result.setStartedAtMs(System.currentTimeMillis());
         Run run = new Run(identity, request, result, fixture, caseInput);
+        if (!slots.tryAcquire())
+            throw new RejectedExecutionException("Evaluation capacity exhausted");
         active.put(key, run);
         try {
-            workers.execute(() -> execute(key, run, identity));
+            workers.execute(new QueuedRun(key, run));
         } catch (RejectedExecutionException error) {
             active.remove(key);
+            slots.release();
             throw error;
         }
         return run.completion;
@@ -343,6 +358,7 @@ public final class EvaluationRunService implements AutoCloseable {
             registry.remove(identity.getOwnerKey(), result.getSessionId());
             active.remove(key);
             Thread.interrupted();
+            slots.release();
             run.completion.complete(copy(result));
         }
     }
@@ -519,6 +535,10 @@ public final class EvaluationRunService implements AutoCloseable {
     /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
     @Override
     public void close() {
+        synchronized (this) {
+            if (closed) return;
+            closed = true;
+        }
         active.values()
                 .forEach(
                         run -> {
@@ -528,7 +548,34 @@ public final class EvaluationRunService implements AutoCloseable {
                             } catch (Exception ignored) {
                             }
                         });
-        workers.shutdownNow();
+        for (Runnable discarded : workers.shutdownNow()) {
+            QueuedRun queued = (QueuedRun) discarded;
+            Run run = queued.run;
+            synchronized (run) {
+                run.result.setStatus("CANCELLED");
+                run.result.setErrorCode("CANCELLED");
+                run.result.setFinishedAtMs(System.currentTimeMillis());
+            }
+            active.remove(queued.key);
+            slots.release();
+            run.completion.complete(copy(run.result));
+        }
+    }
+
+    /** 已准入的工作项；关闭时可结算尚未被线程接收的任务，避免完成句柄永久等待。 */
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    private final class QueuedRun implements Runnable {
+        /** 所有者与执行标识组成的活跃索引键。 */
+        private final String key;
+
+        /** 此工作项独占的输入、状态和完成句柄。 */
+        private final Run run;
+
+        /** 在线程接收工作项后执行评测，实际结束后释放准入名额。 */
+        @Override
+        public void run() {
+            execute(key, run, run.identity);
+        }
     }
 
     /** 评测运行服务内部的运行，封装该步骤需要的状态或输入输出。 */
