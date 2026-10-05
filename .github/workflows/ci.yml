@@ -22,6 +22,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         java: ['17', '21']
     steps:
@@ -33,7 +34,11 @@ jobs:
           cache: maven
       - run: bash scripts/check-architecture-boundaries.sh
       - run: java scripts/CheckJavaDocs.java
-      - run: ./mvnw --batch-mode --no-transfer-progress verify
+      - run: |
+          mkdir -p target
+          ./mvnw --batch-mode --no-transfer-progress verify 2>&1 | tee target/ci-verify.log
+      - if: failure()
+        run: python3 scripts/report-ci-failures.py
       - run: python3 scripts/smoke-demo.py
       - run: python3 scripts/smoke-demo.py --configuration-examples
       - run: ./mvnw --batch-mode --no-transfer-progress install -DskipTests
