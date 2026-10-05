@@ -163,6 +163,15 @@
                         <directory>dist</directory>
                         <targetPath>static</targetPath>
                     </resource>
+                    <resource>
+                        <directory>${project.basedir}/..</directory>
+                        <includes>
+                            <include>LICENSE</include>
+                            <include>NOTICE</include>
+                            <include>THIRD_PARTY_NOTICES.md</include>
+                        </includes>
+                        <targetPath>META-INF</targetPath>
+                    </resource>
                 </resources>
             </build>
         </profile>

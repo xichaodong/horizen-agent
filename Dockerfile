@@ -28,6 +28,7 @@ RUN apt-get update \
     && mkdir -p /opt/horizen-agent /run/horizen-agent /var/lib/horizen-agent \
     && chown 10001:10001 /var/lib/horizen-agent
 COPY --from=backend /build/horizen-agent.jar /opt/horizen-agent/app.jar
+COPY LICENSE NOTICE THIRD_PARTY_NOTICES.md /opt/horizen-agent/
 COPY scripts/container-entrypoint.sh /usr/local/bin/horizen-agent
 RUN chmod 755 /usr/local/bin/horizen-agent
 WORKDIR /var/lib/horizen-agent
