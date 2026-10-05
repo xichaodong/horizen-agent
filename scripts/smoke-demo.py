@@ -2,6 +2,7 @@
 """用合成请求验证离线宿主、SSE 终态和可选的打包前端，无需服务凭据。"""
 import argparse
 from html.parser import HTMLParser
+import http.client
 import json
 import os
 from pathlib import Path
@@ -42,7 +43,8 @@ def verify_host(endpoint, frontend=False):
             with urllib.request.urlopen(endpoint + "/api/status", timeout=1) as response:
                 status = json.load(response)
             break
-        except (urllib.error.URLError, TimeoutError):
+        # 容器转发端口可能已接收连接，但 Java 尚未监听，连接会被关闭或重置。
+        except (urllib.error.URLError, TimeoutError, ConnectionError, http.client.HTTPException):
             if time.monotonic() >= deadline:
                 raise RuntimeError("Offline host did not become ready within 45 seconds.")
             time.sleep(.25)

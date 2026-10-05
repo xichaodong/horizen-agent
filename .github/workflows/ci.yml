@@ -15,6 +15,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python3 scripts/test-public-content.py
+      - run: python3 scripts/test-smoke-demo.py
       - run: python3 scripts/check-public-content.py
       - run: python3 scripts/check-java-style.py
 
