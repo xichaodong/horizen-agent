@@ -45,7 +45,7 @@ horizen:
 Use your provider's OpenAI-compatible API base URL, without `/chat/completions`. Start the published image directly; Java, Node.js and a local build are not required:
 
 ```sh
-HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.2 \
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.3 \
   docker compose -f compose.yml -f compose.configured.yml up -d --no-build
 ```
 
@@ -56,7 +56,7 @@ The override mounts `.env.yml` read-only at startup; it is excluded from the ima
 To try the credential-free demo, use the published image without a local build:
 
 ```sh
-HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.2 docker compose up -d --no-build
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.3 docker compose up -d --no-build
 ```
 
 Use `docker compose logs -f agent` to inspect startup and `docker compose down` to stop. See [Compose](compose.yml), [configured override](compose.configured.yml) and [Dockerfile](Dockerfile).

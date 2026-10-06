@@ -1,6 +1,8 @@
 # Changelog
 
-## v0.1.0-preview.2 — 2026-10-06
+## v0.1.0-preview.3 — 2026-10-06
+
+- Upgrade the transitive `source-map-js` dependency to 1.2.2 to address [GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q). Preview 2 did not publish artifacts because the dependency audit blocked its release.
 
 - Preserve the completed Turn status when the host releases its source subscription after receiving the final reply. Resource cleanup no longer changes a successful real-model conversation into a cancelled Turn.
 - Verify real-model chat, multi-turn context, native tool execution, SSE reconnection, cancellation during generation, and a subsequent turn after cancellation using synthetic inputs.

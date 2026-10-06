@@ -45,7 +45,7 @@ horizen:
 `base-url` 使用服务商的 OpenAI-compatible API 基础地址，不包含 `/chat/completions`。然后直接运行已发布镜像，无需安装 Java、Node.js 或在本机编译：
 
 ```sh
-HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.2 \
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.3 \
   docker compose -f compose.yml -f compose.configured.yml up -d --no-build
 ```
 
@@ -56,7 +56,7 @@ HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.2 \
 只想体验无凭据 demo 时，可以直接使用对应镜像：
 
 ```sh
-HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.2 docker compose up -d --no-build
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.3 docker compose up -d --no-build
 ```
 
 用 `docker compose logs -f agent` 查看启动状态，用 `docker compose down` 停止。文件见 [Compose](compose.yml)、[配置覆盖](compose.configured.yml) 和 [Dockerfile](Dockerfile)。
