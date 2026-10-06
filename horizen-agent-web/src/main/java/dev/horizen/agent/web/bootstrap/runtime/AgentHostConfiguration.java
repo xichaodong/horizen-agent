@@ -29,6 +29,7 @@ import dev.horizen.agent.web.config.E2bSandboxProperties;
 import dev.horizen.agent.web.config.GatewayProperties;
 import dev.horizen.agent.web.config.HorizenProperties;
 import dev.horizen.agent.web.config.MultimodalProperties;
+import dev.horizen.agent.web.config.VisionProperties;
 import dev.horizen.agent.web.config.RuntimeStorageProperties;
 import dev.horizen.agent.web.config.SandboxSnapshotProperties;
 import dev.horizen.agent.web.config.SkillReleaseProperties;
@@ -178,6 +179,7 @@ public class AgentHostConfiguration {
      * @param sandbox        当前Agent宿主组装持有的沙箱对象，供相应处理步骤使用。
      * @param settings       当前Agent宿主组装持有的settings对象，供相应处理步骤使用。
      * @param multimodal     当前Agent宿主组装持有的多模态对象，供相应处理步骤使用。
+     * @param vision         独立视觉模型配置。
      * @param snapshots      当前Agent宿主组装持有的快照集合对象，供相应处理步骤使用。
      * @param workspace      当前Agent宿主组装持有的工作区对象，供相应处理步骤使用。
      * @param skills         当前Agent宿主组装持有的Skill集合对象，供相应处理步骤使用。
@@ -198,7 +200,7 @@ public class AgentHostConfiguration {
             GatewayProperties gateway,
             E2bSandboxProperties sandbox,
             RuntimeStorageProperties settings,
-            MultimodalProperties multimodal,
+            MultimodalProperties multimodal, VisionProperties vision,
             SandboxSnapshotProperties snapshots,
             AgentWorkspaceProperties workspace,
             SkillReleaseProperties skills,
@@ -239,7 +241,7 @@ public class AgentHostConfiguration {
                                 .contextProperties(context)
                                 .gatewayProperties(gateway)
                                 .sandboxProperties(sandbox)
-                                .multimodalProperties(multimodal)
+                                .multimodalProperties(multimodal).visionProperties(vision)
                                 .traceConfig(trace)
                                 .horizenExporter(sink)
                                 .skillRepository(null)
@@ -272,7 +274,7 @@ public class AgentHostConfiguration {
                                                     .contextProperties(context)
                                                     .gatewayProperties(gateway)
                                                     .sandboxProperties(sandbox)
-                                                    .multimodalProperties(multimodal)
+                                                    .multimodalProperties(multimodal).visionProperties(vision)
                                                     .traceConfig(trace)
                                                     .horizenExporter(sink)
                                                     .skillRepository(

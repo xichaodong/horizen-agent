@@ -114,6 +114,26 @@ cp -n .env.yml.example .env.yml
 
 Use the same frontend command as above. The Java host reads the credential; it is never sent to the browser. Keep secrets in process environment or ignored local configuration. The normal host optionally imports `.env.yml`; `scripts/demo.sh` explicitly disables these imports. The commented [YAML template](.env.yml.example) lists the settings and keeps optional integrations disabled.
 
+## Configure a separate vision model
+
+The primary model handles text reasoning and tool calls. Configure an independent image-capable model in the existing `horizen.agent.vision` section of the same `.env.yml`:
+
+```yaml
+horizen:
+  agent:
+    vision:
+      enabled: true
+      model-name: 'your-provider-vision-model-id'
+      base-url: '' # Empty reuses the primary endpoint; a separate provider is supported.
+      api-key: '' # Empty reuses the primary credential; keep real credentials in local configuration.
+```
+
+An explicit vision model name is required. A different provider origin requires an explicit vision credential; the primary credential is never implicitly sent to another service. Disabled vision never falls back to the primary model, and the scripted demo does not call a remote vision provider.
+
+Uploaded images enter the conversation as Artifact references. The agent calls `vision_analyze` when needed; the independent vision model receives the image and returns text for the primary model to reason about. `browser_vision` uses the same vision model after capturing a screenshot. Raw image blocks and signed image URLs are not directly injected into primary-model requests.
+
+Image upload and analysis require Artifact storage; browser screenshots also require the sandbox integration. `multimodal` retains image-count, byte and URL-expiry limits. The former `direct-image-input-enabled` primary-model image switch is removed. Context compression remains independently configurable under `context.compression-model-*`.
+
 ## Choose integrations as needed
 
 | Capability | Default local demo | Optional integration |

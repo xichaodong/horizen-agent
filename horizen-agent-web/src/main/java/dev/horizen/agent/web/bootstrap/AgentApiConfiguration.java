@@ -25,6 +25,7 @@ import dev.horizen.agent.web.bootstrap.runtime.ArtifactSupport;
 import dev.horizen.agent.web.bootstrap.storage.AgentHostResources;
 import dev.horizen.agent.web.bootstrap.storage.RuntimeStorage;
 import dev.horizen.agent.web.config.AgentProperties;
+import dev.horizen.agent.web.config.VisionProperties;
 import dev.horizen.agent.web.config.AgentWorkspaceProperties;
 import dev.horizen.agent.web.config.ArtifactProperties;
 import dev.horizen.agent.web.config.E2bSandboxProperties;
@@ -204,6 +205,7 @@ public class AgentApiConfiguration {
      * @param sandbox   当前AgentAPI组装持有的沙箱对象，供相应处理步骤使用。
      * @param release   当前AgentAPI组装持有的发布对象，供相应处理步骤使用。
      * @param workspace 当前AgentAPI组装持有的工作区对象，供相应处理步骤使用。
+     * @param vision    独立视觉服务的敏感配置。
      * @return 本次操作返回的Agent密钥脱敏器结果。
      */
     @Bean
@@ -213,8 +215,8 @@ public class AgentApiConfiguration {
             HorizenProperties trace,
             E2bSandboxProperties sandbox,
             AgentWorkspaceProperties release,
-            WorkspaceStorageProperties workspace) {
-        return new AgentSecretRedactor(agent, gateway, trace, sandbox, release, workspace);
+            WorkspaceStorageProperties workspace, VisionProperties vision) {
+        return new AgentSecretRedactor(agent, gateway, trace, sandbox, release, workspace, vision);
     }
 
     /**

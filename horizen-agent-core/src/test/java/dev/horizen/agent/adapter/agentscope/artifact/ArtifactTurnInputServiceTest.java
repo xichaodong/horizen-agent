@@ -27,6 +27,23 @@ import java.util.Optional;
 
 class ArtifactTurnInputServiceTest {
     @Test
+    void referenceOnlyImagesStillRespectCountAndByteLimitsWithoutCreatingUrls() {
+        MemoryArtifacts artifacts = new MemoryArtifacts();
+        artifacts.add(artifact("owner", "image-a", "image/png", "image-a-ref", 8L));
+        artifacts.add(artifact("owner", "image-b", "image/png", "image-b-ref", 8L));
+        var service = new ArtifactTurnInputService(artifacts, new MemoryContents(Map.of()));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.resolve("owner", "session", "turn", List.of("image-a", "image-b"), false, 1, 1024, 2048, 3600));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.resolve("owner", "session", "turn", List.of("image-a"), false, 5, 4, 2048, 3600));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.resolve("owner", "session", "turn", List.of("image-a", "image-b"), false, 5, 1024, 12, 3600));
+        assertTrue(artifacts.references.isEmpty());
+        assertTrue(service.resolve("owner", "session", "turn", List.of("image-a"), false, 5, 1024, 2048, 3600).isEmpty());
+        assertEquals(1, artifacts.references.size());
+    }
+
+    @Test
     void resolvesOwnedImagesAndRecordsAllInputReferences() {
         MemoryArtifacts artifacts = new MemoryArtifacts();
         artifacts.add(artifact("owner", "image", "image/png", "image-ref", 8L));

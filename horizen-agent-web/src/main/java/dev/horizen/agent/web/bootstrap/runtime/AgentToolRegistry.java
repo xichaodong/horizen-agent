@@ -58,7 +58,7 @@ public final class AgentToolRegistry {
      * 注册运行时工具集合。
      *
      * @param agent           当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param model           当前Agent工具注册表持有的模型对象，供相应处理步骤使用。
+     * @param visionModel     独立视觉模型；为 null 时不注册视觉工具。
      * @param sessions        会话对象或会话索引，按相应的归属键定位数据。
      * @param artifactSupport 当前Agent工具注册表持有的产物支持对象，供相应处理步骤使用。
      * @param askUsers        澄清请求的存储或服务，用于回答处理与执行恢复。
@@ -69,7 +69,7 @@ public final class AgentToolRegistry {
      */
     public static void registerRuntimeTools(
             HarnessAgent agent,
-            ChatModelBase model,
+            ChatModelBase visionModel,
             SessionTurnStore sessions,
             ArtifactSupport artifactSupport,
             AskUserStore askUsers,
@@ -79,7 +79,7 @@ public final class AgentToolRegistry {
             CloudMemoryService cloudMemory) {
         registerRuntimeTools(
                 agent,
-                model,
+                visionModel,
                 sessions,
                 artifactSupport,
                 askUsers,
@@ -94,7 +94,7 @@ public final class AgentToolRegistry {
      * 注册运行时工具集合。
      *
      * @param agent           当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param model           当前Agent工具注册表持有的模型对象，供相应处理步骤使用。
+     * @param visionModel     独立视觉模型；为 null 时不注册视觉工具。
      * @param sessions        会话对象或会话索引，按相应的归属键定位数据。
      * @param artifactSupport 当前Agent工具注册表持有的产物支持对象，供相应处理步骤使用。
      * @param askUsers        澄清请求的存储或服务，用于回答处理与执行恢复。
@@ -106,7 +106,7 @@ public final class AgentToolRegistry {
      */
     public static void registerRuntimeTools(
             HarnessAgent agent,
-            ChatModelBase model,
+            ChatModelBase visionModel,
             SessionTurnStore sessions,
             ArtifactSupport artifactSupport,
             AskUserStore askUsers,
@@ -147,10 +147,10 @@ public final class AgentToolRegistry {
                                 artifactSupport == null
                                         ? null
                                         : artifactSupport.getLifecycle()));
-        if (artifactSupport != null) {
+        if (artifactSupport != null && visionModel != null) {
             VisionAnalyzeTool vision =
                     new VisionAnalyzeTool(
-                            model,
+                            visionModel,
                             artifactSupport.getArtifacts(),
                             artifactSupport.getContents(),
                             multimodal.getImageUrlExpiresSeconds());

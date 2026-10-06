@@ -199,7 +199,7 @@ class MemoryQualityConfiguredLiveTest {
                         "", "", null, Set.of(), GatewayProperties.Mode.REMOTE, null, Map.of());
         var sandbox =
                 new E2bSandboxProperties(false, "", "", "", "", "", null, null, null, null, null);
-        var multimodal = new MultimodalProperties(false, null, null, null, null);
+        var multimodal = new MultimodalProperties(null, null, null, null);
         try (var runtime =
                      AgentRuntimeFactory.create(
                              RuntimeAssembly.builder()

@@ -1,7 +1,6 @@
 package dev.horizen.agent.web.bootstrap.runtime;
 
 import dev.horizen.agent.adapter.agentscope.runtime.HarnessAgentRuntime;
-import dev.horizen.agent.adapter.agentscope.runtime.MultimodalInputMiddleware;
 import dev.horizen.agent.adapter.agentscope.runtime.SubagentInteractionMiddleware;
 import dev.horizen.agent.adapter.agentscope.runtime.SubagentResultForwardingMiddleware;
 import dev.horizen.agent.adapter.agentscope.workspace.filesystem.SessionWorkspaceVolume;
@@ -115,6 +114,9 @@ public final class AgentRuntimeFactory {
                         ? AgentModelFactory.primary(properties, contextProperties)
                         : AgentModelFactory.primary(
                         properties, contextProperties, infrastructure.getModelTransport());
+        ChatModelBase visionModel = infrastructure == null
+                ? AgentModelFactory.vision(properties, assembly.getVisionProperties())
+                : AgentModelFactory.vision(properties, assembly.getVisionProperties(), infrastructure.getModelTransport());
         Model compactionModel =
                 new ConfiguredCompactionModel(
                         infrastructure == null
@@ -185,7 +187,6 @@ public final class AgentRuntimeFactory {
                 ContextCompactionTelemetry.afterCompaction(
                         contextProperties.isAbortOnSummaryFailure()));
         new ContextRuntimeConfigurer(contextProperties).apply(builder, model, compactionModel);
-        builder.middleware(new MultimodalInputMiddleware());
         configureScriptedRuntime(properties, builder);
         WorkspaceRuntimeConfigurer.configureDistributedWorkspace(
                 builder, distributedStore, sessionTurns, sandboxProperties, workspaceDocuments);
@@ -217,7 +218,7 @@ public final class AgentRuntimeFactory {
         HarnessAgent agent = builder.build();
         AgentToolRegistry.registerRuntimeTools(
                 agent,
-                model,
+                visionModel,
                 sessionTurns,
                 artifactSupport,
                 askUsers,

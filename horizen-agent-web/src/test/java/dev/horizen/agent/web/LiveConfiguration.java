@@ -29,7 +29,7 @@ public final class LiveConfiguration {
                                                 .toUpperCase(Locale.ROOT)
                                                 .replace('-', '_'),
                                         local.getProperty(key)));
-        for (String name : new String[]{"ARK_API_KEY", "ARK_BASE_URL", "ARK_MODEL"}) {
+        for (String name : new String[]{"ARK_API_KEY", "ARK_BASE_URL", "ARK_MODEL", "AGENT_VISION_API_KEY", "AGENT_VISION_BASE_URL", "AGENT_VISION_MODEL"}) {
             String configured = local.getProperty(propertyName(name));
             if (configured != null) local.putIfAbsent(name, configured);
         }
@@ -68,6 +68,9 @@ public final class LiveConfiguration {
             case "ARK_API_KEY" -> "horizen.agent.api-key";
             case "ARK_BASE_URL" -> "horizen.agent.base-url";
             case "ARK_MODEL" -> "horizen.agent.model-name";
+            case "AGENT_VISION_MODEL" -> "horizen.agent.vision.model-name";
+            case "AGENT_VISION_BASE_URL" -> "horizen.agent.vision.base-url";
+            case "AGENT_VISION_API_KEY" -> "horizen.agent.vision.api-key";
             default -> name;
         };
     }

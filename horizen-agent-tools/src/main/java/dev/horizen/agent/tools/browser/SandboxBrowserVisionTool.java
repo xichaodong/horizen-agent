@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 截取当前沙箱页面，并将生成的 Artifact 送入视觉分析。
+ * 截取当前沙箱页面，将截图交给独立视觉模型，向主模型返回文字结果。
  */
 public final class SandboxBrowserVisionTool extends ToolBase {
     /**
@@ -27,7 +27,7 @@ public final class SandboxBrowserVisionTool extends ToolBase {
     /**
      * 当前浏览器截图产物或截图工具，供后续视觉解析使用。
      */
-    private final SandboxBrowserTool screenshot;
+    private final ToolBase screenshot;
 
     /**
      * 读取图片并生成视觉分析的执行依赖。
@@ -40,7 +40,7 @@ public final class SandboxBrowserVisionTool extends ToolBase {
      * @param screenshot 当前沙箱浏览器视觉工具持有的screenshot对象，供相应处理步骤使用。
      * @param vision     当前沙箱浏览器视觉工具持有的视觉对象，供相应处理步骤使用。
      */
-    public SandboxBrowserVisionTool(SandboxBrowserTool screenshot, VisionAnalyzeTool vision) {
+    public SandboxBrowserVisionTool(ToolBase screenshot, VisionAnalyzeTool vision) {
         super(
                 ToolBase.builder()
                         .name("browser_vision")

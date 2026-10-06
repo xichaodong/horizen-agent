@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 将所有者的图像 Artifact 发送给已配置多模态模型，并返回回答。
+ * 将所有者的图像 Artifact 发送给独立视觉模型，只向主模型返回文字结果。
  */
 public final class VisionAnalyzeTool extends ToolBase {
     /**
@@ -31,7 +31,7 @@ public final class VisionAnalyzeTool extends ToolBase {
     private static final long MAX_IMAGE_BYTES = 10L * 1024 * 1024;
 
     /**
-     * 当前模型实例或模型标识，按字段声明的类型解释。
+     * 独立视觉模型，接收图片输入并生成文字；宿主不能把主模型实例传入此字段。
      */
     private final Model model;
 
@@ -125,7 +125,7 @@ public final class VisionAnalyzeTool extends ToolBase {
                 || artifacts == null
                 || contents == null
                 || param.getRuntimeContext() == null) {
-            return Mono.just(ToolResultBlock.error("vision_analyze is not configured"));
+            return Mono.just(ToolResultBlock.error("Independent vision model is not configured; enable horizen.agent.vision and set its model-name"));
         }
         String id = String.valueOf(param.getInput().getOrDefault("artifact_id", "")).trim();
         String question = String.valueOf(param.getInput().getOrDefault("question", "")).trim();
@@ -179,7 +179,7 @@ public final class VisionAnalyzeTool extends ToolBase {
                                             .reduce("", String::concat);
                             return answer.isBlank()
                                     ? ToolResultBlock.error("vision model returned no text")
-                                    : ToolResultBlock.text(answer);
+                                    : ToolResultBlock.of(TextBlock.builder().text(answer).build(), Map.of("visionModel", model.getModelName()));
                         })
                 .onErrorResume(
                         error ->

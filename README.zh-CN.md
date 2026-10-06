@@ -115,6 +115,26 @@ cp -n .env.yml.example .env.yml
 
 前端启动方式相同。凭据由 Java 宿主读取，不会发送到浏览器。普通启动会可选导入本地 `.env.yml`；demo 入口明确禁用这些导入。带注释的 [YAML 模板](.env.yml.example) 列出了各项配置，可选集成默认关闭。
 
+## 单独配置视觉模型
+
+主模型负责文本推理和工具调用，图片由独立视觉模型处理。在同一份 `.env.yml` 的 `horizen.agent.vision` 节点填写：
+
+```yaml
+horizen:
+  agent:
+    vision:
+      enabled: true
+      model-name: '填写服务商提供的视觉模型标识'
+      base-url: '' # 留空复用主模型地址，也可填写另一家视觉服务的基础地址。
+      api-key: '' # 留空复用主模型 Key，也可使用独立凭据；真实 Key 只放本地配置。
+```
+
+视觉模型名称必须显式填写。若视觉服务与主模型的地址属于不同服务商，必须填写独立 Key，不能隐式复用主模型凭据。未开启视觉功能时，不会自动使用主模型读图。脚本模型 demo 不调用远端视觉服务。
+
+上传的图片只向主模型提供 Artifact 引用；需要看图时，Agent 调用 `vision_analyze`，独立视觉模型读取图片并返回文字，主模型据此继续回答。`browser_vision` 截图后也使用这一个视觉模型。原始图片和图片访问链接不会直接注入主模型请求。
+
+图片上传与读取需要配置 Artifact 存储，浏览器截图还需要启用沙箱。`multimodal` 节点保留数量、字节容量及链接有效期限制，旧的 `direct-image-input-enabled` 主模型直接看图开关已移除。上下文压缩模型仍通过 `context.compression-model-*` 独立配置。
+
 ## 按需启用集成
 
 | 能力 | 本地 demo | 可选集成 |

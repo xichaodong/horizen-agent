@@ -159,7 +159,7 @@ class PublishedAgentRuntimeTest {
         var sandbox =
                 new E2bSandboxProperties(
                         false, "", "", "", "", "/tmp/test-workspace", null, null, null, null, null);
-        var multimodal = new MultimodalProperties(null, null, null, null, null);
+        var multimodal = new MultimodalProperties(null, null, null, null);
         List<Path> roots = new CopyOnWriteArrayList<>();
         try (var runtime =
                      new PublishedAgentRuntime(

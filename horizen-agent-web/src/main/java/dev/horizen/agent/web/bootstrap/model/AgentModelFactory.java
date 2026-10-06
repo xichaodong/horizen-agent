@@ -2,6 +2,7 @@ package dev.horizen.agent.web.bootstrap.model;
 
 import dev.horizen.agent.web.config.AgentProperties;
 import dev.horizen.agent.web.config.ContextProperties;
+import dev.horizen.agent.web.config.VisionProperties;
 
 import io.agentscope.core.model.ChatModelBase;
 import io.agentscope.core.model.Model;
@@ -13,8 +14,10 @@ import io.agentscope.extensions.model.openai.formatter.OpenAIChatFormatter;
 
 import okhttp3.OkHttpClient.Builder;
 
+import java.net.URI;
+
 /**
- * 从经过校验的宿主配置创建主模型和压缩模型。
+ * 从经过校验的宿主配置分别创建主模型、视觉模型和压缩模型。
  */
 public final class AgentModelFactory {
     /**
@@ -52,6 +55,57 @@ public final class AgentModelFactory {
                 properties.getModelName(),
                 context.getModelContextWindowTokens(),
                 transport);
+    }
+
+    /**
+     * 创建独立视觉模型，供工具调用；关闭或脚本模式返回 null，不回退到主模型。
+     *
+     * @param primary 主模型配置，仅用于未显式填写的服务地址与凭据。
+     * @param vision  视觉配置；null 表示未启用。
+     * @return 独立视觉模型；未启用时为 null。
+     */
+    public static ChatModelBase vision(AgentProperties primary, VisionProperties vision) {
+        return vision(primary, vision, StandaloneTransport.INSTANCE);
+    }
+
+    /**
+     * 以宿主共享的可取消传输创建独立视觉模型，模型标识始终来自视觉配置。
+     *
+     * @param primary   主模型连接配置，仅提供可复用的连接参数。
+     * @param vision    视觉模型配置；null 表示未启用。
+     * @param transport 宿主持有的可取消 HTTP 传输，不改变模型的分工。
+     * @return 独立视觉模型；关闭或脚本模式时为 null。
+     */
+    public static ChatModelBase vision(AgentProperties primary, VisionProperties vision, HttpTransport transport) {
+        if (vision == null || !vision.isEnabled() || primary.getModelMode() == AgentProperties.ModelMode.SCRIPTED) {
+            return null;
+        }
+        String baseUrl = vision.getBaseUrl().isBlank() ? primary.getBaseUrl() : vision.getBaseUrl();
+        if (vision.getApiKey().isBlank() && !vision.getBaseUrl().isBlank()
+                && !sameProvider(primary.getBaseUrl(), baseUrl)) {
+            throw new IllegalArgumentException("horizen.agent.vision.api-key is required for a different vision provider");
+        }
+        String apiKey = vision.getApiKey().isBlank() ? primary.getApiKey() : vision.getApiKey();
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalArgumentException("horizen.agent.vision.api-key or primary api-key is required");
+        }
+        return openAi(apiKey, baseUrl, vision.getModelName(), 0, transport);
+    }
+
+    /**
+     * 比较协议、主机与有效端口，避免把主模型凭据隐式发送给另一家服务。
+     *
+     * @param primary 主模型服务地址。
+     * @param visual  视觉服务地址。
+     * @return 两个地址是否属于同一 HTTP 服务源。
+     */
+    private static boolean sameProvider(String primary, String visual) {
+        URI left = URI.create(primary);
+        URI right = URI.create(visual);
+        int leftPort = left.getPort() < 0 ? ("https".equalsIgnoreCase(left.getScheme()) ? 443 : 80) : left.getPort();
+        int rightPort = right.getPort() < 0 ? ("https".equalsIgnoreCase(right.getScheme()) ? 443 : 80) : right.getPort();
+        return left.getScheme().equalsIgnoreCase(right.getScheme())
+                && left.getHost() != null && left.getHost().equalsIgnoreCase(right.getHost()) && leftPort == rightPort;
     }
 
     /**

@@ -71,6 +71,7 @@ public final class ArtifactTurnInputService {
         List<AgentInputAttachment> images = new ArrayList<>();
         List<Artifact> resolved = new ArrayList<>();
         long total = 0;
+        int imageCount = 0;
         for (String artifactId : artifactIds) {
             Artifact artifact =
                     artifacts
@@ -90,8 +91,7 @@ public final class ArtifactTurnInputService {
                             : artifact.getMediaType().toLowerCase(Locale.ROOT);
             if (!mediaType.startsWith("image/")) continue;
             mediaType = ArtifactImagePolicy.requireSupportedMediaType(mediaType);
-            if (!directImages) continue;
-            if (images.size() >= maxImages) {
+            if (imageCount++ >= maxImages) {
                 throw new IllegalArgumentException("too many image artifacts; max=" + maxImages);
             }
             if (artifact.getSizeBytes() == null) {
@@ -106,6 +106,7 @@ public final class ArtifactTurnInputService {
             if (total > maxTotalImageBytes) {
                 throw new IllegalArgumentException("image artifacts exceed total byte limit");
             }
+            if (!directImages) continue;
             String url =
                     contents.createDownloadUrl(artifact.getContentRef(), imageUrlExpiresSeconds)
                             .toString();

@@ -1,6 +1,7 @@
 package dev.horizen.agent.web.execution;
 
 import dev.horizen.agent.web.config.AgentProperties;
+import dev.horizen.agent.web.config.VisionProperties;
 import dev.horizen.agent.web.config.AgentWorkspaceProperties;
 import dev.horizen.agent.web.config.E2bSandboxProperties;
 import dev.horizen.agent.web.config.GatewayProperties;
@@ -17,6 +18,11 @@ public final class AgentSecretRedactor implements Function<String, String> {
      * 当前配置的 Agent 实例，承担模型与工具循环执行。
      */
     private final AgentProperties agent;
+
+    /**
+     * 独立视觉模型的敏感凭据，仅用于诊断脱敏。
+     */
+    private final VisionProperties vision;
 
     /**
      * 外部工具目录与调用的网关适配器。
@@ -52,6 +58,7 @@ public final class AgentSecretRedactor implements Function<String, String> {
      * @param sandbox      当前Agent密钥脱敏器持有的沙箱对象，供相应处理步骤使用。
      * @param publications 当前Agent密钥脱敏器持有的发布集合对象，供相应处理步骤使用。
      * @param workspace    当前Agent密钥脱敏器持有的工作区对象，供相应处理步骤使用。
+     * @param vision       独立视觉模型的凭据配置。
      */
     public AgentSecretRedactor(
             AgentProperties agent,
@@ -59,8 +66,10 @@ public final class AgentSecretRedactor implements Function<String, String> {
             HorizenProperties horizen,
             E2bSandboxProperties sandbox,
             AgentWorkspaceProperties publications,
-            WorkspaceStorageProperties workspace) {
+            WorkspaceStorageProperties workspace,
+            VisionProperties vision) {
         this.agent = agent;
+        this.vision = vision;
         this.gateway = gateway;
         this.horizen = horizen;
         this.sandbox = sandbox;
@@ -77,8 +86,8 @@ public final class AgentSecretRedactor implements Function<String, String> {
     @Override
     public String apply(String value) {
         String redacted =
-                workspace.redact(
-                        sandbox.redact(horizen.redact(gateway.redact(agent.redact(value)))));
+                vision.redact(workspace.redact(
+                        sandbox.redact(horizen.redact(gateway.redact(agent.redact(value))))));
         return redacted == null || publicationToken == null || publicationToken.isBlank()
                 ? redacted
                 : redacted.replace(publicationToken, "***");

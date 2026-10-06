@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 class MultimodalPropertiesTest {
     @Test
     void appliesSafeDefaults() {
-        MultimodalProperties properties = new MultimodalProperties(null, null, null, null, null);
-        assertTrue(properties.isDirectImageInputEnabled());
+        MultimodalProperties properties = new MultimodalProperties(null, null, null, null);
         assertEquals(5, properties.getMaxImagesPerTurn());
         assertEquals(10L * 1024 * 1024, properties.getMaxImageBytes());
         assertEquals(20L * 1024 * 1024, properties.getMaxTotalImageBytes());
@@ -21,12 +20,12 @@ class MultimodalPropertiesTest {
     void rejectsInvalidLimits() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultimodalProperties(true, 0, 1L, 1L, 3600));
+                () -> new MultimodalProperties(0, 1L, 1L, 3600));
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultimodalProperties(true, 1, 10L, 9L, 3600));
+                () -> new MultimodalProperties(1, 10L, 9L, 3600));
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultimodalProperties(true, 1, 10L, 10L, 10));
+                () -> new MultimodalProperties(1, 10L, 10L, 10));
     }
 }

@@ -12,6 +12,7 @@ import dev.horizen.agent.web.config.ContextProperties;
 import dev.horizen.agent.web.config.E2bSandboxProperties;
 import dev.horizen.agent.web.config.GatewayProperties;
 import dev.horizen.agent.web.config.MultimodalProperties;
+import dev.horizen.agent.web.config.VisionProperties;
 import dev.horizen.agent.web.config.SandboxSnapshotProperties;
 
 import io.agentscope.harness.agent.DistributedStore;
@@ -52,6 +53,11 @@ public final class RuntimeAssembly {
      * 图片输入的数量、容量与引用策略配置。
      */
     MultimodalProperties multimodalProperties;
+
+    /**
+     * 独立视觉模型配置；未提供时不启用视觉工具。
+     */
+    VisionProperties visionProperties;
 
     /**
      * 本次运行使用的 Trace 采集与上报配置。

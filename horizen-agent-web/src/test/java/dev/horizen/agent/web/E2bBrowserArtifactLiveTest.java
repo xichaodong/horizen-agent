@@ -55,6 +55,7 @@ class E2bBrowserArtifactLiveTest {
     @Test
     void publishesSandboxScreenshotAsArtifact() throws Exception {
         Assumptions.assumeTrue(Boolean.getBoolean("horizen.e2b.browser.artifact.live"));
+        String visionModelName = required("browser.live.model.name");
         HikariDataSource dataSource = dataSource();
         String owner = "browser-live-" + UUID.randomUUID().toString().replace("-", "");
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
@@ -97,14 +98,8 @@ class E2bBrowserArtifactLiveTest {
             OpenAIChatModel model =
                     OpenAIChatModel.builder()
                             .apiKey(required("browser.live.model.apiKey"))
-                            .baseUrl(
-                                    System.getProperty(
-                                            "browser.live.model.baseUrl",
-                                            "https://ark.cn-beijing.volces.com/api/v3"))
-                            .modelName(
-                                    System.getProperty(
-                                            "browser.live.model.name",
-                                            "deepseek-v4-1-flash-260910"))
+                            .baseUrl(required("browser.live.model.baseUrl"))
+                            .modelName(visionModelName)
                             .stream(true)
                             .formatter(new OpenAIChatFormatter())
                             .build();
@@ -187,7 +182,17 @@ class E2bBrowserArtifactLiveTest {
 
     private static String environmentValue(String name) {
         return switch (name) {
-            case "browser.live.model.apiKey" -> LiveConfiguration.environment("ARK_API_KEY");
+            case "browser.live.model.apiKey" -> {
+                String vision = LiveConfiguration.environment("AGENT_VISION_API_KEY");
+                yield vision == null || vision.isBlank() ? LiveConfiguration.environment("ARK_API_KEY") : vision;
+            }
+            case "browser.live.model.baseUrl" -> {
+                String vision = LiveConfiguration.environment("AGENT_VISION_BASE_URL");
+                String primary = LiveConfiguration.environment("ARK_BASE_URL");
+                yield vision == null || vision.isBlank()
+                        ? (primary == null || primary.isBlank() ? "https://ark.cn-beijing.volces.com/api/v3" : primary) : vision;
+            }
+            case "browser.live.model.name" -> LiveConfiguration.environment("AGENT_VISION_MODEL");
             case "browser.live.e2b.apiKey" -> LiveConfiguration.environment("AGENT_E2B_API_KEY");
             case "browser.live.e2b.apiBaseUrl" -> LiveConfiguration.environment("AGENT_E2B_API_BASE_URL");
             case "browser.live.e2b.runtime" -> LiveConfiguration.environment("AGENT_E2B_RUNTIME_BASE_URL_PATTERN");

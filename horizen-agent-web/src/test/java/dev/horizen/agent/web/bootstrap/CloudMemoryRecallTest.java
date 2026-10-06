@@ -233,7 +233,7 @@ class CloudMemoryRecallTest {
                 null,
                 null,
                 new E2bSandboxProperties(false, "", "", "", "", "", null, null, null, null, null),
-                new MultimodalProperties(false, null, null, null, null),
+                new MultimodalProperties(null, null, null, null),
                 new ToolDescriptorRegistry(),
                 new CloudMemoryService(documents));
         return agent;

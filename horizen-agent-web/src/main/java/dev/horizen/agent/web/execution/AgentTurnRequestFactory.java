@@ -94,7 +94,7 @@ public final class AgentTurnRequestFactory implements TurnRequestFactory {
                                     request.getSessionId(),
                                     turnId,
                                     request.getArtifactIds(),
-                                    multimodal.isDirectImageInputEnabled(),
+                                    false,
                                     multimodal.getMaxImagesPerTurn(),
                                     multimodal.getMaxImageBytes(),
                                     multimodal.getMaxTotalImageBytes(),
@@ -134,7 +134,7 @@ public final class AgentTurnRequestFactory implements TurnRequestFactory {
         if (!request.getArtifactIds().isEmpty()) {
             message.append("\n\n本轮可用 Artifact：")
                     .append(String.join(", ", request.getArtifactIds()))
-                    .append("。历史只保存 Artifact 引用；重新分析图片时调用 vision_analyze，")
+                    .append("。图片不直接发送给主模型；分析图片时必须调用 vision_analyze，由独立视觉模型读取，")
                     .append("读取其他文件时调用 load_artifact。");
         }
         List<Map<String, Object>> recent =

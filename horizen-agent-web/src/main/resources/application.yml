@@ -77,8 +77,12 @@ horizen:
       max-event-bytes: ${AGENT_EVENT_MAX_EVENT_BYTES:262144}
       max-turn-bytes: ${AGENT_EVENT_MAX_TURN_BYTES:8388608}
       max-turn-events: ${AGENT_EVENT_MAX_TURN_EVENTS:32768}
+    vision:
+      enabled: ${AGENT_VISION_ENABLED:false}
+      model-name: ${AGENT_VISION_MODEL:}
+      base-url: ${AGENT_VISION_BASE_URL:}
+      api-key: ${AGENT_VISION_API_KEY:}
     multimodal:
-      direct-image-input-enabled: ${AGENT_MULTIMODAL_DIRECT_IMAGE_INPUT_ENABLED:true}
       max-images-per-turn: ${AGENT_MULTIMODAL_MAX_IMAGES:5}
       max-image-bytes: ${AGENT_MULTIMODAL_MAX_IMAGE_BYTES:10485760}
       max-total-image-bytes: ${AGENT_MULTIMODAL_MAX_TOTAL_IMAGE_BYTES:20971520}

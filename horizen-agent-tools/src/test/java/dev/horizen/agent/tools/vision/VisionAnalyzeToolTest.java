@@ -25,6 +25,9 @@ import io.agentscope.core.model.GenerateOptions;
 import io.agentscope.core.model.Model;
 import io.agentscope.core.model.ToolSchema;
 import io.agentscope.core.tool.ToolCallParam;
+import io.agentscope.core.tool.ToolBase;
+import dev.horizen.agent.tools.browser.SandboxBrowserVisionTool;
+import reactor.core.publisher.Mono;
 
 import org.junit.jupiter.api.Test;
 
@@ -112,7 +115,49 @@ class VisionAnalyzeToolTest {
                                         .build())
                         .block();
         assertTrue(sawImage.get());
+        assertEquals("vision-test", result.getMetadata().get("visionModel"));
         assertEquals("a blue chart", ((TextBlock) result.getOutput().get(0)).getText());
+    }
+
+    @Test
+    void browserScreenshotUsesTheSameDedicatedVisionToolAndReturnsOnlyText() {
+        Artifact image = new Artifact("image-1", "owner", ArtifactKind.FILE, ArtifactState.READY,
+                "image.png", "image/png", "memory:image", 8L, null, null, ArtifactSource.USER,
+                null, null, Instant.EPOCH, Instant.EPOCH, null, 0);
+        AtomicBoolean sawImage = new AtomicBoolean();
+        Model visual = new Model() {
+            public Flux<ChatResponse> stream(List<Msg> messages, List<ToolSchema> tools, GenerateOptions options) {
+                sawImage.set(messages.get(0).hasContentBlocks(ImageBlock.class));
+                return Flux.just(ChatResponse.builder().content(List.of(TextBlock.builder().text("a blue chart").build())).build());
+            }
+
+            public String getModelName() {
+                return "browser-image-model";
+            }
+        };
+        ToolBase screenshot = new ToolBase(ToolBase.builder().name("browser_screenshot").description("合成截图测试").inputSchema(Map.of())) {
+            public Mono<ToolResultBlock> callAsync(ToolCallParam param) {
+                assertEquals("owner", param.getRuntimeContext().getUserId());
+                return Mono.just(ToolResultBlock.text("{\"artifact_id\":\"image-1\"}"));
+            }
+        };
+        var tool = new SandboxBrowserVisionTool(screenshot,
+                new VisionAnalyzeTool(visual, new SingleArtifactStore(image), new BytesStore()));
+        var result = tool.callAsync(ToolCallParam.builder()
+                .runtimeContext(RuntimeContext.builder().userId("owner").sessionId("session").build())
+                .input(Map.of("question", "describe the screenshot")).build()).block();
+        assertTrue(sawImage.get());
+        assertEquals("a blue chart", ((TextBlock) result.getOutput().get(0)).getText());
+        assertEquals("browser-image-model", result.getMetadata().get("visionModel"));
+        assertTrue(result.getOutput().stream().noneMatch(ImageBlock.class::isInstance));
+    }
+
+    @Test
+    void unconfiguredVisionReturnsAnErrorWithoutUsingAnotherModel() {
+        var tool = new VisionAnalyzeTool(null, null, null);
+        var result = tool.callAsync(ToolCallParam.builder().input(Map.of("artifact_id", "image-1")).build()).block();
+        assertEquals("error", result.getState().getValue());
+        assertTrue(((TextBlock) result.getOutput().get(0)).getText().contains("Independent vision model"));
     }
 
     private static final class BytesStore implements ArtifactContentStore {

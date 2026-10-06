@@ -37,7 +37,7 @@ public class RuntimeInfrastructure {
     CloudMemoryService memory;
 
     /**
-     * 主模型与压缩模型共用的可取消 HTTP 传输实现。
+     * 主模型、视觉模型与压缩模型共用的可取消 HTTP 传输；模型实例和用途分别配置。
      */
     HttpTransport modelTransport;
 }
