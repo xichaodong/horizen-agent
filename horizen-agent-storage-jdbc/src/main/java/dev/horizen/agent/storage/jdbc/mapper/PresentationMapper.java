@@ -21,7 +21,7 @@ public interface PresentationMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateCreateOrFind(
+    int insertPresentation(
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
             @Param("turnId") String turnId,

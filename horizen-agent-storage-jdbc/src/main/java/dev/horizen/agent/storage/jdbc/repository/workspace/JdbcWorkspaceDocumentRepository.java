@@ -436,7 +436,7 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
                         transactions.execute(
                                 () -> {
                                     int n =
-                                            mapper.updateDelete(
+                                            mapper.deleteDocument(
                                                     key.getOwnerKey(),
                                                     key.getAgentKey(),
                                                     key.getScopeKey(),
@@ -487,7 +487,7 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
      */
     private void insert(Prepared p) {
         var fileClass = WorkspaceFilePolicy.classify(p.key.getDocumentPath());
-        mapper.updateInsert(
+        mapper.insertDocument(
                 WorkspaceFileRow.builder()
                         .ownerKey(p.key.getOwnerKey())
                         .agentKey(p.key.getAgentKey())
@@ -513,7 +513,7 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
      */
     private void update(Prepared p) {
         int n =
-                mapper.updateUpdate(
+                mapper.updateDocument(
                         WorkspaceFileRow.builder()
                                 .contentRef(p.reference)
                                 .checksumSha256(p.checksum)
@@ -555,7 +555,7 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
             String sessionId,
             String turnId,
             String toolCallId) {
-        mapper.updateLog(
+        mapper.insertDocumentOperation(
                 WorkspaceOperationRow.builder()
                         .ownerKey(key.getOwnerKey())
                         .agentKey(key.getAgentKey())

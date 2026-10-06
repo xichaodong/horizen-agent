@@ -17,7 +17,7 @@ public interface TurnTimelineMapper {
      * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次处理得到的结果集合。
      */
-    List<String> selectAppend(
+    List<String> selectMessageIdsForTurn(
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
             @Param("turnId") String turnId);
@@ -32,7 +32,7 @@ public interface TurnTimelineMapper {
      * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次处理得到的结果集合。
      */
-    List<String> selectAttach(
+    List<String> selectHistoryPayload(
             @Param("ownerKey") String ownerKey,
             @Param("recordType") String recordType,
             @Param("recordId") String recordId,
@@ -51,7 +51,7 @@ public interface TurnTimelineMapper {
      * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次操作返回的整数结果。
      */
-    int updateAttach(
+    int attachTimelineEvent(
             @Param("timelinePayloadJson") String timelinePayloadJson,
             @Param("timelineCreatedAt") Timestamp timelineCreatedAt,
             @Param("ownerKey") String ownerKey,
@@ -70,7 +70,7 @@ public interface TurnTimelineMapper {
      * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次操作返回的对话历史存储记录结果。
      */
-    ConversationHistoryRow selectAttach2(
+    ConversationHistoryRow selectTimelineEvent(
             @Param("ownerKey") String ownerKey,
             @Param("recordType") String recordType,
             @Param("recordId") String recordId,

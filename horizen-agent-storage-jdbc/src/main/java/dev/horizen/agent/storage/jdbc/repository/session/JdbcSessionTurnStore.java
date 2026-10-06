@@ -136,7 +136,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
                     StartTurnResult.Outcome.SESSION_BUSY, null, session.getActiveTurnId());
         }
 
-        mapper.updateStartTurnInTransaction(
+        mapper.insertTurn(
                 ownerKey,
                 command.getTurnId(),
                 command.getSessionId(),
@@ -162,7 +162,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
                 command.getStartedAt());
 
         int updated =
-                mapper.updateStartTurnInTransaction2(
+                mapper.claimSessionForTurn(
                         command.getTurnId(),
                         sequence + 1,
                         JdbcExecutionMappings.timestamp(command.getStartedAt()),
@@ -237,7 +237,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
                 command.getTargetStatus().isTerminal() ? command.getOccurredAt() : null;
 
         int updated =
-                mapper.updateTransitionInTransaction(
+                mapper.transitionTurn(
                         command.getTargetStatus().name(),
                         executorId,
                         JdbcExecutionMappings.nullableTimestamp(leaseExpiresAt),
@@ -281,14 +281,14 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
         if (command.getTargetStatus().isTerminal()) {
             if (nextSequence == null) {
                 updated =
-                        mapper.updateUpdateSessionAfterTransition(
+                        mapper.releaseSessionTurn(
                                 JdbcExecutionMappings.timestamp(command.getOccurredAt()),
                                 command.getOwnerKey(),
                                 command.getSessionId(),
                                 command.getTurnId());
             } else {
                 updated =
-                        mapper.updateUpdateSessionAfterTransition2(
+                        mapper.releaseSessionTurnWithMessage(
                                 nextSequence,
                                 JdbcExecutionMappings.timestamp(command.getOccurredAt()),
                                 JdbcExecutionMappings.timestamp(command.getOccurredAt()),
@@ -300,7 +300,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
             return;
         }
         updated =
-                mapper.updateUpdateSessionAfterTransition3(
+                mapper.touchActiveSession(
                         JdbcExecutionMappings.timestamp(command.getOccurredAt()),
                         command.getOwnerKey(),
                         command.getSessionId(),
@@ -601,7 +601,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     private void ensureSession(
             String ownerKey, String sessionId, String actorId, String firstMessage, Instant now) {
         try {
-            mapper.updateEnsureSession(
+            mapper.insertSession(
                     ownerKey,
                     sessionId,
                     SessionStatus.ACTIVE.name(),
@@ -696,7 +696,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
             String content,
             long sequence,
             Instant now) {
-        mapper.updateInsertMessage(
+        mapper.insertMessage(
                 ownerKey,
                 sessionId,
                 turnId,

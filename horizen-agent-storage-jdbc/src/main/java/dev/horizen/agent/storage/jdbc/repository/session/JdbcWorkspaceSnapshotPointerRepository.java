@@ -75,17 +75,16 @@ public class JdbcWorkspaceSnapshotPointerRepository implements WorkspaceSnapshot
         if (next == null || !next.matches("[A-Za-z0-9][A-Za-z0-9_-]{0,159}"))
             throw new IllegalArgumentException("Invalid snapshotId");
         if (executorId == null)
-            return mapper.updateCompareAndSetCommitted(
-                            next, key.getOwnerKey(), key.getSessionId(), expected, expected)
+            return mapper.compareAndSetSnapshot(
+                            next, key.getOwnerKey(), key.getSessionId(), expected)
                     == 1;
         if (turnId == null)
             throw new IllegalStateException("Snapshot commit requires an execution identity");
-        return mapper.updateCompareAndSetCommitted2(
+        return mapper.compareAndSetSnapshotForActiveTurn(
                         next,
                         key.getOwnerKey(),
                         key.getSessionId(),
                         turnId,
-                        expected,
                         expected,
                         turnId,
                         executorId)
@@ -106,7 +105,7 @@ public class JdbcWorkspaceSnapshotPointerRepository implements WorkspaceSnapshot
         if (snapshotId == null || !snapshotId.matches("[A-Za-z0-9][A-Za-z0-9_-]{0,159}")) {
             throw new IllegalArgumentException("Invalid snapshotId");
         }
-        int updated = mapper.updateSaveCommitted(snapshotId, key.getOwnerKey(), key.getSessionId());
+        int updated = mapper.updateSnapshot(snapshotId, key.getOwnerKey(), key.getSessionId());
         if (updated != 1 && findSnapshotId(key).filter(snapshotId::equals).isEmpty()) {
             throw new IllegalStateException("Workspace Session does not exist");
         }

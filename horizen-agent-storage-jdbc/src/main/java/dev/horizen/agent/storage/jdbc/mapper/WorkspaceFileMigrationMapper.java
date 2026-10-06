@@ -16,7 +16,7 @@ public interface WorkspaceFileMigrationMapper {
      * @param limit 本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      */
-    List<WorkspaceDocumentRow> selectMigrateBatch(@Param("limit") Integer limit);
+    List<WorkspaceDocumentRow> selectUnmigratedDocuments(@Param("limit") Integer limit);
 
     /**
      * 写入新的工作区文件记录，字段绑定由当前 SQL 映射明确指定。 查询或更新限定在传入的数据归属范围内。
@@ -37,7 +37,7 @@ public interface WorkspaceFileMigrationMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateMigrateFile(
+    int insertMigratedFile(
             @Param("ownerKey") String ownerKey,
             @Param("agentKey") String agentKey,
             @Param("scopeKey") String scopeKey,
@@ -62,7 +62,7 @@ public interface WorkspaceFileMigrationMapper {
      * @param pathHash 路径的内容摘要，供校验或去重使用。
      * @return 本次处理得到的结果集合。
      */
-    List<Map<String, Object>> selectMigrateOperationIds(
+    List<Map<String, Object>> selectLegacyAppendOperations(
             @Param("ownerKey") String ownerKey,
             @Param("agentKey") String agentKey,
             @Param("scopeKey") String scopeKey,
@@ -81,7 +81,7 @@ public interface WorkspaceFileMigrationMapper {
      * @param createdAt 当前记录的创建时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateMigrateOperationIds(
+    int insertMigratedOperation(
             @Param("ownerKey") String ownerKey,
             @Param("agentKey") String agentKey,
             @Param("scopeKey") String scopeKey,
@@ -106,7 +106,7 @@ public interface WorkspaceFileMigrationMapper {
      * @param createdAt 当前记录的创建时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateInsertAudit(
+    int insertMigrationAudit(
             @Param("ownerKey") String ownerKey,
             @Param("agentKey") String agentKey,
             @Param("scopeKey") String scopeKey,

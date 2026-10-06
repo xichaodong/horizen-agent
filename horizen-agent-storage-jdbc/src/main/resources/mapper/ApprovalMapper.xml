@@ -1,37 +1,120 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="dev.horizen.agent.storage.jdbc.mapper.ApprovalMapper">
-  <insert id="updateInsertPending" >
-    INSERT INTO ha_interaction (
-    owner_key, interaction_type, interaction_id, session_id, turn_id, reply_id,
-    tool_call_id, status, request_json, response_json, expires_at,
-    created_at, updated_at, version
-) VALUES (#{ownerKey}, 'APPROVAL', #{interactionId}, #{sessionId}, #{turnId}, #{replyId}, #{toolCallId}, 'PENDING', #{requestJson}, '{}', #{expiresAt}, #{createdAt}, #{updatedAt}, 0)
-  </insert>
+    <insert id="insertPendingApproval">
+        INSERT INTO
+            ha_interaction (
+                owner_key,
+                interaction_type,
+                interaction_id,
+                session_id,
+                turn_id,
+                reply_id,
+                tool_call_id,
+                status,
+                request_json,
+                response_json,
+                expires_at,
+                created_at,
+                updated_at,
+                version
+            )
+        VALUES
+            (
+                #{ownerKey},
+                'APPROVAL',
+                #{interactionId},
+                #{sessionId},
+                #{turnId},
+                #{replyId},
+                #{toolCallId},
+                'PENDING',
+                #{requestJson},
+                '{}',
+                #{expiresAt},
+                #{createdAt},
+                #{updatedAt},
+                0
+            )
+    </insert>
 
-  <select id="selectInsertPending" resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow">
-    SELECT * FROM ha_interaction
-WHERE owner_key = #{ownerKey} AND interaction_type = 'APPROVAL' AND turn_id = #{turnId} AND tool_call_id = #{toolCallId}
-  </select>
+    <select
+        id="selectApprovalByToolCall"
+        resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow"
+    >
+        SELECT
+            *
+        FROM
+            ha_interaction
+        WHERE
+            owner_key = #{ownerKey}
+            AND interaction_type = 'APPROVAL'
+            AND turn_id = #{turnId}
+            AND tool_call_id = #{toolCallId}
+    </select>
 
-  <select id="selectFindPending" resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow">
-    SELECT * FROM ha_interaction
-WHERE owner_key = #{ownerKey} AND interaction_type = 'APPROVAL' AND session_id = #{sessionId} AND turn_id = #{turnId} AND status = #{status}
-ORDER BY created_at, interaction_id
-  </select>
+    <select
+        id="selectPendingApprovals"
+        resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow"
+    >
+        SELECT
+            *
+        FROM
+            ha_interaction
+        WHERE
+            owner_key = #{ownerKey}
+            AND interaction_type = 'APPROVAL'
+            AND session_id = #{sessionId}
+            AND turn_id = #{turnId}
+            AND status = #{status}
+        ORDER BY
+            created_at,
+            interaction_id
+    </select>
 
-  <select id="selectDecideInTransaction" resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow">
-    SELECT * FROM ha_interaction
-WHERE owner_key = #{ownerKey} AND interaction_type = 'APPROVAL' AND interaction_id = #{interactionId} FOR UPDATE
-  </select>
+    <select
+        id="selectApprovalForUpdate"
+        resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow"
+    >
+        SELECT
+            *
+        FROM
+            ha_interaction
+        WHERE
+            owner_key = #{ownerKey}
+            AND interaction_type = 'APPROVAL'
+            AND interaction_id = #{interactionId} FOR
+        UPDATE
+    </select>
 
-  <update id="updateDecideInTransaction" >
-    UPDATE ha_interaction
-SET status = #{status}, response_json = #{responseJson}, resolved_at = #{resolvedAt}, updated_at = #{updatedAt}, version = version + 1
-WHERE owner_key = #{ownerKey} AND interaction_type = 'APPROVAL' AND interaction_id = #{interactionId} AND status = #{status2} AND version = #{version}
-  </update>
+    <update id="updateApprovalDecision">
+        UPDATE ha_interaction
+        SET
+            status = #{status},
+            response_json = #{responseJson},
+            resolved_at = #{resolvedAt},
+            updated_at = #{updatedAt},
+            version = version + 1
+        WHERE
+            owner_key = #{ownerKey}
+            AND interaction_type = 'APPROVAL'
+            AND interaction_id = #{interactionId}
+            AND status = #{expectedStatus}
+            AND version = #{version}
+    </update>
 
-  <select id="selectDecideInTransaction2" resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow">
-    SELECT * FROM ha_interaction WHERE owner_key = #{ownerKey} AND interaction_type = 'APPROVAL' AND interaction_id = #{interactionId}
-  </select>
+    <select
+        id="selectApprovalById"
+        resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow"
+    >
+        SELECT
+            *
+        FROM
+            ha_interaction
+        WHERE
+            owner_key = #{ownerKey}
+            AND interaction_type = 'APPROVAL'
+            AND interaction_id = #{interactionId}
+    </select>
 </mapper>

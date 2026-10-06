@@ -24,7 +24,7 @@ public interface ApprovalMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateInsertPending(
+    int insertPendingApproval(
             @Param("ownerKey") String ownerKey,
             @Param("interactionId") String interactionId,
             @Param("sessionId") String sessionId,
@@ -44,7 +44,7 @@ public interface ApprovalMapper {
      * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
      * @return 本次处理得到的结果集合。
      */
-    List<InteractionRow> selectInsertPending(
+    List<InteractionRow> selectApprovalByToolCall(
             @Param("ownerKey") String ownerKey,
             @Param("turnId") String turnId,
             @Param("toolCallId") String toolCallId);
@@ -58,7 +58,7 @@ public interface ApprovalMapper {
      * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
      * @return 本次处理得到的结果集合。
      */
-    List<InteractionRow> selectFindPending(
+    List<InteractionRow> selectPendingApprovals(
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
             @Param("turnId") String turnId,
@@ -71,7 +71,7 @@ public interface ApprovalMapper {
      * @param interactionId 交互的标识，用于关联相应记录或执行。
      * @return 本次处理得到的结果集合。
      */
-    List<InteractionRow> selectDecideInTransaction(
+    List<InteractionRow> selectApprovalForUpdate(
             @Param("ownerKey") String ownerKey, @Param("interactionId") String interactionId);
 
     /**
@@ -83,18 +83,18 @@ public interface ApprovalMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param interactionId 交互的标识，用于关联相应记录或执行。
-     * @param status2 当前审批映射器使用的状态2，供其处理与状态记录使用。
+     * @param expectedStatus 更新前必须匹配的原状态，用于拒绝已被其他执行修改的记录。
      * @param version 记录版本，用于乐观并发控制或区分协议版本。
      * @return 本次操作返回的整数结果。
      */
-    int updateDecideInTransaction(
+    int updateApprovalDecision(
             @Param("status") String status,
             @Param("responseJson") String responseJson,
             @Param("resolvedAt") Timestamp resolvedAt,
             @Param("updatedAt") Timestamp updatedAt,
             @Param("ownerKey") String ownerKey,
             @Param("interactionId") String interactionId,
-            @Param("status2") String status2,
+            @Param("expectedStatus") String expectedStatus,
             @Param("version") Object version);
 
     /**
@@ -104,6 +104,6 @@ public interface ApprovalMapper {
      * @param interactionId 交互的标识，用于关联相应记录或执行。
      * @return 本次处理得到的结果集合。
      */
-    List<InteractionRow> selectDecideInTransaction2(
+    List<InteractionRow> selectApprovalById(
             @Param("ownerKey") String ownerKey, @Param("interactionId") String interactionId);
 }

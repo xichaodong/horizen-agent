@@ -18,7 +18,7 @@ public interface WorkspaceAuditMapper {
      * @param limit 本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      */
-    List<WorkspaceOperationRow> selectList(
+    List<WorkspaceOperationRow> selectScopeOperations(
             @Param("ownerKey") String ownerKey,
             @Param("agentKey") String agentKey,
             @Param("scopeKey") String scopeKey,
@@ -36,7 +36,7 @@ public interface WorkspaceAuditMapper {
      * @param limit 本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      */
-    List<WorkspaceOperationRow> selectList2(
+    List<WorkspaceOperationRow> selectPathOperations(
             @Param("ownerKey") String ownerKey,
             @Param("agentKey") String agentKey,
             @Param("scopeKey") String scopeKey,

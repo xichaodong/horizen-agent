@@ -1,41 +1,117 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="dev.horizen.agent.storage.jdbc.mapper.SessionHistoryMapper">
     <sql id="Visible">
-        FROM ha_session s JOIN ha_session c ON c.owner_key=#{owner} AND c.session_id=#{current}
-        <if test="withMessages">JOIN ha_conversation_history h ON h.owner_key=s.owner_key AND h.session_id=s.session_id</if>
-        WHERE s.owner_key=c.owner_key AND s.status='ACTIVE' AND c.status='ACTIVE'
-          AND (s.project_id=c.project_id OR (s.project_id IS NULL AND c.project_id IS NULL))
-          AND (s.agent_key=c.agent_key OR (s.agent_key IS NULL AND c.agent_key IS NULL))
+        FROM ha_session s
+        JOIN ha_session c ON c.owner_key = #{owner} AND c.session_id = #{current}
+        <if test="withMessages">
+            JOIN ha_conversation_history h
+                ON h.owner_key = s.owner_key AND h.session_id = s.session_id
+        </if>
+        WHERE s.owner_key = c.owner_key
+            AND s.status = 'ACTIVE'
+            AND c.status = 'ACTIVE'
+            AND (s.project_id = c.project_id OR (s.project_id IS NULL AND c.project_id IS NULL))
+            AND (s.agent_key = c.agent_key OR (s.agent_key IS NULL AND c.agent_key IS NULL))
     </sql>
-    <sql id="Content">JSON_UNQUOTE(JSON_EXTRACT(h.payload_json,'$.content'))</sql>
+
+    <sql id="Content">
+        JSON_UNQUOTE(JSON_EXTRACT(h.payload_json, '$.content'))
+    </sql>
+
     <sql id="HistoryFilter">
-        AND h.record_type='MESSAGE'
-        AND JSON_UNQUOTE(JSON_EXTRACT(h.payload_json,'$.status'))='FINAL'
-        AND JSON_UNQUOTE(JSON_EXTRACT(h.payload_json,'$.role')) IN ('USER','ASSISTANT')
-        <choose><when test="target != null">AND s.session_id=#{target}</when><otherwise>AND s.session_id&lt;&gt;#{current}</otherwise></choose>
-        <if test="message != null">AND h.record_id=#{message}</if>
-        <if test="searching">AND (LOWER(s.title) LIKE #{pattern} ESCAPE '!' OR LOWER(<include refid="Content"/>) LIKE #{pattern} ESCAPE '!')</if>
+        AND h.record_type = 'MESSAGE'
+        AND JSON_UNQUOTE(JSON_EXTRACT(h.payload_json, '$.status')) = 'FINAL'
+        AND JSON_UNQUOTE(JSON_EXTRACT(h.payload_json, '$.role')) IN ('USER', 'ASSISTANT')
+        <choose>
+            <when test="target != null">
+                AND s.session_id = #{target}
+            </when>
+            <otherwise>
+                AND s.session_id &lt;&gt; #{current}
+            </otherwise>
+        </choose>
+        <if test="message != null">
+            AND h.record_id = #{message}
+        </if>
+        <if test="searching">
+            AND (
+                LOWER(s.title) LIKE #{pattern} ESCAPE '!'
+                OR LOWER(<include refid="Content" />) LIKE #{pattern} ESCAPE '!'
+            )
+        </if>
     </sql>
+
     <sql id="Start">
-        <choose><when test="searching">GREATEST(1,LOCATE(#{keyword},LOWER(<include refid="Content"/>))-60)</when><otherwise>#{textStart}</otherwise></choose>
+        <choose>
+            <when test="searching">
+                GREATEST(1, LOCATE(#{keyword}, LOWER(<include refid="Content" />)) - 60)
+            </when>
+            <otherwise>
+                #{textStart}
+            </otherwise>
+        </choose>
     </sql>
-    <select id="visibleCurrent" resultType="java.lang.String" timeout="${leaseQueryTimeoutSeconds}">
-        SELECT c.session_id <include refid="Visible"/> AND s.session_id=#{current}
+
+    <select
+        id="visibleCurrent"
+        resultType="java.lang.String"
+        timeout="${leaseQueryTimeoutSeconds}"
+    >
+        SELECT c.session_id
+        <include refid="Visible" />
+        AND s.session_id = #{current}
     </select>
-    <select id="targetTitles" resultType="java.lang.String" timeout="${leaseQueryTimeoutSeconds}">
-        SELECT s.title <include refid="Visible"/> AND s.session_id=#{target}
+
+    <select
+        id="targetTitles"
+        resultType="java.lang.String"
+        timeout="${leaseQueryTimeoutSeconds}"
+    >
+        SELECT s.title
+        <include refid="Visible" />
+        AND s.session_id = #{target}
     </select>
-    <select id="countHistory" resultType="java.lang.Long" timeout="${leaseQueryTimeoutSeconds}">
-        SELECT COUNT(*) <include refid="Visible"/> <include refid="HistoryFilter"/>
+
+    <select
+        id="countHistory"
+        resultType="java.lang.Long"
+        timeout="${leaseQueryTimeoutSeconds}"
+    >
+        SELECT COUNT(*)
+        <include refid="Visible" />
+        <include refid="HistoryFilter" />
     </select>
-    <select id="selectHistory" resultType="dev.horizen.agent.storage.jdbc.model.SessionHistoryRow" timeout="${leaseQueryTimeoutSeconds}">
-        SELECT s.session_id,s.title,h.turn_id,h.record_id,h.message_sequence,h.created_at,
-            JSON_UNQUOTE(JSON_EXTRACT(h.payload_json,'$.role')) AS message_role,
-            SUBSTRING(<include refid="Content"/>,<include refid="Start"/>,#{contentLimit}) AS excerpt,
-            (<include refid="Start"/>-1) AS content_offset, CHAR_LENGTH(<include refid="Content"/>) AS content_length
-        <include refid="Visible"/> <include refid="HistoryFilter"/>
-        <choose><when test="searching">ORDER BY h.created_at DESC,h.history_sequence DESC</when><otherwise>ORDER BY h.message_sequence,h.history_sequence</otherwise></choose>
+
+    <select
+        id="selectHistory"
+        resultType="dev.horizen.agent.storage.jdbc.model.SessionHistoryRow"
+        timeout="${leaseQueryTimeoutSeconds}"
+    >
+        SELECT
+            s.session_id,
+            s.title,
+            h.turn_id,
+            h.record_id,
+            h.message_sequence,
+            h.created_at,
+            JSON_UNQUOTE(JSON_EXTRACT(h.payload_json, '$.role')) AS message_role,
+            SUBSTRING(<include refid="Content" />, <include
+            refid="Start"
+        />, #{contentLimit}) AS excerpt,
+            (<include refid="Start" /> - 1) AS content_offset,
+            CHAR_LENGTH(<include refid="Content" />) AS content_length
+        <include refid="Visible" />
+        <include refid="HistoryFilter" />
+        <choose>
+            <when test="searching">
+                ORDER BY h.created_at DESC, h.history_sequence DESC
+            </when>
+            <otherwise>
+                ORDER BY h.message_sequence, h.history_sequence
+            </otherwise>
+        </choose>
         LIMIT #{limit} OFFSET #{offset}
     </select>
 </mapper>

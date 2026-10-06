@@ -32,7 +32,7 @@ public interface ArtifactMapper {
      * @param deletedAt 记录进入删除状态的时间，供生命周期和审计查询使用。
      * @return 本次操作返回的整数结果。
      */
-    int updateCreate(
+    int insertArtifact(
             @Param("ownerKey") String ownerKey,
             @Param("artifactId") String artifactId,
             @Param("kind") String kind,
@@ -81,7 +81,7 @@ public interface ArtifactMapper {
      * @param version 记录版本，用于乐观并发控制或区分协议版本。
      * @return 本次操作返回的整数结果。
      */
-    int updateUpdate(
+    int updateArtifact(
             @Param("kind") String kind,
             @Param("status") String status,
             @Param("title") String title,
@@ -113,7 +113,7 @@ public interface ArtifactMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateAddReference(
+    int insertArtifactReference(
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
             @Param("turnId") String turnId,
@@ -131,7 +131,7 @@ public interface ArtifactMapper {
      * @param recordId 历史或审计记录的标识，用于定位单条持久化事实。
      * @return 本次处理得到的结果集合。
      */
-    List<ConversationHistoryRow> selectAddReference(
+    List<ConversationHistoryRow> selectArtifactReference(
             @Param("ownerKey") String ownerKey, @Param("recordId") String recordId);
 
     /**
@@ -142,7 +142,7 @@ public interface ArtifactMapper {
      * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次处理得到的结果集合。
      */
-    List<Map<String, Object>> selectAttachToUserMessage(
+    List<Map<String, Object>> selectUserMessagesForTurn(
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
             @Param("turnId") String turnId);
@@ -154,7 +154,7 @@ public interface ArtifactMapper {
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @return 本次处理生成或读取的文本。
      */
-    String selectAttachToUserMessage2(
+    String selectMessagePayloadForUpdate(
             @Param("historySequence") Object historySequence, @Param("ownerKey") String ownerKey);
 
     /**
@@ -165,7 +165,7 @@ public interface ArtifactMapper {
      * @param recordId 历史或审计记录的标识，用于定位单条持久化事实。
      * @return 本次操作返回的整数结果。
      */
-    int updateAttachToUserMessage(
+    int updateMessagePayload(
             @Param("payloadJson") String payloadJson,
             @Param("ownerKey") String ownerKey,
             @Param("recordId") Object recordId);
@@ -193,8 +193,19 @@ public interface ArtifactMapper {
     /**
      * 按映射语句的筛选与分页条件读取ha_artifact记录。
      *
-     * @param parameters 调用参数集合，由相应工具或协议转换器解释。
+     * @param ownerKey 同时限定消息历史和产物元数据的归属范围。
+     * @param sessionId 只读取该会话中引用过的产物。
+     * @param readyStatus 必须匹配的产物就绪状态。
+     * @param limit 最多返回的产物数量。
+     * @param offset 分页时跳过的产物数量。
+     * @param outputsOnly 是否只列出 OUTPUT 引用对应的产物。
      * @return 本次处理得到的结果集合。
      */
-    List<ArtifactRow> selectReady(Map<String, Object> parameters);
+    List<ArtifactRow> selectReady(
+            @Param("ownerKey") String ownerKey,
+            @Param("sessionId") String sessionId,
+            @Param("readyStatus") String readyStatus,
+            @Param("limit") int limit,
+            @Param("offset") int offset,
+            @Param("outputsOnly") boolean outputsOnly);
 }

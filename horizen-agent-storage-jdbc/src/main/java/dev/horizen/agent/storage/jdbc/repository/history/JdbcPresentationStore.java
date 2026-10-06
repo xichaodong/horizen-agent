@@ -69,7 +69,7 @@ public class JdbcPresentationStore implements PresentationStore {
                                 "block",
                                 record.getBlock()));
         try {
-            mapper.updateCreateOrFind(
+            mapper.insertPresentation(
                     record.getOwnerKey(),
                     record.getSessionId(),
                     record.getTurnId(),

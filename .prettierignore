@@ -18,6 +18,4 @@ LICENSE
 NOTICE
 mvnw
 mvnw.cmd
-# Dynamic MyBatis SQL text is not handled by the generic XML formatter.
-**/src/main/resources/mapper/*.xml
 !/.env.yml.example

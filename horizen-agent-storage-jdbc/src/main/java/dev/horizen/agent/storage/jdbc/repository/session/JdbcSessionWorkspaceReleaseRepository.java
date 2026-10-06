@@ -72,7 +72,7 @@ public class JdbcSessionWorkspaceReleaseRepository implements SessionWorkspaceRe
     public SessionWorkspaceRelease bindIfAbsent(
             String ownerKey, String sessionId, SessionWorkspaceRelease selected) {
         Objects.requireNonNull(selected, "selected");
-        mapper.updateBindIfAbsent(
+        mapper.bindWorkspaceReleaseIfAbsent(
                 selected.getCatalog().getProjectId(),
                 selected.getCatalog().getAgentKey(),
                 selected.getReleaseId(),

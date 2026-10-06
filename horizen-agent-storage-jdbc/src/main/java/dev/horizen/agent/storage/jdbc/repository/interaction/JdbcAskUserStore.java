@@ -59,7 +59,7 @@ public class JdbcAskUserStore implements AskUserStore {
             throw new IllegalArgumentException("new ask_user request must be pending");
         }
         try {
-            mapper.updateCreateOrFind(
+            mapper.insertQuestion(
                     request.getOwnerKey(),
                     request.getAskUserId(),
                     request.getSessionId(),
@@ -160,7 +160,7 @@ public class JdbcAskUserStore implements AskUserStore {
         String response =
                 JdbcInteractionJson.encode(Map.of("answersJson", answers == null ? "[]" : answers));
         int changed =
-                mapper.updateResolve(
+                mapper.resolveQuestion(
                         status.name(),
                         response,
                         timestamp(at),

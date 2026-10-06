@@ -17,7 +17,7 @@ public interface SessionWorkspaceReleaseMapper {
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次操作返回的整数结果。
      */
-    int updateBindIfAbsent(
+    int bindWorkspaceReleaseIfAbsent(
             @Param("projectId") Long projectId,
             @Param("agentKey") String agentKey,
             @Param("workspaceReleaseId") Long workspaceReleaseId,

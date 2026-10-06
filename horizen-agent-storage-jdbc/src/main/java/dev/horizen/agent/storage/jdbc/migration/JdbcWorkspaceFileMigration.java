@@ -59,7 +59,7 @@ public class JdbcWorkspaceFileMigration {
         if (limit <= 0 || limit > 1000)
             throw new IllegalArgumentException("Migration batch limit is invalid");
         List<Legacy> rows =
-                mapper.selectMigrateBatch(limit).stream()
+                mapper.selectUnmigratedDocuments(limit).stream()
                         .map(
                                 rs ->
                                         new Legacy(
@@ -97,7 +97,7 @@ public class JdbcWorkspaceFileMigration {
         try {
             transactions.executeWithoutResult(
                     () -> {
-                        mapper.updateMigrateFile(
+                        mapper.insertMigratedFile(
                                 row.key.getOwnerKey(),
                                 row.key.getAgentKey(),
                                 row.key.getScopeKey(),
@@ -145,7 +145,7 @@ public class JdbcWorkspaceFileMigration {
      * @param row 当前JDBC工作区文件迁移持有的存储记录对象，供相应处理步骤使用。
      */
     private void migrateOperationIds(Legacy row) {
-        mapper.selectMigrateOperationIds(
+        mapper.selectLegacyAppendOperations(
                         row.key.getOwnerKey(),
                         row.key.getAgentKey(),
                         row.key.getScopeKey(),
@@ -153,7 +153,7 @@ public class JdbcWorkspaceFileMigration {
                 .forEach(
                         value -> {
                             try {
-                                mapper.updateMigrateOperationIds(
+                                mapper.insertMigratedOperation(
                                         row.key.getOwnerKey(),
                                         row.key.getAgentKey(),
                                         row.key.getScopeKey(),
@@ -187,7 +187,7 @@ public class JdbcWorkspaceFileMigration {
                                                 + row.key.getDocumentPath())
                                         .getBytes(StandardCharsets.UTF_8));
         try {
-            mapper.updateInsertAudit(
+            mapper.insertMigrationAudit(
                     row.key.getOwnerKey(),
                     row.key.getAgentKey(),
                     row.key.getScopeKey(),

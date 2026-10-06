@@ -105,8 +105,8 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
      * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
      */
     private void lock(long project, String agent) {
-        mapper.updateLock(project, agent);
-        mapper.selectLock(project, agent);
+        mapper.insertWorkspaceIfAbsent(project, agent);
+        mapper.selectWorkspaceForUpdate(project, agent);
     }
 
     /**
@@ -130,8 +130,8 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
                 transaction.execute(
                         () -> {
                             lock(project, agent);
-                            if (mapper.updateSave(operator, project, agent, expected) != 1)
-                                return false;
+                            if (mapper.advanceWorkspaceVersion(operator, project, agent, expected)
+                                    != 1) return false;
                             var old = files(project, agent);
                             Map<String, File> previous = new HashMap<>();
                             old.forEach(f -> previous.put(f.getPath(), f));
@@ -149,7 +149,7 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
                                         prior == null
                                                 ? 0
                                                 : fileVersion(project, agent, file.getPath());
-                                mapper.updateSave2(
+                                mapper.upsertDraftFile(
                                         owner(project),
                                         agent,
                                         kind,
@@ -174,7 +174,7 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
                                 if (!paths.contains(prior.getPath())) {
                                     long priorVersion =
                                             fileVersion(project, agent, prior.getPath());
-                                    mapper.updateSave3(
+                                    mapper.deleteDraftFile(
                                             owner(project), agent, hash(prior.getPath()));
                                     audit(
                                             project,
@@ -227,7 +227,7 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
             long beforeVersion,
             Long afterVersion) {
         File file = after == null ? before : after;
-        mapper.updateAudit(
+        mapper.insertWorkspaceOperation(
                 WorkspaceOperationRow.builder()
                         .ownerKey(owner(project))
                         .agentKey(agent)
@@ -279,16 +279,17 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
         return transaction.execute(
                 () -> {
                     lock(project, agent);
-                    long version = mapper.selectPublish(project, agent);
+                    long version = mapper.selectWorkspaceVersion(project, agent);
                     if (version != expected)
                         throw new IllegalStateException("Workspace version conflict");
                     var prior = current(project, agent).orElse(null);
                     if (prior != null && prior.getReleaseHash().equals(hash))
                         throw new IllegalStateException("Workspace content already published");
                     long number = prior == null ? 1 : prior.getReleaseNo() + 1;
-                    mapper.updatePublish(project, agent, number, hash, manifest, notes, operator);
+                    mapper.insertWorkspaceRelease(
+                            project, agent, number, hash, manifest, notes, operator);
                     var release = currentByNumber(project, agent, number);
-                    mapper.updatePublish2(release.getId(), project, agent, expected);
+                    mapper.setCurrentRelease(release.getId(), project, agent, expected);
                     for (var file : files(project, agent)) {
                         long fileVersion = fileVersion(project, agent, file.getPath());
                         audit(

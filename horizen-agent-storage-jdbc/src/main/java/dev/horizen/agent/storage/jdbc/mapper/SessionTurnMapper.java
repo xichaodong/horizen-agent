@@ -29,7 +29,7 @@ public interface SessionTurnMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateStartTurnInTransaction(
+    int insertTurn(
             @Param("ownerKey") String ownerKey,
             @Param("turnId") String turnId,
             @Param("sessionId") String sessionId,
@@ -54,7 +54,7 @@ public interface SessionTurnMapper {
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次操作返回的整数结果。
      */
-    int updateStartTurnInTransaction2(
+    int claimSessionForTurn(
             @Param("activeTurnId") String activeTurnId,
             @Param("nextMessageSequence") Long nextMessageSequence,
             @Param("lastMessageAt") Timestamp lastMessageAt,
@@ -76,7 +76,7 @@ public interface SessionTurnMapper {
      * @param version 记录版本，用于乐观并发控制或区分协议版本。
      * @return 本次操作返回的整数结果。
      */
-    int updateTransitionInTransaction(
+    int transitionTurn(
             @Param("status") String status,
             @Param("executorId") String executorId,
             @Param("leaseExpiresAt") Timestamp leaseExpiresAt,
@@ -96,7 +96,7 @@ public interface SessionTurnMapper {
      * @param activeTurnId 会话当前占用的执行标识；无活跃执行时为空。
      * @return 本次操作返回的整数结果。
      */
-    int updateUpdateSessionAfterTransition(
+    int releaseSessionTurn(
             @Param("updatedAt") Timestamp updatedAt,
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
@@ -113,7 +113,7 @@ public interface SessionTurnMapper {
      * @param activeTurnId 会话当前占用的执行标识；无活跃执行时为空。
      * @return 本次操作返回的整数结果。
      */
-    int updateUpdateSessionAfterTransition2(
+    int releaseSessionTurnWithMessage(
             @Param("nextMessageSequence") Long nextMessageSequence,
             @Param("lastMessageAt") Timestamp lastMessageAt,
             @Param("updatedAt") Timestamp updatedAt,
@@ -130,7 +130,7 @@ public interface SessionTurnMapper {
      * @param activeTurnId 会话当前占用的执行标识；无活跃执行时为空。
      * @return 本次操作返回的整数结果。
      */
-    int updateUpdateSessionAfterTransition3(
+    int touchActiveSession(
             @Param("updatedAt") Timestamp updatedAt,
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
@@ -222,7 +222,7 @@ public interface SessionTurnMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param status2 当前会话执行映射器使用的状态2，供其处理与状态记录使用。
+     * @param expectedStatus 更新前必须匹配的原状态，用于拒绝已被其他执行修改的记录。
      * @return 本次操作返回的整数结果。
      */
     int updateArchiveSession(
@@ -230,7 +230,7 @@ public interface SessionTurnMapper {
             @Param("updatedAt") Timestamp updatedAt,
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
-            @Param("status2") String status2);
+            @Param("expectedStatus") String expectedStatus);
 
     /**
      * 按映射语句的筛选与分页条件读取会话历史记录。 查询或更新限定在传入的数据归属范围内。
@@ -245,34 +245,34 @@ public interface SessionTurnMapper {
     /**
      * 按映射语句的筛选与分页条件读取执行记录。
      *
-     * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param status2 当前会话执行映射器使用的状态2，供其处理与状态记录使用。
+     * @param runningStatus 筛选仍在运行的执行状态。
+     * @param cancellingStatus 筛选正在取消、尚未收敛到终态的执行状态。
      * @param leaseExpiresAt 执行实例租约到期时间，用于判断执行权是否仍有效。
      * @param limit 本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      */
     List<TurnRow> selectFindExpiredLeases(
-            @Param("status") String status,
-            @Param("status2") String status2,
+            @Param("runningStatus") String runningStatus,
+            @Param("cancellingStatus") String cancellingStatus,
             @Param("leaseExpiresAt") Timestamp leaseExpiresAt,
             @Param("limit") Integer limit);
 
     /**
      * 按映射语句的筛选与分页条件读取执行记录。
      *
-     * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param status2 当前会话执行映射器使用的状态2，供其处理与状态记录使用。
-     * @param status3 当前会话执行映射器使用的状态3，供其处理与状态记录使用。
-     * @param status4 当前会话执行映射器使用的状态4，供其处理与状态记录使用。
+     * @param runningStatus 筛选仍在运行的执行状态。
+     * @param waitingApprovalStatus 筛选等待工具审批的执行状态。
+     * @param waitingAskUserStatus 筛选等待用户澄清回答的执行状态。
+     * @param cancellingStatus 筛选正在取消、尚未收敛到终态的执行状态。
      * @param deadlineAt 当前操作允许继续执行的截止时间。
      * @param limit 本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      */
     List<TurnRow> selectFindOverdueTurns(
-            @Param("status") String status,
-            @Param("status2") String status2,
-            @Param("status3") String status3,
-            @Param("status4") String status4,
+            @Param("runningStatus") String runningStatus,
+            @Param("waitingApprovalStatus") String waitingApprovalStatus,
+            @Param("waitingAskUserStatus") String waitingAskUserStatus,
+            @Param("cancellingStatus") String cancellingStatus,
             @Param("deadlineAt") Timestamp deadlineAt,
             @Param("limit") Integer limit);
 
@@ -289,7 +289,7 @@ public interface SessionTurnMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateEnsureSession(
+    int insertSession(
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
             @Param("status") String status,
@@ -355,7 +355,7 @@ public interface SessionTurnMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateInsertMessage(
+    int insertMessage(
             @Param("ownerKey") String ownerKey,
             @Param("sessionId") String sessionId,
             @Param("turnId") String turnId,

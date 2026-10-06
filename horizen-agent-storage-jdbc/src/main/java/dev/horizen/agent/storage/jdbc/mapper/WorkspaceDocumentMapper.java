@@ -70,7 +70,7 @@ public interface WorkspaceDocumentMapper {
      * @param version 记录版本，用于乐观并发控制或区分协议版本。
      * @return 本次操作返回的整数结果。
      */
-    int updateDelete(
+    int deleteDocument(
             @Param("ownerKey") String ownerKey,
             @Param("agentKey") String agentKey,
             @Param("scopeKey") String scopeKey,
@@ -83,7 +83,7 @@ public interface WorkspaceDocumentMapper {
      * @param write 当前工作区文档映射器持有的写入对象，供相应处理步骤使用。
      * @return 本次操作返回的整数结果。
      */
-    int updateInsert(WorkspaceFileRow write);
+    int insertDocument(WorkspaceFileRow write);
 
     /**
      * 更新满足当前映射条件的工作区文件记录。 使用原版本条件防止覆盖并发更新。 查询或更新限定在传入的数据归属范围内。
@@ -91,7 +91,7 @@ public interface WorkspaceDocumentMapper {
      * @param write 当前工作区文档映射器持有的写入对象，供相应处理步骤使用。
      * @return 本次操作返回的整数结果。
      */
-    int updateUpdate(WorkspaceFileRow write);
+    int updateDocument(WorkspaceFileRow write);
 
     /**
      * 写入新的工作区操作记录，字段绑定由当前 SQL 映射明确指定。 查询或更新限定在传入的数据归属范围内。
@@ -99,5 +99,5 @@ public interface WorkspaceDocumentMapper {
      * @param write 当前工作区文档映射器持有的写入对象，供相应处理步骤使用。
      * @return 本次操作返回的整数结果。
      */
-    int updateLog(WorkspaceOperationRow write);
+    int insertDocumentOperation(WorkspaceOperationRow write);
 }

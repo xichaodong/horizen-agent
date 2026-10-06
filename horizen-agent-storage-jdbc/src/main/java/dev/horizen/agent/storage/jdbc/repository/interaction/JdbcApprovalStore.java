@@ -105,7 +105,7 @@ public class JdbcApprovalStore implements ApprovalStore {
     private void insertPending(ApprovalRequest approval) {
         String requestJson = requestJson(approval);
         try {
-            mapper.updateInsertPending(
+            mapper.insertPendingApproval(
                     approval.getOwnerKey(),
                     approval.getApprovalId(),
                     approval.getSessionId(),
@@ -119,7 +119,7 @@ public class JdbcApprovalStore implements ApprovalStore {
         } catch (DuplicateKeyException ignored) {
             var existing =
                     mapper
-                            .selectInsertPending(
+                            .selectApprovalByToolCall(
                                     approval.getOwnerKey(),
                                     approval.getTurnId(),
                                     approval.getToolCallId())
@@ -165,7 +165,7 @@ public class JdbcApprovalStore implements ApprovalStore {
     @Override
     public List<ApprovalRequest> findPending(String ownerKey, String sessionId, String turnId) {
         return mapper
-                .selectFindPending(ownerKey, sessionId, turnId, ApprovalStatus.PENDING.name())
+                .selectPendingApprovals(ownerKey, sessionId, turnId, ApprovalStatus.PENDING.name())
                 .stream()
                 .map(MAPPER)
                 .toList();
@@ -197,7 +197,7 @@ public class JdbcApprovalStore implements ApprovalStore {
         Optional<ApprovalRequest> current =
                 first(
                         mapper
-                                .selectDecideInTransaction(
+                                .selectApprovalForUpdate(
                                         command.getOwnerKey(), command.getApprovalId())
                                 .stream()
                                 .map(MAPPER)
@@ -212,7 +212,7 @@ public class JdbcApprovalStore implements ApprovalStore {
         ApprovalStatus next =
                 command.isApproved() ? ApprovalStatus.APPROVED : ApprovalStatus.DENIED;
         int updatedRows =
-                mapper.updateDecideInTransaction(
+                mapper.updateApprovalDecision(
                         next.name(),
                         JdbcInteractionJson.encode(
                                 Map.of(
@@ -233,7 +233,7 @@ public class JdbcApprovalStore implements ApprovalStore {
         ApprovalRequest updated =
                 first(
                                 mapper
-                                        .selectDecideInTransaction2(
+                                        .selectApprovalById(
                                                 command.getOwnerKey(), command.getApprovalId())
                                         .stream()
                                         .map(MAPPER)

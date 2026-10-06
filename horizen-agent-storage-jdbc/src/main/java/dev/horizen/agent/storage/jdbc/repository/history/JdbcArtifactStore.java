@@ -13,7 +13,6 @@ import dev.horizen.agent.storage.jdbc.mapper.ArtifactMapper;
 import dev.horizen.agent.storage.jdbc.model.ArtifactRow;
 import dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow;
 import dev.horizen.agent.storage.jdbc.support.RowValues;
-import dev.horizen.agent.storage.jdbc.support.SqlParams;
 import dev.horizen.agent.storage.jdbc.transaction.JdbcUnitOfWork;
 import dev.horizen.agent.transaction.UnitOfWork;
 
@@ -110,7 +109,7 @@ public class JdbcArtifactStore implements ArtifactStore {
         if (artifact.getVersion() != 0) {
             throw new IllegalArgumentException("new Artifact version must be zero");
         }
-        mapper.updateCreate(
+        mapper.insertArtifact(
                 artifact.getOwnerKey(),
                 artifact.getArtifactId(),
                 artifact.getKind().name(),
@@ -171,7 +170,7 @@ public class JdbcArtifactStore implements ArtifactStore {
             throw new IllegalArgumentException("invalid artifact state transition");
         }
         int updated =
-                mapper.updateUpdate(
+                mapper.updateArtifact(
                         artifact.getKind().name(),
                         artifact.getState().name(),
                         artifact.getTitle(),
@@ -218,7 +217,7 @@ public class JdbcArtifactStore implements ArtifactStore {
                     payload.put("role", reference.getRole().name());
                     payload.put("toolCallId", reference.getToolCallId());
                     try {
-                        mapper.updateAddReference(
+                        mapper.insertArtifactReference(
                                 reference.getOwnerKey(),
                                 reference.getSessionId(),
                                 reference.getTurnId(),
@@ -231,7 +230,7 @@ public class JdbcArtifactStore implements ArtifactStore {
                     } catch (DuplicateKeyException ignored) {
                         var existing =
                                 mapper
-                                        .selectAddReference(
+                                        .selectArtifactReference(
                                                 reference.getOwnerKey(), reference.getReferenceId())
                                         .stream()
                                         .map(REFERENCE_MAPPER)
@@ -253,14 +252,14 @@ public class JdbcArtifactStore implements ArtifactStore {
     private void attachToUserMessage(ArtifactReference reference) {
         // 并发 load_artifact 调用仅串行执行此小型元数据更新，事务中不执行远程 I/O。
         var messages =
-                mapper.selectAttachToUserMessage(
+                mapper.selectUserMessagesForTurn(
                         reference.getOwnerKey(), reference.getSessionId(), reference.getTurnId());
         for (var row : messages) {
             var payload = JdbcHistoryJson.object((String) row.get("payload_json"));
             if (!"USER".equals(payload.path("role").asText())) continue;
             // 锁定具体主键行，避免锁定仍可能插入引用记录的二级索引范围。
             String locked =
-                    mapper.selectAttachToUserMessage2(
+                    mapper.selectMessagePayloadForUpdate(
                             row.get("history_sequence"), reference.getOwnerKey());
             payload = JdbcHistoryJson.object(locked);
             var ids = payload.withArray("artifactIds");
@@ -268,7 +267,7 @@ public class JdbcArtifactStore implements ArtifactStore {
             for (var id : ids) if (reference.getArtifactId().equals(id.asText())) exists = true;
             if (exists) continue;
             ids.add(reference.getArtifactId());
-            mapper.updateAttachToUserMessage(
+            mapper.updateMessagePayload(
                     JdbcHistoryJson.encode(payload), reference.getOwnerKey(), row.get("record_id"));
         }
     }
@@ -386,11 +385,12 @@ public class JdbcArtifactStore implements ArtifactStore {
         if (limit <= 0) return List.of();
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");
         // 先按标识分组再关联元数据，避免同一文件的多次使用占用结果数量上限。
-        var parameters =
-                SqlParams.values(
-                        ownerKey, sessionId, ownerKey, ArtifactState.READY.name(), limit, offset);
-        parameters.put("outputsOnly", outputsOnly);
-        return mapper.selectReady(parameters).stream().map(ARTIFACT_MAPPER).toList();
+        return mapper
+                .selectReady(
+                        ownerKey, sessionId, ArtifactState.READY.name(), limit, offset, outputsOnly)
+                .stream()
+                .map(ARTIFACT_MAPPER)
+                .toList();
     }
 
     /**

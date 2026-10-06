@@ -25,7 +25,7 @@ public interface AskUserMapper {
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次操作返回的整数结果。
      */
-    int updateCreateOrFind(
+    int insertQuestion(
             @Param("ownerKey") String ownerKey,
             @Param("interactionId") String interactionId,
             @Param("sessionId") String sessionId,
@@ -86,7 +86,7 @@ public interface AskUserMapper {
      * @param version 记录版本，用于乐观并发控制或区分协议版本。
      * @return 本次操作返回的整数结果。
      */
-    int updateResolve(
+    int resolveQuestion(
             @Param("status") String status,
             @Param("responseJson") String responseJson,
             @Param("resolvedAt") Timestamp resolvedAt,

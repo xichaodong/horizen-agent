@@ -37,7 +37,8 @@ public interface WorkspaceCatalogMapper {
      * @param agentKey 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
      * @return 本次操作返回的整数结果。
      */
-    int updateLock(@Param("projectId") Long projectId, @Param("agentKey") String agentKey);
+    int insertWorkspaceIfAbsent(
+            @Param("projectId") Long projectId, @Param("agentKey") String agentKey);
 
     /**
      * 按映射语句的筛选与分页条件读取ha_workspace记录。
@@ -46,7 +47,7 @@ public interface WorkspaceCatalogMapper {
      * @param agentKey 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
      * @return 本次处理得到的结果集合。
      */
-    List<Map<String, Object>> selectLock(
+    List<Map<String, Object>> selectWorkspaceForUpdate(
             @Param("projectId") Long projectId, @Param("agentKey") String agentKey);
 
     /**
@@ -58,7 +59,7 @@ public interface WorkspaceCatalogMapper {
      * @param version 记录版本，用于乐观并发控制或区分协议版本。
      * @return 本次操作返回的整数结果。
      */
-    int updateSave(
+    int advanceWorkspaceVersion(
             @Param("updatedBy") String updatedBy,
             @Param("projectId") Long projectId,
             @Param("agentKey") String agentKey,
@@ -78,7 +79,7 @@ public interface WorkspaceCatalogMapper {
      * @param mediaType 当前工作区目录映射器使用的媒体类型，供其处理与状态记录使用。
      * @return 本次操作返回的整数结果。
      */
-    int updateSave2(
+    int upsertDraftFile(
             @Param("ownerKey") String ownerKey,
             @Param("agentKey") String agentKey,
             @Param("fileKind") String fileKind,
@@ -97,7 +98,7 @@ public interface WorkspaceCatalogMapper {
      * @param pathHash 路径的内容摘要，供校验或去重使用。
      * @return 本次操作返回的整数结果。
      */
-    int updateSave3(
+    int deleteDraftFile(
             @Param("ownerKey") String ownerKey,
             @Param("agentKey") String agentKey,
             @Param("pathHash") String pathHash);
@@ -121,7 +122,7 @@ public interface WorkspaceCatalogMapper {
      * @param write 当前工作区目录映射器持有的写入对象，供相应处理步骤使用。
      * @return 本次操作返回的整数结果。
      */
-    int updateAudit(WorkspaceOperationRow write);
+    int insertWorkspaceOperation(WorkspaceOperationRow write);
 
     /**
      * 按映射语句的筛选与分页条件读取ha_workspace记录。
@@ -130,7 +131,8 @@ public interface WorkspaceCatalogMapper {
      * @param agentKey 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
      * @return 本次操作返回的长整型结果。
      */
-    Long selectPublish(@Param("projectId") Long projectId, @Param("agentKey") String agentKey);
+    Long selectWorkspaceVersion(
+            @Param("projectId") Long projectId, @Param("agentKey") String agentKey);
 
     /**
      * 写入新的工作区发布记录，字段绑定由当前 SQL 映射明确指定。
@@ -144,7 +146,7 @@ public interface WorkspaceCatalogMapper {
      * @param createdBy 当前工作区目录映射器使用的创建按条件，供其处理与状态记录使用。
      * @return 本次操作返回的整数结果。
      */
-    int updatePublish(
+    int insertWorkspaceRelease(
             @Param("projectId") Long projectId,
             @Param("agentKey") String agentKey,
             @Param("releaseNo") Long releaseNo,
@@ -162,7 +164,7 @@ public interface WorkspaceCatalogMapper {
      * @param version 记录版本，用于乐观并发控制或区分协议版本。
      * @return 本次操作返回的整数结果。
      */
-    int updatePublish2(
+    int setCurrentRelease(
             @Param("currentReleaseId") Long currentReleaseId,
             @Param("projectId") Long projectId,
             @Param("agentKey") String agentKey,

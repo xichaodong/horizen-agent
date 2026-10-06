@@ -48,7 +48,7 @@ public class JdbcWorkspaceAuditRepository implements WorkspaceAuditRepository {
         if (limit < 1 || limit > 101) throw new IllegalArgumentException("Invalid audit page size");
         if (allFiles)
             return mapper
-                    .selectList(
+                    .selectScopeOperations(
                             key.getOwnerKey(),
                             key.getAgentKey(),
                             key.getScopeKey(),
@@ -58,7 +58,7 @@ public class JdbcWorkspaceAuditRepository implements WorkspaceAuditRepository {
                     .map(MAPPER)
                     .toList();
         return mapper
-                .selectList2(
+                .selectPathOperations(
                         key.getOwnerKey(),
                         key.getAgentKey(),
                         key.getScopeKey(),

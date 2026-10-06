@@ -21,6 +21,10 @@
     {
       "files": "pom.xml",
       "options": { "xmlWhitespaceSensitivity": "ignore" }
+    },
+    {
+      "files": "**/src/main/resources/mapper/*.xml",
+      "options": { "xmlWhitespaceSensitivity": "strict", "singleAttributePerLine": true }
     }
   ]
 }

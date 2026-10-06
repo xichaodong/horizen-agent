@@ -1,19 +1,75 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="dev.horizen.agent.storage.jdbc.mapper.WorkspaceAuditMapper">
-  <select id="selectList" resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceOperationRow">
-    SELECT * FROM ha_workspace_operation WHERE owner_key=#{ownerKey} AND agent_key=#{agentKey} AND scope_key=#{scopeKey} AND audit_sequence&lt;#{auditSequence} ORDER BY audit_sequence DESC LIMIT #{limit}
-  </select>
+    <select
+        id="selectScopeOperations"
+        resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceOperationRow"
+    >
+        SELECT
+            *
+        FROM
+            ha_workspace_operation
+        WHERE
+            owner_key = #{ownerKey}
+            AND agent_key = #{agentKey}
+            AND scope_key = #{scopeKey}
+            AND audit_sequence &lt; #{auditSequence}
+        ORDER BY
+            audit_sequence DESC
+        LIMIT
+            #{limit}
+    </select>
 
-  <select id="selectList2" resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceOperationRow">
-    SELECT * FROM ha_workspace_operation WHERE owner_key=#{ownerKey} AND agent_key=#{agentKey} AND scope_key=#{scopeKey} AND path_hash=#{pathHash} AND audit_sequence&lt;#{auditSequence} ORDER BY audit_sequence DESC LIMIT #{limit}
-  </select>
+    <select
+        id="selectPathOperations"
+        resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceOperationRow"
+    >
+        SELECT
+            *
+        FROM
+            ha_workspace_operation
+        WHERE
+            owner_key = #{ownerKey}
+            AND agent_key = #{agentKey}
+            AND scope_key = #{scopeKey}
+            AND path_hash = #{pathHash}
+            AND audit_sequence &lt; #{auditSequence}
+        ORDER BY
+            audit_sequence DESC
+        LIMIT
+            #{limit}
+    </select>
 
-  <select id="selectFind" resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceOperationRow">
-    SELECT * FROM ha_workspace_operation WHERE owner_key=#{ownerKey} AND agent_key=#{agentKey} AND scope_key=#{scopeKey} AND path_hash=#{pathHash} AND audit_sequence=#{auditSequence}
-  </select>
+    <select
+        id="selectFind"
+        resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceOperationRow"
+    >
+        SELECT
+            *
+        FROM
+            ha_workspace_operation
+        WHERE
+            owner_key = #{ownerKey}
+            AND agent_key = #{agentKey}
+            AND scope_key = #{scopeKey}
+            AND path_hash = #{pathHash}
+            AND audit_sequence = #{auditSequence}
+    </select>
 
-  <select id="selectOwnsMemory" resultType="java.lang.String">
-    SELECT session_id FROM ha_session WHERE owner_key=#{ownerKey} AND project_id=#{projectId} AND agent_key=#{agentKey} LIMIT 1
-  </select>
+    <select
+        id="selectOwnsMemory"
+        resultType="java.lang.String"
+    >
+        SELECT
+            session_id
+        FROM
+            ha_session
+        WHERE
+            owner_key = #{ownerKey}
+            AND project_id = #{projectId}
+            AND agent_key = #{agentKey}
+        LIMIT
+            1
+    </select>
 </mapper>

@@ -58,7 +58,7 @@ public class JdbcTurnTimelineStore implements TurnTimelineStore {
         ObjectNode event = JdbcHistoryJson.object(payloadJson);
         String kind = event.path("type").asText();
         if ("done".equals(kind) && event.path("source").asText("").isEmpty()) {
-            var messageIds = mapper.selectAppend(ownerKey, sessionId, turnId);
+            var messageIds = mapper.selectMessageIdsForTurn(ownerKey, sessionId, turnId);
             for (String messageId : messageIds) {
                 TurnTimelineEvent attached =
                         attach(ownerKey, sessionId, turnId, "MESSAGE", messageId, event, createdAt);
@@ -118,7 +118,7 @@ public class JdbcTurnTimelineStore implements TurnTimelineStore {
             String id,
             ObjectNode event,
             Instant at) {
-        var bodies = mapper.selectAttach(owner, type, id, session, turn);
+        var bodies = mapper.selectHistoryPayload(owner, type, id, session, turn);
         if (bodies.isEmpty()) return null;
         ObjectNode body = JdbcHistoryJson.object(bodies.get(0));
         ObjectNode header = event.deepCopy();
@@ -139,10 +139,10 @@ public class JdbcTurnTimelineStore implements TurnTimelineStore {
                     || !body.path("toolCallId").equals(details.path("toolCallId"))) return null;
             header.remove("details");
         }
-        mapper.updateAttach(
+        mapper.attachTimelineEvent(
                 JdbcHistoryJson.encode(header), Timestamp.from(at), owner, type, id, session, turn);
         return RowValues.mapOne(
-                mapper.selectAttach2(owner, type, id, session, turn), rs -> map(rs));
+                mapper.selectTimelineEvent(owner, type, id, session, turn), rs -> map(rs));
     }
 
     /**
