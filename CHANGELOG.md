@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.0-preview.4 — 2026-10-06
+
+- Configure a separate vision model with optional independent endpoint and credentials. Uploaded images remain Artifact references in primary-model requests; `vision_analyze` and `browser_vision` send images to the vision model and return text. Disabled vision never falls back to the primary model, and credentials are not implicitly shared across provider origins.
+- Preserve image limits for reference-only input and identify the vision model in tool-result metadata. Verify the model and credential routing with isolated local HTTP services.
+- Share native IntelliJ IDEA 2026.2.1 code style with CI and format MyBatis mappings and source consistently.
+
 ## v0.1.0-preview.3 — 2026-10-06
 
 - Upgrade the transitive `source-map-js` dependency to 1.2.2 to address [GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q). Preview 2 did not publish artifacts because the dependency audit blocked its release.
