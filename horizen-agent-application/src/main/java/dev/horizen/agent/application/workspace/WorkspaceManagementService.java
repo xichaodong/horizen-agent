@@ -13,20 +13,26 @@ import lombok.Value;
 
 import java.util.*;
 
-/** Agent 项目工作区管理用例；所有文件内容均在 SQL 提交前完成暂存。 */
+/**
+ * Agent 项目工作区管理用例；所有文件内容均在 SQL 提交前完成暂存。
+ */
 public final class WorkspaceManagementService {
-    /** 当前资源目录或目录定位键，用于查找可用发布与工具。 */
+    /**
+     * 当前资源目录或目录定位键，用于查找可用发布与工具。
+     */
     @Getter(AccessLevel.PACKAGE)
     private final WorkspaceCatalogRepository catalog;
 
-    /** 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。 */
+    /**
+     * 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     */
     @Getter(AccessLevel.PACKAGE)
     private final WorkspaceContentRepository contents;
 
     /**
      * 创建工作区管理服务，初始化该组件所需的状态、配置或依赖。
      *
-     * @param catalog 当前资源目录或目录定位键，用于查找可用发布与工具。
+     * @param catalog  当前资源目录或目录定位键，用于查找可用发布与工具。
      * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      */
     public WorkspaceManagementService(
@@ -39,7 +45,7 @@ public final class WorkspaceManagementService {
      * 计算或取得本方法声明的结果，供当前WorkspaceManagementService处理步骤使用。
      *
      * @param project 当前工作区管理服务使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @return 本次操作返回的草稿结果。
      */
     public WorkspaceCatalogRepository.Draft draft(long project, String agent) {
@@ -64,12 +70,12 @@ public final class WorkspaceManagementService {
     /**
      * 按预期版本提交工作区修改，冲突时不覆盖他人已经提交的内容。
      *
-     * @param project 当前工作区管理服务使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param expected 当前工作区管理服务使用的预期，供其处理与状态记录使用。
+     * @param project    当前工作区管理服务使用的Project，供其处理与状态记录使用。
+     * @param agent      当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param expected   当前工作区管理服务使用的预期，供其处理与状态记录使用。
      * @param skillsJson Skill集合的 JSON 表示，供持久化或协议转换使用。
-     * @param requested 请求的的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param operator 当前工作区管理服务使用的操作符，供其处理与状态记录使用。
+     * @param requested  请求的的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param operator   当前工作区管理服务使用的操作符，供其处理与状态记录使用。
      * @return 本次操作返回的草稿结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -89,13 +95,13 @@ public final class WorkspaceManagementService {
     /**
      * 按预期版本提交工作区修改，冲突时不覆盖他人已经提交的内容。
      *
-     * @param project 当前工作区管理服务使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param expected 当前工作区管理服务使用的预期，供其处理与状态记录使用。
+     * @param project   当前工作区管理服务使用的Project，供其处理与状态记录使用。
+     * @param agent     当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param expected  当前工作区管理服务使用的预期，供其处理与状态记录使用。
      * @param requested 请求的的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param operator 当前工作区管理服务使用的操作符，供其处理与状态记录使用。
+     * @param operator  当前工作区管理服务使用的操作符，供其处理与状态记录使用。
      * @return 本次操作返回的草稿结果。
-     * @throws Conflict 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws Conflict                 当前输入或运行状态不满足本方法的处理条件时抛出。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public WorkspaceCatalogRepository.Draft save(
@@ -125,7 +131,7 @@ public final class WorkspaceManagementService {
                     byte[] bytes = input.getBytes();
                     long limit =
                             input.getPath().equals("AGENTS.md")
-                                            || input.getPath().startsWith("subagents/")
+                                    || input.getPath().startsWith("subagents/")
                                     ? 65536
                                     : 10L * 1024 * 1024;
                     if (bytes.length > limit)
@@ -193,7 +199,7 @@ public final class WorkspaceManagementService {
      * 完成当前操作的coordinates步骤，按实现更新相应状态或依赖。
      *
      * @param project 当前工作区管理服务使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private static void coordinates(long project, String agent) {
@@ -201,25 +207,39 @@ public final class WorkspaceManagementService {
         new AgentCatalogKey(project, agent);
     }
 
-    /** 管理接口传入的工作区文件及元数据。 */
+    /**
+     * 管理接口传入的工作区文件及元数据。
+     */
     @Value
     public static class Input {
-        /** 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。 */
+        /**
+         * 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。
+         */
         String path;
 
-        /** 当前内容字节或字节计数，用于传输、校验与容量控制。 */
+        /**
+         * 当前内容字节或字节计数，用于传输、校验与容量控制。
+         */
         byte[] bytes;
 
-        /** 内容校验值，用于确认传输或存储后的内容一致。 */
+        /**
+         * 内容校验值，用于确认传输或存储后的内容一致。
+         */
         String checksum;
 
-        /** 内容的 MIME 媒体类型，供传输、展示与解析策略选择使用。 */
+        /**
+         * 内容的 MIME 媒体类型，供传输、展示与解析策略选择使用。
+         */
         String mediaType;
     }
 
-    /** 工作区管理服务内部的Conflict，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 工作区管理服务内部的Conflict，封装该步骤需要的状态或输入输出。
+     */
     public static final class Conflict extends RuntimeException {
-        /** 创建Conflict，初始化该组件所需的状态、配置或依赖。 */
+        /**
+         * 创建Conflict，初始化该组件所需的状态、配置或依赖。
+         */
         public Conflict() {
             super("Workspace version conflict; reload before editing");
         }

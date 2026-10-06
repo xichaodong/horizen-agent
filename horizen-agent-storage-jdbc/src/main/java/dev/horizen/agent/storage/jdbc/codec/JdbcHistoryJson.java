@@ -7,13 +7,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import dev.horizen.agent.common.json.JsonUtils;
 
-/** JDBC 历史记录信封；领域仓储契约不依赖 JSON。 */
+/**
+ * JDBC 历史记录信封；领域仓储契约不依赖 JSON。
+ */
 public final class JdbcHistoryJson {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     public static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private JdbcHistoryJson() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private JdbcHistoryJson() {
+    }
 
     /**
      * 计算或取得本方法声明的结果，供当前JdbcHistoryJson处理步骤使用。

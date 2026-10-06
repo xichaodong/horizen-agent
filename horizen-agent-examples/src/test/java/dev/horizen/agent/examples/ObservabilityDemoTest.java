@@ -13,12 +13,13 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 class ObservabilityDemoTest {
-    @TempDir Path directory;
+    @TempDir
+    Path directory;
 
     @Test
     void realAgentLoopCallsToolThenProducesCorrelatedTrace() throws Exception {
         Path file = directory.resolve("success.jsonl");
-        ObservabilityDemo.main(new String[] {file.toString(), "no-horizen"});
+        ObservabilityDemo.main(new String[]{file.toString(), "no-horizen"});
         var events = read(file);
         assertEquals("AGENT_START", events.get(0).path("type").asText());
         assertEquals(
@@ -32,19 +33,19 @@ class ObservabilityDemoTest {
                                 e ->
                                         e.path("type").asText().equals("TOOL_RESULT_END")
                                                 && e.at("/attributes/toolCallId")
-                                                        .asText()
-                                                        .equals("demo-echo-1")
+                                                .asText()
+                                                .equals("demo-echo-1")
                                                 && e.at("/attributes/toolState")
-                                                        .asText()
-                                                        .equals("success")));
+                                                .asText()
+                                                .equals("success")));
         assertTrue(
                 events.stream()
                         .anyMatch(
                                 e ->
                                         e.path("type").asText().equals("AGENT_RESULT")
                                                 && e.at("/attributes/text")
-                                                        .asText()
-                                                        .contains("Hello, Horizen!")));
+                                                .asText()
+                                                .contains("Hello, Horizen!")));
         assertEquals(1, events.stream().map(e -> e.path("traceId").asText()).distinct().count());
         assertFalse(
                 events.stream().anyMatch(e -> e.path("type").asText().equals("EXECUTION_ERROR")));
@@ -55,7 +56,7 @@ class ObservabilityDemoTest {
         Path file = directory.resolve("failure.jsonl");
         assertThrows(
                 RuntimeException.class,
-                () -> ObservabilityDemo.main(new String[] {file.toString(), "fail", "no-horizen"}));
+                () -> ObservabilityDemo.main(new String[]{file.toString(), "fail", "no-horizen"}));
         var events = read(file);
         assertTrue(
                 events.stream().anyMatch(e -> e.path("type").asText().equals("EXECUTION_ERROR")));

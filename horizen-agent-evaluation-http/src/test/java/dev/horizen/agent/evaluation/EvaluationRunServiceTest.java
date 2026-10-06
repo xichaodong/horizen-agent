@@ -665,7 +665,8 @@ class EvaluationRunServiceTest {
                 String requestId,
                 EvaluationProtocol.Step step,
                 Duration timeout,
-                Consumer<AgentRuntimeEvent> events) {}
+                Consumer<AgentRuntimeEvent> events) {
+        }
 
         public void resume(
                 ExecutionIdentity identity,
@@ -677,6 +678,7 @@ class EvaluationRunServiceTest {
             throw new IllegalStateException("Unexpected resume");
         }
 
-        public void cancel(ExecutionIdentity identity, String session) {}
+        public void cancel(ExecutionIdentity identity, String session) {
+        }
     }
 }

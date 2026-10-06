@@ -15,18 +15,18 @@ class ArtifactIdentifierBoundaryTest {
         assertEquals(max, artifact(max, max, max).getArtifactId());
         assertEquals(
                 max,
-                new ArtifactContentWrite(max, max, new byte[] {1}, "text/plain").getOwnerKey());
-        for (int size : new int[] {192, 256}) {
+                new ArtifactContentWrite(max, max, new byte[]{1}, "text/plain").getOwnerKey());
+        for (int size : new int[]{192, 256}) {
             String invalid = "a".repeat(size);
             assertThrows(IllegalArgumentException.class, () -> artifact(invalid, "id", null));
             assertThrows(IllegalArgumentException.class, () -> artifact("owner", invalid, null));
             assertThrows(IllegalArgumentException.class, () -> artifact("owner", "id", invalid));
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> new ArtifactContentWrite(invalid, "id", new byte[] {1}, "text/plain"));
+                    () -> new ArtifactContentWrite(invalid, "id", new byte[]{1}, "text/plain"));
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> new ArtifactContentWrite("owner", invalid, new byte[] {1}, "text/plain"));
+                    () -> new ArtifactContentWrite("owner", invalid, new byte[]{1}, "text/plain"));
         }
     }
 

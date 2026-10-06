@@ -85,7 +85,8 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 class HarnessAgentRuntimeTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void iterationLimitProducesVisibleFailureAndRetainsPartialSummary() {
@@ -270,24 +271,24 @@ class HarnessAgentRuntimeTest {
                                             event.getType() == AgentRuntimeEvent.Type.TEXT_DELTA
                                                     && "child-result".equals(event.getText())
                                                     && started.getSource()
-                                                            .equals(event.getSource())),
+                                                    .equals(event.getSource())),
                     events.toString());
             assertTrue(
                     events.stream()
                             .anyMatch(
                                     event ->
                                             event.getType()
-                                                            == AgentRuntimeEvent.Type
-                                                                    .SUBAGENT_COMPLETED
+                                                    == AgentRuntimeEvent.Type
+                                                    .SUBAGENT_COMPLETED
                                                     && started.getSource()
-                                                            .equals(event.getSource())));
+                                                    .equals(event.getSource())));
             assertTrue(
                     events.stream()
                             .anyMatch(
                                     event ->
                                             event.getType() == AgentRuntimeEvent.Type.MODEL_STARTED
                                                     && started.getSource()
-                                                            .equals(event.getSource())));
+                                                    .equals(event.getSource())));
         }
     }
 
@@ -367,12 +368,12 @@ class HarnessAgentRuntimeTest {
 
         try (HarnessAgentRuntime runtime = new HarnessAgentRuntime(agent)) {
             finalReply(
-                            runtime,
-                            request(
-                                    "turn-context-1",
-                                    "alice",
-                                    "context-session",
-                                    "first ".repeat(500)))
+                    runtime,
+                    request(
+                            "turn-context-1",
+                            "alice",
+                            "context-session",
+                            "first ".repeat(500)))
                     .block(Duration.ofSeconds(5));
 
             List<AgentRuntimeEvent> events =
@@ -432,8 +433,8 @@ class HarnessAgentRuntimeTest {
 
         try (HarnessAgentRuntime runtime = new HarnessAgentRuntime(agent)) {
             finalReply(
-                            runtime,
-                            request("turn-head-1", "alice", "head-session", foundingInstruction))
+                    runtime,
+                    request("turn-head-1", "alice", "head-session", foundingInstruction))
                     .block(Duration.ofSeconds(5));
             AgentRuntimeEvent reply =
                     finalReply(runtime, request("turn-head-2", "alice", "head-session", "continue"))
@@ -507,8 +508,8 @@ class HarnessAgentRuntimeTest {
                             .anyMatch(
                                     event ->
                                             event.getType()
-                                                            == AgentRuntimeEvent.Type
-                                                                    .EXECUTION_NOTICE
+                                                    == AgentRuntimeEvent.Type
+                                                    .EXECUTION_NOTICE
                                                     && !event.getText().isBlank()));
             assertEquals(
                     "reply:second",
@@ -556,12 +557,12 @@ class HarnessAgentRuntimeTest {
 
         try (HarnessAgentRuntime runtime = new HarnessAgentRuntime(agent)) {
             finalReply(
-                            runtime,
-                            request(
-                                    "turn-summary-fail-1",
-                                    "alice",
-                                    "summary-fail-session",
-                                    "first"))
+                    runtime,
+                    request(
+                            "turn-summary-fail-1",
+                            "alice",
+                            "summary-fail-session",
+                            "first"))
                     .block(Duration.ofSeconds(5));
             List<AgentRuntimeEvent> events =
                     runtime.stream(
@@ -580,7 +581,7 @@ class HarnessAgentRuntimeTest {
                                     event ->
                                             event.getType()
                                                     == AgentRuntimeEvent.Type
-                                                            .CONTEXT_COMPACTION_FAILED));
+                                                    .CONTEXT_COMPACTION_FAILED));
             assertEquals(
                     AgentRuntimeEvent.Type.TURN_FAILED, events.get(events.size() - 1).getType());
         }
@@ -623,12 +624,12 @@ class HarnessAgentRuntimeTest {
         try (HarnessAgentRuntime runtime = new HarnessAgentRuntime(agent)) {
             AgentRuntimeEvent reply =
                     finalReply(
-                                    runtime,
-                                    request(
-                                            "turn-compact-once",
-                                            "alice",
-                                            "compact-once-session",
-                                            "run"))
+                            runtime,
+                            request(
+                                    "turn-compact-once",
+                                    "alice",
+                                    "compact-once-session",
+                                    "run"))
                             .block(Duration.ofSeconds(5));
 
             assertEquals("done", reply.getText());
@@ -641,40 +642,40 @@ class HarnessAgentRuntimeTest {
         try (HarnessAgentRuntime runtime = runtime(new ConversationModel(), true)) {
             Mono.zip(
                             finalReply(
-                                            runtime,
-                                            request(
-                                                    "turn-a1",
-                                                    "alice",
-                                                    "same-session",
-                                                    "remember:Alice"))
+                                    runtime,
+                                    request(
+                                            "turn-a1",
+                                            "alice",
+                                            "same-session",
+                                            "remember:Alice"))
                                     .subscribeOn(Schedulers.parallel()),
                             finalReply(
-                                            runtime,
-                                            request(
-                                                    "turn-b1",
-                                                    "bob",
-                                                    "same-session",
-                                                    "remember:Bob"))
+                                    runtime,
+                                    request(
+                                            "turn-b1",
+                                            "bob",
+                                            "same-session",
+                                            "remember:Bob"))
                                     .subscribeOn(Schedulers.parallel()))
                     .block(Duration.ofSeconds(5));
 
             var replies =
                     Mono.zip(
                                     finalReply(
-                                                    runtime,
-                                                    request(
-                                                            "turn-a2",
-                                                            "alice",
-                                                            "same-session",
-                                                            "who am I?"))
+                                            runtime,
+                                            request(
+                                                    "turn-a2",
+                                                    "alice",
+                                                    "same-session",
+                                                    "who am I?"))
                                             .subscribeOn(Schedulers.parallel()),
                                     finalReply(
-                                                    runtime,
-                                                    request(
-                                                            "turn-b2",
-                                                            "bob",
-                                                            "same-session",
-                                                            "who am I?"))
+                                            runtime,
+                                            request(
+                                                    "turn-b2",
+                                                    "bob",
+                                                    "same-session",
+                                                    "who am I?"))
                                             .subscribeOn(Schedulers.parallel()))
                             .block(Duration.ofSeconds(5));
 
@@ -695,20 +696,20 @@ class HarnessAgentRuntimeTest {
             var replies =
                     Mono.zip(
                                     finalReply(
-                                                    runtime,
-                                                    request(
-                                                            "turn-a",
-                                                            "alice",
-                                                            "same-session",
-                                                            "instruction?"))
+                                            runtime,
+                                            request(
+                                                    "turn-a",
+                                                    "alice",
+                                                    "same-session",
+                                                    "instruction?"))
                                             .subscribeOn(Schedulers.parallel()),
                                     finalReply(
-                                                    runtime,
-                                                    request(
-                                                            "turn-b",
-                                                            "bob",
-                                                            "same-session",
-                                                            "instruction?"))
+                                            runtime,
+                                            request(
+                                                    "turn-b",
+                                                    "bob",
+                                                    "same-session",
+                                                    "instruction?"))
                                             .subscribeOn(Schedulers.parallel()))
                             .block(Duration.ofSeconds(5));
 
@@ -727,20 +728,20 @@ class HarnessAgentRuntimeTest {
             var replies =
                     Mono.zip(
                                     finalReply(
-                                                    runtime,
-                                                    request(
-                                                            "turn-skill-a",
-                                                            "alice",
-                                                            "same-session",
-                                                            "load skill"))
+                                            runtime,
+                                            request(
+                                                    "turn-skill-a",
+                                                    "alice",
+                                                    "same-session",
+                                                    "load skill"))
                                             .subscribeOn(Schedulers.parallel()),
                                     finalReply(
-                                                    runtime,
-                                                    request(
-                                                            "turn-skill-b",
-                                                            "bob",
-                                                            "same-session",
-                                                            "load skill"))
+                                            runtime,
+                                            request(
+                                                    "turn-skill-b",
+                                                    "bob",
+                                                    "same-session",
+                                                    "load skill"))
                                             .subscribeOn(Schedulers.parallel()))
                             .block(Duration.ofSeconds(5));
 
@@ -753,37 +754,37 @@ class HarnessAgentRuntimeTest {
     void restoresOwnerStateAfterRuntimeRestart() {
         Path stateDirectory = workspace.resolve("state");
         try (HarnessAgentRuntime first =
-                runtime(
-                        new ConversationModel(),
-                        true,
-                        new JsonFileAgentStateStore(stateDirectory))) {
+                     runtime(
+                             new ConversationModel(),
+                             true,
+                             new JsonFileAgentStateStore(stateDirectory))) {
             finalReply(
-                            first,
-                            request(
-                                    "turn-before-restart",
-                                    "alice",
-                                    "restart-session",
-                                    "remember:Alice"))
+                    first,
+                    request(
+                            "turn-before-restart",
+                            "alice",
+                            "restart-session",
+                            "remember:Alice"))
                     .block(Duration.ofSeconds(5));
         }
 
         try (HarnessAgentRuntime restarted =
-                runtime(
-                        new ConversationModel(),
-                        true,
-                        new JsonFileAgentStateStore(stateDirectory))) {
+                     runtime(
+                             new ConversationModel(),
+                             true,
+                             new JsonFileAgentStateStore(stateDirectory))) {
             SessionExecutionState previous =
                     restarted.sessionExecution("alice", "restart-session").orElseThrow();
             assertEquals("turn-before-restart", previous.getTurnId());
             assertEquals(TurnStatus.COMPLETED, previous.getStatus());
             AgentRuntimeEvent reply =
                     finalReply(
-                                    restarted,
-                                    request(
-                                            "turn-after-restart",
-                                            "alice",
-                                            "restart-session",
-                                            "who am I?"))
+                            restarted,
+                            request(
+                                    "turn-after-restart",
+                                    "alice",
+                                    "restart-session",
+                                    "who am I?"))
                             .block(Duration.ofSeconds(5));
             assertEquals("Alice", reply.getText());
         }
@@ -802,8 +803,8 @@ class HarnessAgentRuntimeTest {
                     SessionTurnBusyException.class,
                     () ->
                             finalReply(
-                                            runtime,
-                                            request("turn-c2", "alice", "one-session", "second"))
+                                    runtime,
+                                    request("turn-c2", "alice", "one-session", "second"))
                                     .block(Duration.ofSeconds(2)));
             model.release.countDown();
             assertEquals("done", first.get(2, TimeUnit.SECONDS).getText());
@@ -1049,9 +1050,9 @@ class HarnessAgentRuntimeTest {
             ToolApprovalRequest pending =
                     ((List<?>) approval.getDetails())
                             .stream()
-                                    .map(ToolApprovalRequest.class::cast)
-                                    .findFirst()
-                                    .orElseThrow();
+                            .map(ToolApprovalRequest.class::cast)
+                            .findFirst()
+                            .orElseThrow();
             AgentTurnRequest resume =
                     AgentTurnRequest.builder()
                             .turnId("turn-approval")
@@ -1173,21 +1174,21 @@ class HarnessAgentRuntimeTest {
                         .build();
         try (HarnessAgentRuntime runtime = new HarnessAgentRuntime(agent)) {
             finalReply(
-                            runtime,
-                            request(
-                                    "turn-artifact-1",
-                                    "alice",
-                                    "artifact-session",
-                                    "produce report"))
+                    runtime,
+                    request(
+                            "turn-artifact-1",
+                            "alice",
+                            "artifact-session",
+                            "produce report"))
                     .block(Duration.ofSeconds(5));
             AgentRuntimeEvent next =
                     finalReply(
-                                    runtime,
-                                    request(
-                                            "turn-artifact-2",
-                                            "alice",
-                                            "artifact-session",
-                                            "continue with the report"))
+                            runtime,
+                            request(
+                                    "turn-artifact-2",
+                                    "alice",
+                                    "artifact-session",
+                                    "continue with the report"))
                             .block(Duration.ofSeconds(5));
             assertEquals("load_artifact art_history_report", next.getText());
         }
@@ -1223,12 +1224,12 @@ class HarnessAgentRuntimeTest {
         Files.writeString(
                 directory.resolve("SKILL.md"),
                 """
-        ---
-        name: greeting
-        description: %s
-        ---
-        %s
-        """
+                        ---
+                        name: greeting
+                        description: %s
+                        ---
+                        %s
+                        """
                         .formatted(description, body));
     }
 
@@ -1387,9 +1388,9 @@ class HarnessAgentRuntimeTest {
             regularCalls++;
             if (regularCalls > 1
                     && messages.stream()
-                            .anyMatch(
-                                    message ->
-                                            foundingInstruction.equals(message.getTextContent()))) {
+                    .anyMatch(
+                            message ->
+                                    foundingInstruction.equals(message.getTextContent()))) {
                 return text("head-preserved");
             }
             return text("first-reply");
@@ -1935,8 +1936,8 @@ class HarnessAgentRuntimeTest {
                                                     .input(Map.of("questions", List.of(question)))
                                                     .content(
                                                             """
-{"questions":[{"questionId":"period","type":"single","title":"统计周期","required":true,"options":[{"optionId":"7d","label":"最近七天"},{"optionId":"30d","label":"最近三十天"}]}]}
-""")
+                                                                    {"questions":[{"questionId":"period","type":"single","title":"统计周期","required":true,"options":[{"optionId":"7d","label":"最近七天"},{"optionId":"30d","label":"最近三十天"}]}]}
+                                                                    """)
                                                     .build()))
                             .build());
         }

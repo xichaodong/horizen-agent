@@ -21,29 +21,41 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-/** 将所有者的图像 Artifact 发送给已配置多模态模型，并返回回答。 */
+/**
+ * 将所有者的图像 Artifact 发送给已配置多模态模型，并返回回答。
+ */
 public final class VisionAnalyzeTool extends ToolBase {
-    /** 最大图片字节的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大图片字节的固定取值，用于相应策略和边界判断。
+     */
     private static final long MAX_IMAGE_BYTES = 10L * 1024 * 1024;
 
-    /** 当前模型实例或模型标识，按字段声明的类型解释。 */
+    /**
+     * 当前模型实例或模型标识，按字段声明的类型解释。
+     */
     private final Model model;
 
-    /** 产物管理依赖或产物集合，用于引用、读取与交付资源。 */
+    /**
+     * 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     */
     private final ArtifactStore artifacts;
 
-    /** 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。 */
+    /**
+     * 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     */
     private final ArtifactContentStore contents;
 
-    /** 图片URL过期，单位为秒。 */
+    /**
+     * 图片URL过期，单位为秒。
+     */
     private final int imageUrlExpiresSeconds;
 
     /**
      * 创建视觉分析工具，初始化该组件所需的状态、配置或依赖。
      *
-     * @param model 当前视觉分析工具持有的模型对象，供相应处理步骤使用。
+     * @param model     当前视觉分析工具持有的模型对象，供相应处理步骤使用。
      * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
-     * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     * @param contents  资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      */
     public VisionAnalyzeTool(Model model, ArtifactStore artifacts, ArtifactContentStore contents) {
         this(model, artifacts, contents, 3600);
@@ -52,9 +64,9 @@ public final class VisionAnalyzeTool extends ToolBase {
     /**
      * 创建视觉分析工具，初始化该组件所需的状态、配置或依赖。
      *
-     * @param model 当前视觉分析工具持有的模型对象，供相应处理步骤使用。
-     * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
-     * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     * @param model                  当前视觉分析工具持有的模型对象，供相应处理步骤使用。
+     * @param artifacts              产物管理依赖或产物集合，用于引用、读取与交付资源。
+     * @param contents               资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      * @param imageUrlExpiresSeconds 图片URL过期，单位为秒。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -74,17 +86,17 @@ public final class VisionAnalyzeTool extends ToolBase {
                                         "properties",
                                         Map.of(
                                                 "artifact_id",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "description",
-                                                                "图片 Artifact ID"),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "description",
+                                                        "图片 Artifact ID"),
                                                 "question",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "description",
-                                                                "希望分析图片的具体问题")),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "description",
+                                                        "希望分析图片的具体问题")),
                                         "required",
                                         List.of("artifact_id", "question"),
                                         "additionalProperties",

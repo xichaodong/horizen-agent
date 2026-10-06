@@ -168,9 +168,9 @@ class CloudSessionSearchToolTest {
         assertEquals(
                 ToolResultState.ERROR,
                 call(
-                                new CloudSessionSearchTool(denied, artifactStore),
-                                Map.of("session_id", "foreign"),
-                                context())
+                        new CloudSessionSearchTool(denied, artifactStore),
+                        Map.of("session_id", "foreign"),
+                        context())
                         .getState());
         assertEquals(prior, artifactStore.calls);
     }
@@ -265,19 +265,19 @@ class CloudSessionSearchToolTest {
                 query ->
                         query.getTargetSessionId().equals("past")
                                 ? Optional.of(
-                                        new SessionHistoryPage(
-                                                "past",
-                                                "过去分析",
-                                                1L,
-                                                List.of(
-                                                        entry(
-                                                                "past",
-                                                                "message",
-                                                                "past result",
-                                                                0,
-                                                                11)),
-                                                false,
-                                                1))
+                                new SessionHistoryPage(
+                                        "past",
+                                        "过去分析",
+                                        1L,
+                                        List.of(
+                                                entry(
+                                                        "past",
+                                                        "message",
+                                                        "past result",
+                                                        0,
+                                                        11)),
+                                        false,
+                                        1))
                                 : Optional.empty();
         var tool = new CloudSessionSearchTool(history);
         var read = JSON.readTree(output(call(tool, Map.of("session_id", "past"), context())));

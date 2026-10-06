@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class HistoryRecoveryScope {
-    /** eligible的状态标记，用于选择当前组件的处理路径。 */
+    /**
+     * eligible的状态标记，用于选择当前组件的处理路径。
+     */
     private boolean eligible;
 }

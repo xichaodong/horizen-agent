@@ -179,7 +179,7 @@ npm run build
 
 GitHub CI verifies Java 17/21 on Linux, the frontend, repository content, and a credential-free Web smoke test. Live model, database, object-store and sandbox tests require explicit local configuration and are not part of the public CI baseline. The CI commands above are reproducible locally. See [contribution rules](CONTRIBUTING.md) and [changelog](CHANGELOG.md).
 
-Run `./scripts/format.sh apply` after source edits, or `./scripts/format.sh check` to check without changing files. Install frontend dependencies first. Spotless formats Java; Prettier formats Maven POMs and frontend sources. Formatting checks run in Maven verification and GitHub CI.
+Run `./scripts/format.sh apply` after source edits, or `./scripts/format.sh check` to validate without changing files. The project uses the native IntelliJ IDEA formatter with shared project settings and a pinned version, matching **Code → Reformat Code** in IDEA. CI checks the same format; Maven verification checks compilation and tests. See [IDE and formatter setup](CONTRIBUTING.md#changes-and-review).
 
 Maintainer: **xichaodong**. Use this repository's Issues for bugs and feature requests and pull requests for contributions. Security reports follow [SECURITY.md](SECURITY.md). See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 

@@ -16,27 +16,37 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-/** 通过仓储接口构建持久化历史的展示视图。 */
+/**
+ * 通过仓储接口构建持久化历史的展示视图。
+ */
 public final class ConversationHistoryQueryService {
-    /** 会话对象或会话索引，按相应的归属键定位数据。 */
+    /**
+     * 会话对象或会话索引，按相应的归属键定位数据。
+     */
     private final SessionTurnStore sessions;
 
-    /** 需要持久化或展示的结构化呈现块集合。 */
+    /**
+     * 需要持久化或展示的结构化呈现块集合。
+     */
     private final PresentationStore presentations;
 
-    /** 存储正式过程事件的时间线端口，供持久化与刷新恢复使用。 */
+    /**
+     * 存储正式过程事件的时间线端口，供持久化与刷新恢复使用。
+     */
     private final TurnTimelineStore timeline;
 
-    /** 产物管理依赖或产物集合，用于引用、读取与交付资源。 */
+    /**
+     * 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     */
     private final ArtifactStore artifacts;
 
     /**
      * 创建对话历史查询服务，初始化该组件所需的状态、配置或依赖。
      *
-     * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
+     * @param sessions      会话对象或会话索引，按相应的归属键定位数据。
      * @param presentations 需要持久化或展示的结构化呈现块集合。
-     * @param timeline 提供时间线能力的依赖，具体实现由当前组件的组装方传入。
-     * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     * @param timeline      提供时间线能力的依赖，具体实现由当前组件的组装方传入。
+     * @param artifacts     产物管理依赖或产物集合，用于引用、读取与交付资源。
      */
     public ConversationHistoryQueryService(
             SessionTurnStore sessions,
@@ -52,7 +62,7 @@ public final class ConversationHistoryQueryService {
     /**
      * 按归属读取会话正式消息、过程事实与呈现块，组合成刷新或恢复所需的历史。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次操作返回的对话历史结果。
      */
@@ -72,9 +82,9 @@ public final class ConversationHistoryQueryService {
     /**
      * 从正式用户消息的资源引用中恢复输入产物集合。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param messages  消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @return 按返回类型约定组织的结果映射。
      */
     private Map<String, List<Artifact>> inputArtifacts(

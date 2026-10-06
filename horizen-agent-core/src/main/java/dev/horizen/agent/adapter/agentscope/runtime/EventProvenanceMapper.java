@@ -12,7 +12,9 @@ import io.agentscope.core.event.AgentStartEvent;
 
 import java.util.Map;
 
-/** 运行时事件来源映射边界：EventProvenanceMapper。 */
+/**
+ * 运行时事件来源映射边界：EventProvenanceMapper。
+ */
 final class EventProvenanceMapper {
     /**
      * 判断子Agent。
@@ -27,9 +29,9 @@ final class EventProvenanceMapper {
     /**
      * 生成当前操作所需的stepKey文本，供调用方继续处理。
      *
-     * @param kind 当前资源或请求类别，供生命周期、存储与呈现策略选择处理路径。
+     * @param kind   当前资源或请求类别，供生命周期、存储与呈现策略选择处理路径。
      * @param source 待解析或转换的来源对象。
-     * @param id 目标对象的标识。
+     * @param id     目标对象的标识。
      * @return 本次处理生成或读取的文本。
      */
     static String stepKey(String kind, AgentEvent source, String id) {
@@ -40,7 +42,7 @@ final class EventProvenanceMapper {
     /**
      * 计算或取得本方法声明的结果，供当前EventProvenanceMapper处理步骤使用。
      *
-     * @param target 本次转换、状态更新或内容写入的目标。
+     * @param target      本次转换、状态更新或内容写入的目标。
      * @param sourceEvent 当前事件来源关联映射器持有的来源事件对象，供相应处理步骤使用。
      * @return 本次操作返回的Agent运行时事件结果。
      */
@@ -76,7 +78,7 @@ final class EventProvenanceMapper {
      * 生成当前操作所需的metadataText文本，供调用方继续处理。
      *
      * @param metadata 与当前对象关联的附加元数据，不替代领域状态或授权校验。
-     * @param key 当前对象的查找或写入键。
+     * @param key      当前对象的查找或写入键。
      * @return 本次处理生成或读取的文本。
      */
     static String metadataText(Map<String, Object> metadata, String key) {

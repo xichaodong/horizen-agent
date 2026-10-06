@@ -15,8 +15,8 @@ export function finishTool(step, event) {
     const snapshot = toolSnapshot(event.details);
     return {
         ...step,
-        ...(snapshot && typeof snapshot.input === 'string' ? { input: snapshot.input } : {}),
-        ...(snapshot && typeof snapshot.output === 'string' ? { output: snapshot.output } : {}),
+        ...(snapshot && typeof snapshot.input === 'string' ? {input: snapshot.input} : {}),
+        ...(snapshot && typeof snapshot.output === 'string' ? {output: snapshot.output} : {}),
         outputSnapshot: true,
         status: event.status || 'success',
         durationMs: event.durationMs,
@@ -46,7 +46,7 @@ export function finishSubagent(execution, status, forceStatus = false) {
         ...execution,
         status: forceStatus || execution.status === 'running' ? status : execution.status,
         steps: (execution.steps || []).map((step) =>
-            step.status === 'running' ? { ...step, status: unfinished } : step
+            step.status === 'running' ? {...step, status: unfinished} : step
         ),
     };
 }

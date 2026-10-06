@@ -40,10 +40,15 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/** 使用脚本模型和进程内只读工具运行真实 AgentScope 循环。 */
+/**
+ * 使用脚本模型和进程内只读工具运行真实 AgentScope 循环。
+ */
 public final class ObservabilityDemo {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private ObservabilityDemo() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private ObservabilityDemo() {
+    }
 
     /**
      * 完成当前操作的main步骤，按实现更新相应状态或依赖。
@@ -136,13 +141,19 @@ public final class ObservabilityDemo {
         }
     }
 
-    /** 无需远端凭据的确定性演示模型，供本地运行链路与示例使用。 */
+    /**
+     * 无需远端凭据的确定性演示模型，供本地运行链路与示例使用。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class ScriptedModel extends ChatModelBase {
-        /** 调用集合的原子状态，供并发更新与统计读取使用。 */
+        /**
+         * 调用集合的原子状态，供并发更新与统计读取使用。
+         */
         private final AtomicInteger calls = new AtomicInteger();
 
-        /** fail的状态标记，用于选择当前组件的处理路径。 */
+        /**
+         * fail的状态标记，用于选择当前组件的处理路径。
+         */
         private final boolean fail;
 
         /**
@@ -159,8 +170,8 @@ public final class ObservabilityDemo {
          * 计算或取得本方法声明的结果，供当前ScriptedModel处理步骤使用。
          *
          * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-         * @param tools 工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-         * @param options 可供当前请求选择的选项或策略集合。
+         * @param tools    工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+         * @param options  可供当前请求选择的选项或策略集合。
          * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
          */
         @Override
@@ -221,7 +232,9 @@ public final class ObservabilityDemo {
         }
     }
 
-    /** 只读的演示回显工具，用于验证模型与工具调用链路。 */
+    /**
+     * 只读的演示回显工具，用于验证模型与工具调用链路。
+     */
     private static final class EchoTool implements AgentTool {
         /**
          * 读取名称。

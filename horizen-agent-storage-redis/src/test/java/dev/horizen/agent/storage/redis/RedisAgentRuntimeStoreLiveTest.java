@@ -40,7 +40,8 @@ import java.util.UUID;
 @EnabledIfSystemProperty(named = "horizen.redis.live", matches = "true")
 class RedisAgentRuntimeStoreLiveTest {
 
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     private JedisPooled commands;
     private JedisPool subscriptions;

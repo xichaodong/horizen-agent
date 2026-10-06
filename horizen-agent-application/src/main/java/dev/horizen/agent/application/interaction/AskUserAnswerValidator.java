@@ -9,16 +9,21 @@ import dev.horizen.agent.domain.askuser.AskUserQuestion;
 
 import java.util.*;
 
-/** 依据可信的持久化问题校验类型化答案，不依赖 HTTP 传输。 */
+/**
+ * 依据可信的持久化问题校验类型化答案，不依赖 HTTP 传输。
+ */
 public final class AskUserAnswerValidator {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private AskUserAnswerValidator() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private AskUserAnswerValidator() {
+    }
 
     /**
      * 编码提问用户回答校验器。
      *
      * @param questionsJson 问题集合的 JSON 表示，供持久化或协议转换使用。
-     * @param answers 用户对澄清问题的回答集合，按问题标识关联选项和补充文本。
+     * @param answers       用户对澄清问题的回答集合，按问题标识关联选项和补充文本。
      * @return 本次处理生成或读取的文本。
      */
     public static String encode(String questionsJson, List<Map<String, Object>> answers) {
@@ -29,7 +34,7 @@ public final class AskUserAnswerValidator {
      * 核对问题标识、选项选择、自由文本与必填规则，拒绝不属于原澄清请求的答案。
      *
      * @param questionsJson 问题集合的 JSON 表示，供持久化或协议转换使用。
-     * @param rawAnswers 原始回答集合的索引映射，供按键查找或归并当前组件的数据。
+     * @param rawAnswers    原始回答集合的索引映射，供按键查找或归并当前组件的数据。
      * @return 本次处理得到的结果集合。
      * @throws ApplicationError 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -38,7 +43,8 @@ public final class AskUserAnswerValidator {
         final List<AskUserQuestion> questions;
         try {
             questions =
-                    JsonUtils.read(questionsJson, new TypeReference<List<AskUserQuestion>>() {});
+                    JsonUtils.read(questionsJson, new TypeReference<List<AskUserQuestion>>() {
+                    });
         } catch (Exception error) {
             throw new ApplicationError(ApplicationError.Code.CONFLICT, "问题单内容无效");
         }

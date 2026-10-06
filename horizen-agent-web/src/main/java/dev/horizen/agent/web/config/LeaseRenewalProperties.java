@@ -8,26 +8,40 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
 
-/** 实例级 Turn 批量续租的分批、并发和有限重试边界。 */
+/**
+ * 实例级 Turn 批量续租的分批、并发和有限重试边界。
+ */
 @ConfigurationProperties(prefix = "horizen.agent.storage.lease-renewal")
 @Data
 public class LeaseRenewalProperties {
-    /** 单个处理批次允许包含的最大项目数量。 */
+    /**
+     * 单个处理批次允许包含的最大项目数量。
+     */
     private int batchSize = 50;
 
-    /** 同时执行当前处理步骤的并发数量上限。 */
+    /**
+     * 同时执行当前处理步骤的并发数量上限。
+     */
     private int concurrency = 2;
 
-    /** 首次尝试失败后允许的额外重试次数。 */
+    /**
+     * 首次尝试失败后允许的额外重试次数。
+     */
     private int retries = 1;
 
-    /** 重试延迟的时间配置，供等待、调度或失效判断使用。 */
+    /**
+     * 重试延迟的时间配置，供等待、调度或失效判断使用。
+     */
     private Duration retryDelay = Duration.ofSeconds(1);
 
-    /** 查询允许持续的最长等待时间。 */
+    /**
+     * 查询允许持续的最长等待时间。
+     */
     private Duration queryTimeout = Duration.ofSeconds(3);
 
-    /** 连接取得租约允许持续的最长等待时间。 */
+    /**
+     * 连接取得租约允许持续的最长等待时间。
+     */
     private Duration connectionAcquireTimeout = Duration.ofSeconds(3);
 
     /**
@@ -42,6 +56,7 @@ public class LeaseRenewalProperties {
 
     /**
      * 校验当前租约续期配置的输入与状态约束，不满足条件时拒绝继续处理。
+     *
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public void validate() {

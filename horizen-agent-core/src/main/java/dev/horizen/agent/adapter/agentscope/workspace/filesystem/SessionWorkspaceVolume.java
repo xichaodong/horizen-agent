@@ -17,53 +17,79 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
-/** 提供与沙箱调用相同的云端 Session 目录视图，不暴露 Shell 执行能力。 */
+/**
+ * 提供与沙箱调用相同的云端 Session 目录视图，不暴露 Shell 执行能力。
+ */
 public final class SessionWorkspaceVolume implements AutoCloseable {
-    /** 本组件使用的根路径或根对象，限定后续读取与定位范围。 */
+    /**
+     * 本组件使用的根路径或根对象，限定后续读取与定位范围。
+     */
     private final Path root;
 
-    /** 当前工作区目录中的文件内容访问端口。 */
+    /**
+     * 当前工作区目录中的文件内容访问端口。
+     */
     private final LocalFilesystem files;
 
-    /** 保存或取得工作区归档内容的存储端口。 */
+    /**
+     * 保存或取得工作区归档内容的存储端口。
+     */
     private final WorkspaceSnapshotRepository archives;
 
-    /** 按会话定位最近持久工作区快照的指针仓储。 */
+    /**
+     * 按会话定位最近持久工作区快照的指针仓储。
+     */
     private final WorkspaceSnapshotPointerRepository pointers;
 
-    /** 组合资源归属与作用域的定位键，供仓储查询和更新使用。 */
+    /**
+     * 组合资源归属与作用域的定位键，供仓储查询和更新使用。
+     */
     private final WorkspaceSnapshotKey key;
 
-    /** 当前操作取得的工作区或发布资源租约，使用结束后归还。 */
+    /**
+     * 当前操作取得的工作区或发布资源租约，使用结束后归还。
+     */
     private final SandboxLease lease;
 
-    /** 本次处理或传输允许的最大字节数。 */
+    /**
+     * 本次处理或传输允许的最大字节数。
+     */
     private final long maxBytes;
 
-    /** 归档或目录中允许处理的条目数量上限。 */
+    /**
+     * 归档或目录中允许处理的条目数量上限。
+     */
     private final int maxEntries;
 
-    /** 当前工作区修改是否已保存到快照。 */
+    /**
+     * 当前工作区修改是否已保存到快照。
+     */
     private boolean saved;
 
-    /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+    /**
+     * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+     */
     private boolean closed;
 
-    /** 基础快照的标识，用于关联相应记录或执行。 */
+    /**
+     * 基础快照的标识，用于关联相应记录或执行。
+     */
     private String baseSnapshotId;
 
-    /** 单次用户输入触发的执行标识，用于关联状态、消息和事件。 */
+    /**
+     * 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     */
     private String turnId;
 
     /**
      * 创建会话工作区工作卷，初始化该组件所需的状态、配置或依赖。
      *
-     * @param root 当前操作允许使用的根路径。
-     * @param archives 提供归档集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param pointers 提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param key 当前对象的查找或写入键。
-     * @param lease 当前会话工作区工作卷持有的租约对象，供相应处理步骤使用。
-     * @param maxBytes 本次处理或传输允许的最大字节数。
+     * @param root       当前操作允许使用的根路径。
+     * @param archives   提供归档集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param pointers   提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param key        当前对象的查找或写入键。
+     * @param lease      当前会话工作区工作卷持有的租约对象，供相应处理步骤使用。
+     * @param maxBytes   本次处理或传输允许的最大字节数。
      * @param maxEntries 归档或目录中允许处理的条目数量上限。
      */
     private SessionWorkspaceVolume(
@@ -87,12 +113,12 @@ public final class SessionWorkspaceVolume implements AutoCloseable {
     /**
      * 准备会话工作区工作卷。
      *
-     * @param call 当前会话工作区工作卷持有的调用对象，供相应处理步骤使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param archives 提供归档集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param pointers 提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param guard 当前会话工作区工作卷持有的防护对象，供相应处理步骤使用。
-     * @param maxBytes 本次处理或传输允许的最大字节数。
+     * @param call       当前会话工作区工作卷持有的调用对象，供相应处理步骤使用。
+     * @param agent      当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param archives   提供归档集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param pointers   提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param guard      当前会话工作区工作卷持有的防护对象，供相应处理步骤使用。
+     * @param maxBytes   本次处理或传输允许的最大字节数。
      * @param maxEntries 归档或目录中允许处理的条目数量上限。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -144,14 +170,17 @@ public final class SessionWorkspaceVolume implements AutoCloseable {
         return files;
     }
 
-    /** 完成当前操作的changed步骤，按实现更新相应状态或依赖。 */
+    /**
+     * 完成当前操作的changed步骤，按实现更新相应状态或依赖。
+     */
     public void changed() {
         saved = false;
     }
 
     /**
      * 完成当前操作的checkpoint步骤，按实现更新相应状态或依赖。
-     * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     *
+     * @throws IOException           当前输入或运行状态不满足本方法的处理条件时抛出。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public synchronized void checkpoint() {
@@ -160,7 +189,7 @@ public final class SessionWorkspaceVolume implements AutoCloseable {
         try {
             spool = Files.createTempFile("horizen-session-archive-", ".tar");
             try (var output = new TarArchiveOutputStream(Files.newOutputStream(spool));
-                    var paths = Files.walk(root)) {
+                 var paths = Files.walk(root)) {
                 output.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
                 int count = 0;
                 long bytes = 0;
@@ -224,6 +253,7 @@ public final class SessionWorkspaceVolume implements AutoCloseable {
 
     /**
      * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     *
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
@@ -242,9 +272,9 @@ public final class SessionWorkspaceVolume implements AutoCloseable {
     /**
      * 提取会话工作区工作卷。
      *
-     * @param input 本次处理的输入。
-     * @param root 当前操作允许使用的根路径。
-     * @param maxBytes 本次处理或传输允许的最大字节数。
+     * @param input      本次处理的输入。
+     * @param root       当前操作允许使用的根路径。
+     * @param maxBytes   本次处理或传输允许的最大字节数。
      * @param maxEntries 归档或目录中允许处理的条目数量上限。
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

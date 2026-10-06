@@ -4,13 +4,19 @@ import dev.horizen.agent.web.stream.RedisTurnEventBridge;
 
 import lombok.RequiredArgsConstructor;
 
-/** 容器管理资源的状态视图；资源销毁由 Spring 负责。 */
+/**
+ * 容器管理资源的状态视图；资源销毁由 Spring 负责。
+ */
 @RequiredArgsConstructor
 public final class AgentHostResources {
-    /** 本组件使用的 {@code RuntimeStorage} 状态或依赖，用于 storage 的处理。 */
+    /**
+     * 本组件使用的 {@code RuntimeStorage} 状态或依赖，用于 storage 的处理。
+     */
     private final RuntimeStorage storage;
 
-    /** 当前执行或历史事件集合，供持久化、回放与观测使用。 */
+    /**
+     * 当前执行或历史事件集合，供持久化、回放与观测使用。
+     */
     private final RedisTurnEventBridge events;
 
     /**

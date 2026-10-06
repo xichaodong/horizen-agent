@@ -1,17 +1,18 @@
-import { request as apiRequest } from '../api/client.js';
-import { useEffect } from 'react';
-import { useLatest } from './useLatest.js';
-import { listMessages, listPresentations } from '../utils/chat.js';
+import {request as apiRequest} from '../api/client.js';
+import {useEffect} from 'react';
+import {useLatest} from './useLatest.js';
+import {listMessages, listPresentations} from '../utils/chat.js';
+
 /** 恢复当前会话的正式消息、过程事件和卡片，防止旧请求覆盖已切换会话的内容。 */
 export function useConversationHistory({
-    status,
-    activeSessionId,
-    sessions,
-    updateSession,
-    appendMessage,
-    streamSequencesRef,
-    applyTurnEvent,
-}) {
+                                           status,
+                                           activeSessionId,
+                                           sessions,
+                                           updateSession,
+                                           appendMessage,
+                                           streamSequencesRef,
+                                           applyTurnEvent,
+                                       }) {
     const latest = useLatest({
         sessions,
         updateSession,
@@ -21,7 +22,7 @@ export function useConversationHistory({
     });
     const targetSession = sessions.find((session) => session.id === activeSessionId);
     useEffect(() => {
-        const { sessions, updateSession, appendMessage, streamSequencesRef, applyTurnEvent } =
+        const {sessions, updateSession, appendMessage, streamSequencesRef, applyTurnEvent} =
             latest.current;
         if (!status.ready || !activeSessionId) return undefined;
         const target = sessions.find((session) => session.id === activeSessionId);
@@ -29,7 +30,7 @@ export function useConversationHistory({
         const controller = new AbortController();
         apiRequest('/api/session/messages/query', {
             method: 'POST',
-            body: JSON.stringify({ sessionId: activeSessionId }),
+            body: JSON.stringify({sessionId: activeSessionId}),
             signal: controller.signal,
         })
             .then((response) => {
@@ -157,7 +158,7 @@ export function useConversationHistory({
                         Number(currentTurnRecovery.lastEventSequence) || 0
                     );
                 }
-                updateSession(activeSessionId, (session) => ({ ...session, historyLoaded: true }));
+                updateSession(activeSessionId, (session) => ({...session, historyLoaded: true}));
             })
             .catch((error) => {
                 if (error.name !== 'AbortError') {

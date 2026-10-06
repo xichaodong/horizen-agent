@@ -44,23 +44,28 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.List;
 
-/** 注册宿主、Provider 和沙箱工具，不负责构建 Agent。 */
+/**
+ * 注册宿主、Provider 和沙箱工具，不负责构建 Agent。
+ */
 public final class AgentToolRegistry {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private AgentToolRegistry() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private AgentToolRegistry() {
+    }
 
     /**
      * 注册运行时工具集合。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param model 当前Agent工具注册表持有的模型对象，供相应处理步骤使用。
-     * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
+     * @param agent           当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param model           当前Agent工具注册表持有的模型对象，供相应处理步骤使用。
+     * @param sessions        会话对象或会话索引，按相应的归属键定位数据。
      * @param artifactSupport 当前Agent工具注册表持有的产物支持对象，供相应处理步骤使用。
-     * @param askUsers 澄清请求的存储或服务，用于回答处理与执行恢复。
-     * @param sandbox 当前Agent工具注册表持有的沙箱对象，供相应处理步骤使用。
-     * @param multimodal 当前Agent工具注册表持有的多模态对象，供相应处理步骤使用。
-     * @param descriptors 当前Agent工具注册表持有的描述集合对象，供相应处理步骤使用。
-     * @param cloudMemory 提供云端记忆能力的依赖，具体实现由当前组件的组装方传入。
+     * @param askUsers        澄清请求的存储或服务，用于回答处理与执行恢复。
+     * @param sandbox         当前Agent工具注册表持有的沙箱对象，供相应处理步骤使用。
+     * @param multimodal      当前Agent工具注册表持有的多模态对象，供相应处理步骤使用。
+     * @param descriptors     当前Agent工具注册表持有的描述集合对象，供相应处理步骤使用。
+     * @param cloudMemory     提供云端记忆能力的依赖，具体实现由当前组件的组装方传入。
      */
     public static void registerRuntimeTools(
             HarnessAgent agent,
@@ -88,16 +93,16 @@ public final class AgentToolRegistry {
     /**
      * 注册运行时工具集合。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param model 当前Agent工具注册表持有的模型对象，供相应处理步骤使用。
-     * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
+     * @param agent           当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param model           当前Agent工具注册表持有的模型对象，供相应处理步骤使用。
+     * @param sessions        会话对象或会话索引，按相应的归属键定位数据。
      * @param artifactSupport 当前Agent工具注册表持有的产物支持对象，供相应处理步骤使用。
-     * @param askUsers 澄清请求的存储或服务，用于回答处理与执行恢复。
-     * @param sandbox 当前Agent工具注册表持有的沙箱对象，供相应处理步骤使用。
-     * @param multimodal 当前Agent工具注册表持有的多模态对象，供相应处理步骤使用。
-     * @param descriptors 当前Agent工具注册表持有的描述集合对象，供相应处理步骤使用。
-     * @param cloudMemory 提供云端记忆能力的依赖，具体实现由当前组件的组装方传入。
-     * @param webClient 提供Web客户端能力的依赖，具体实现由当前组件的组装方传入。
+     * @param askUsers        澄清请求的存储或服务，用于回答处理与执行恢复。
+     * @param sandbox         当前Agent工具注册表持有的沙箱对象，供相应处理步骤使用。
+     * @param multimodal      当前Agent工具注册表持有的多模态对象，供相应处理步骤使用。
+     * @param descriptors     当前Agent工具注册表持有的描述集合对象，供相应处理步骤使用。
+     * @param cloudMemory     提供云端记忆能力的依赖，具体实现由当前组件的组装方传入。
+     * @param webClient       提供Web客户端能力的依赖，具体实现由当前组件的组装方传入。
      */
     public static void registerRuntimeTools(
             HarnessAgent agent,
@@ -134,14 +139,14 @@ public final class AgentToolRegistry {
                 .registerAgentTool(
                         webClient == null
                                 ? new WebExtractTool(
-                                        artifactSupport == null
-                                                ? null
-                                                : artifactSupport.getLifecycle())
+                                artifactSupport == null
+                                        ? null
+                                        : artifactSupport.getLifecycle())
                                 : new WebExtractTool(
-                                        webClient,
-                                        artifactSupport == null
-                                                ? null
-                                                : artifactSupport.getLifecycle()));
+                                webClient,
+                                artifactSupport == null
+                                        ? null
+                                        : artifactSupport.getLifecycle()));
         if (artifactSupport != null) {
             VisionAnalyzeTool vision =
                     new VisionAnalyzeTool(
@@ -191,19 +196,19 @@ public final class AgentToolRegistry {
         if (properties.mock()) return new FixtureGateway(properties.getFixtureFile());
         return properties.configured()
                 ? new GatewayClient(
-                        URI.create(properties.getUrl()),
-                        properties.getToken(),
-                        properties.getTimeout(),
-                        properties.getAllowedTools())
+                URI.create(properties.getUrl()),
+                properties.getToken(),
+                properties.getTimeout(),
+                properties.getAllowedTools())
                 : null;
     }
 
     /**
      * 注册网关工具集合。
      *
-     * @param toolkit 当前Agent工具注册表持有的工具集对象，供相应处理步骤使用。
-     * @param gateway 外部工具目录与调用的网关适配器。
-     * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
+     * @param toolkit     当前Agent工具注册表持有的工具集对象，供相应处理步骤使用。
+     * @param gateway     外部工具目录与调用的网关适配器。
+     * @param properties  宿主绑定的配置对象，供组件组装与策略校验使用。
      * @param descriptors 当前Agent工具注册表持有的描述集合对象，供相应处理步骤使用。
      * @return 本次操作返回的工具目录解析器结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -246,7 +251,7 @@ public final class AgentToolRegistry {
      * 确保提供方工具分组。
      *
      * @param toolkit 当前Agent工具注册表持有的工具集对象，供相应处理步骤使用。
-     * @param group 当前Agent工具注册表持有的分组对象，供相应处理步骤使用。
+     * @param group   当前Agent工具注册表持有的分组对象，供相应处理步骤使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public static void ensureProviderToolGroup(Toolkit toolkit, ToolGroupDefinition group) {
@@ -261,8 +266,8 @@ public final class AgentToolRegistry {
                     group.getActivateOnSkill().isEmpty()
                             ? !(existing instanceof SkillToolGroup)
                             : existing instanceof SkillToolGroup skill
-                                    && group.getActivateOnSkill()
-                                            .equals(skill.getActivateOnSkill());
+                            && group.getActivateOnSkill()
+                            .equals(skill.getActivateOnSkill());
             if (!sameSkill || existing.isActive() != group.isActiveByDefault()) {
                 throw new IllegalArgumentException(
                         "Provider returned inconsistent tool group metadata: " + group.getId());

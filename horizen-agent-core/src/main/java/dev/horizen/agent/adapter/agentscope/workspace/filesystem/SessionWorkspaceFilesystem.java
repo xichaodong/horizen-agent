@@ -6,7 +6,9 @@ import io.agentscope.harness.agent.filesystem.model.*;
 
 import java.util.*;
 
-/** 每次调用使用的代理，仅暴露文件操作，不暴露宿主 Shell。 */
+/**
+ * 每次调用使用的代理，仅暴露文件操作，不暴露宿主 Shell。
+ */
 public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
     /**
      * 计算或取得本方法声明的结果，供当前SessionWorkspaceFilesystem处理步骤使用。
@@ -25,7 +27,7 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
      * 计算或取得本方法声明的结果，供当前SessionWorkspaceFilesystem处理步骤使用。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param path 需要读取、写入或校验的路径。
+     * @param path    需要读取、写入或校验的路径。
      * @return 本次操作返回的Ls结果结果。
      */
     @Override
@@ -38,10 +40,10 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
     /**
      * 读取会话工作区文件系统。
      *
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param context  当前执行上下文，提供关联标识和宿主绑定信息。
      * @param filePath 当前会话工作区文件系统使用的文件路径，供其处理与状态记录使用。
-     * @param offset 本次读取的起始偏移。
-     * @param limit 本次处理或返回数量上限。
+     * @param offset   本次读取的起始偏移。
+     * @param limit    本次处理或返回数量上限。
      * @return 本次操作返回的读取结果结果。
      */
     @Override
@@ -54,9 +56,9 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
     /**
      * 写入会话工作区文件系统。
      *
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param context  当前执行上下文，提供关联标识和宿主绑定信息。
      * @param filePath 当前会话工作区文件系统使用的文件路径，供其处理与状态记录使用。
-     * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+     * @param content  当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @return 本次操作返回的写入结果结果。
      */
     @Override
@@ -68,10 +70,10 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
     /**
      * 计算或取得本方法声明的结果，供当前SessionWorkspaceFilesystem处理步骤使用。
      *
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param filePath 当前会话工作区文件系统使用的文件路径，供其处理与状态记录使用。
-     * @param oldString 当前会话工作区文件系统使用的old文本，供其处理与状态记录使用。
-     * @param newString 当前会话工作区文件系统使用的新建文本，供其处理与状态记录使用。
+     * @param context    当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param filePath   当前会话工作区文件系统使用的文件路径，供其处理与状态记录使用。
+     * @param oldString  当前会话工作区文件系统使用的old文本，供其处理与状态记录使用。
+     * @param newString  当前会话工作区文件系统使用的新建文本，供其处理与状态记录使用。
      * @param replaceAll 替换全部的状态标记，用于选择当前组件的处理路径。
      * @return 本次操作返回的Edit结果结果。
      */
@@ -91,8 +93,8 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
      * @param pattern 当前会话工作区文件系统使用的校验模式，供其处理与状态记录使用。
-     * @param path 需要读取、写入或校验的路径。
-     * @param glob 当前会话工作区文件系统使用的路径匹配，供其处理与状态记录使用。
+     * @param path    需要读取、写入或校验的路径。
+     * @param glob    当前会话工作区文件系统使用的路径匹配，供其处理与状态记录使用。
      * @return 本次操作返回的Grep结果结果。
      */
     @Override
@@ -107,7 +109,7 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
      * @param pattern 当前会话工作区文件系统使用的校验模式，供其处理与状态记录使用。
-     * @param path 需要读取、写入或校验的路径。
+     * @param path    需要读取、写入或校验的路径。
      * @return 本次操作返回的路径匹配结果结果。
      */
     @Override
@@ -121,7 +123,7 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
      * 上传文件集合。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param files 文件集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param files   文件集合的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @return 本次处理得到的结果集合。
      */
     @Override
@@ -135,7 +137,7 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
      * 下载文件集合。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param paths paths的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param paths   paths的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @return 本次处理得到的结果集合。
      */
     @Override
@@ -147,7 +149,7 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
      * 检查是否存在会话工作区文件系统。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param path 需要读取、写入或校验的路径。
+     * @param path    需要读取、写入或校验的路径。
      * @return 本次检查是否通过或本次更新是否成功。
      */
     @Override
@@ -160,7 +162,7 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
      * 删除会话工作区文件系统。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param path 需要读取、写入或校验的路径。
+     * @param path    需要读取、写入或校验的路径。
      * @return 本次操作返回的写入结果结果。
      */
     @Override
@@ -172,9 +174,9 @@ public final class SessionWorkspaceFilesystem implements AbstractFilesystem {
     /**
      * 计算或取得本方法声明的结果，供当前SessionWorkspaceFilesystem处理步骤使用。
      *
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param context  当前执行上下文，提供关联标识和宿主绑定信息。
      * @param fromPath 当前会话工作区文件系统使用的来源路径，供其处理与状态记录使用。
-     * @param toPath 当前会话工作区文件系统使用的目标路径，供其处理与状态记录使用。
+     * @param toPath   当前会话工作区文件系统使用的目标路径，供其处理与状态记录使用。
      * @return 本次操作返回的写入结果结果。
      */
     @Override

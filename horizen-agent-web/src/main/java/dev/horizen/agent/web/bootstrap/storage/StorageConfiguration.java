@@ -13,7 +13,9 @@ import org.springframework.context.annotation.*;
 
 import java.util.UUID;
 
-/** 管理服务持久化资源，将 Mapper 和 Repository 组装交给 Spring。 */
+/**
+ * 管理服务持久化资源，将 Mapper 和 Repository 组装交给 Spring。
+ */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "horizen.agent.storage.mode", havingValue = "DISTRIBUTED")
 @Import(AgentJdbcConfiguration.class)
@@ -22,7 +24,7 @@ public class StorageConfiguration {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
-     * @param leases 当前存储组装持有的租约集合对象，供相应处理步骤使用。
+     * @param leases     当前存储组装持有的租约集合对象，供相应处理步骤使用。
      * @return 本次操作返回的Hikari数据来源结果。
      */
     @Bean(destroyMethod = "close", name = "agentDataSource")
@@ -55,7 +57,7 @@ public class StorageConfiguration {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param instanceId 当前服务实例标识，用于区分分布式执行与资源统计。
-     * @param leases 当前存储组装持有的租约集合对象，供相应处理步骤使用。
+     * @param leases     当前存储组装持有的租约集合对象，供相应处理步骤使用。
      * @return 本次操作返回的JDBC存储选项集合结果。
      */
     @Bean

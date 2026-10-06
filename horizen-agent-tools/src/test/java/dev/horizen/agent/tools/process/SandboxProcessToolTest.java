@@ -26,7 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 class SandboxProcessToolTest {
     private static final ObjectMapper JSON = new ObjectMapper();
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void startsWaitsAndReadsIncrementalLogs() throws Exception {
@@ -131,11 +132,11 @@ class SandboxProcessToolTest {
                         Files.writeString(
                                 setsid,
                                 """
-                #!/usr/bin/env python3
-                import os, sys
-                os.setsid()
-                os.execvp(sys.argv[1], sys.argv[1:])
-                """);
+                                        #!/usr/bin/env python3
+                                        import os, sys
+                                        os.setsid()
+                                        os.execvp(sys.argv[1], sys.argv[1:])
+                                        """);
                         setsid.toFile().setExecutable(true);
                     }
                     ProcessBuilder builder =

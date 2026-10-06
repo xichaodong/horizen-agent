@@ -34,33 +34,53 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-/** 在服务端持有 Turn 执行；页面 SSE 连接只订阅事件，不拥有执行生命周期。 */
+/**
+ * 在服务端持有 Turn 执行；页面 SSE 连接只订阅事件，不拥有执行生命周期。
+ */
 public final class TurnExecutionManager implements AutoCloseable {
-    /** 当前组件的诊断日志器。 */
+    /**
+     * 当前组件的诊断日志器。
+     */
     private static final Logger log = LoggerFactory.getLogger(TurnExecutionManager.class);
 
-    /** 默认回放事件集合的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 默认回放事件集合的固定取值，用于相应策略和边界判断。
+     */
     private static final int DEFAULT_REPLAY_EVENTS = 2048;
 
-    /** 启动注册超时的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 启动注册超时的固定取值，用于相应策略和边界判断。
+     */
     private static final Duration START_REGISTRATION_TIMEOUT = Duration.ofSeconds(2);
 
-    /** 本组件使用的 {@code Object} 状态或依赖，用于 lifecycle 的处理。 */
+    /**
+     * 本组件使用的 {@code Object} 状态或依赖，用于 lifecycle 的处理。
+     */
     private final Object lifecycle = new Object();
 
-    /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+    /**
+     * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+     */
     private volatile boolean closed;
 
-    /** 独立的阻塞安全控制池；事件写入占满共享工作线程时仍可中断 Runtime。 */
+    /**
+     * 独立的阻塞安全控制池；事件写入占满共享工作线程时仍可中断 Runtime。
+     */
     private final Scheduler controls = Schedulers.newBoundedElastic(4, 256, "turn-control");
 
-    /** 执行 Agent 模型与工具循环的运行时接口。 */
+    /**
+     * 执行 Agent 模型与工具循环的运行时接口。
+     */
     private final AgentRuntime runtime;
 
-    /** 本地观察流允许保留的回放事件数量。 */
+    /**
+     * 本地观察流允许保留的回放事件数量。
+     */
     private final int replayEvents;
 
-    /** 执行集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 执行集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<SessionKey, ManagedTurn> turns = new ConcurrentHashMap<>();
 
     /**
@@ -75,7 +95,7 @@ public final class TurnExecutionManager implements AutoCloseable {
     /**
      * 创建执行执行管理器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param runtime 执行 Agent 模型与工具循环的运行时接口。
+     * @param runtime      执行 Agent 模型与工具循环的运行时接口。
      * @param replayEvents 当前执行执行管理器使用的回放事件集合，供其处理与状态记录使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -91,13 +111,13 @@ public final class TurnExecutionManager implements AutoCloseable {
      * 取得本地执行句柄并持有运行订阅，使浏览器观察连接的断开不终止实际执行。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param request 当前操作的请求参数。
-     * @param source 待解析或转换的来源对象。
+     * @param request     当前操作的请求参数。
+     * @param source      待解析或转换的来源对象。
      * @param maxDuration 最大耗时的时间配置，供等待、调度或失效判断使用。
-     * @param observer 接收结果或事件的回调。
+     * @param observer    接收结果或事件的回调。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
-     * @throws ClosedException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws ClosedException             当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalArgumentException    当前输入或运行状态不满足本方法的处理条件时抛出。
      * @throws TurnAlreadyRunningException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public Flux<AgentRuntimeEvent> start(
@@ -105,16 +125,17 @@ public final class TurnExecutionManager implements AutoCloseable {
             Flux<AgentRuntimeEvent> source,
             Duration maxDuration,
             Consumer<AgentRuntimeEvent> observer) {
-        return start(request, source, maxDuration, observer, (event, error) -> {});
+        return start(request, source, maxDuration, observer, (event, error) -> {
+        });
     }
 
     /**
      * 持有单次执行，并在取得失败终态后调用写入失败收敛器。
      *
-     * @param request 当前执行请求。
-     * @param source 借用的执行事件流；本管理器拥有其订阅。
-     * @param maxDuration 执行的总时间预算。
-     * @param observer 按顺序执行的观测或持久化回调，不在状态锁内调用。
+     * @param request         当前执行请求。
+     * @param source          借用的执行事件流；本管理器拥有其订阅。
+     * @param maxDuration     执行的总时间预算。
+     * @param observer        按顺序执行的观测或持久化回调，不在状态锁内调用。
      * @param observerFailure 仅由取得终态的写入失败调用，防止覆盖已接受的取消或超时。
      * @return 按持久化顺序输出的本地观察流。
      */
@@ -124,18 +145,19 @@ public final class TurnExecutionManager implements AutoCloseable {
             Duration maxDuration,
             Consumer<AgentRuntimeEvent> observer,
             BiConsumer<AgentRuntimeEvent, RuntimeException> observerFailure) {
-        return start(request, source, maxDuration, observer, observerFailure, () -> {});
+        return start(request, source, maxDuration, observer, observerFailure, () -> {
+        });
     }
 
     /**
      * 为应用协调器提供最后一次观测完成后的本地清理钩子。
      *
-     * @param request 当前执行请求。
-     * @param source 借用的执行源。
-     * @param maxDuration 总执行时间预算。
-     * @param observer 串行观测回调。
+     * @param request         当前执行请求。
+     * @param source          借用的执行源。
+     * @param maxDuration     总执行时间预算。
+     * @param observer        串行观测回调。
      * @param observerFailure 已取得失败归属的收敛回调。
-     * @param settled 最后一次观测完成后的本地清理，不应执行阻塞 I/O。
+     * @param settled         最后一次观测完成后的本地清理，不应执行阻塞 I/O。
      * @return 本地观察流。
      */
     public Flux<AgentRuntimeEvent> start(
@@ -218,8 +240,8 @@ public final class TurnExecutionManager implements AutoCloseable {
     /**
      * 取得已有执行的观察流；核对期望执行标识，避免旧页面订阅到后续执行。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param ownerKey       宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId      会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param expectedTurnId 调用方期望操作的执行标识，用于防止旧页面误操作后续执行。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
@@ -239,7 +261,7 @@ public final class TurnExecutionManager implements AutoCloseable {
     /**
      * 判断是否存在活跃执行。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -253,8 +275,8 @@ public final class TurnExecutionManager implements AutoCloseable {
      * 并发状态更新包含比较交换操作。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param ownerKey       宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId      会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param expectedTurnId 调用方期望操作的执行标识，用于防止旧页面误操作后续执行。
      * @return 本次操作返回的取消结果结果。
      * @throws ClosedException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -300,7 +322,7 @@ public final class TurnExecutionManager implements AutoCloseable {
      * 并发状态更新包含比较交换操作。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param current 当前执行执行管理器持有的当前对象，供相应处理步骤使用。
      */
     private void timeout(SessionKey key, ManagedTurn current) {
@@ -338,128 +360,210 @@ public final class TurnExecutionManager implements AutoCloseable {
         controls.dispose();
     }
 
-    /** 关闭异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。 */
+    /**
+     * 关闭异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。
+     */
     public static final class ClosedException extends IllegalStateException {
-        /** 创建关闭异常，初始化该组件所需的状态、配置或依赖。 */
+        /**
+         * 创建关闭异常，初始化该组件所需的状态、配置或依赖。
+         */
         public ClosedException() {
             super("Turn execution manager is closed");
         }
     }
 
-    /** 取消操作的结果，区分已提交控制请求与执行已经确认停止。 */
+    /**
+     * 取消操作的结果，区分已提交控制请求与执行已经确认停止。
+     */
     public enum CancelResult {
-        /** 执行或交互已取消，不再继续原处理。 */
+        /**
+         * 执行或交互已取消，不再继续原处理。
+         */
         CANCELLED,
-        /** 目标执行已经结束，不再重复取消。 */
+        /**
+         * 目标执行已经结束，不再重复取消。
+         */
         ALREADY_TERMINAL,
-        /** 原会话的当前执行已经变化，旧请求不能作用于后续执行。 */
+        /**
+         * 原会话的当前执行已经变化，旧请求不能作用于后续执行。
+         */
         TURN_CHANGED,
-        /** 本实例没有持有目标执行，需通过对应的持有方处理。 */
+        /**
+         * 本实例没有持有目标执行，需通过对应的持有方处理。
+         */
         NOT_OWNED,
-        /** 在当前访问范围内没有找到所请求对象。 */
+        /**
+         * 在当前访问范围内没有找到所请求对象。
+         */
         NOT_FOUND
     }
 
-    /** 执行Already运行中异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。 */
+    /**
+     * 执行Already运行中异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。
+     */
     public static final class TurnAlreadyRunningException extends IllegalStateException {
-        /** 创建执行Already运行中异常，初始化该组件所需的状态、配置或依赖。 */
+        /**
+         * 创建执行Already运行中异常，初始化该组件所需的状态、配置或依赖。
+         */
         TurnAlreadyRunningException() {
             super("session already has a running turn");
         }
     }
 
-    /** 执行Not可用异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。 */
+    /**
+     * 执行Not可用异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。
+     */
     public static final class TurnNotAvailableException extends IllegalStateException {
-        /** 创建执行Not可用异常，初始化该组件所需的状态、配置或依赖。 */
+        /**
+         * 创建执行Not可用异常，初始化该组件所需的状态、配置或依赖。
+         */
         TurnNotAvailableException() {
             super("turn event stream is not available on this instance");
         }
     }
 
-    /** 执行已改变异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。 */
+    /**
+     * 执行已改变异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。
+     */
     public static final class TurnChangedException extends IllegalStateException {
-        /** 创建执行已改变异常，初始化该组件所需的状态、配置或依赖。 */
+        /**
+         * 创建执行已改变异常，初始化该组件所需的状态、配置或依赖。
+         */
         TurnChangedException() {
             super("session current turn has changed");
         }
     }
 
-    /** 执行管理器定位隔离会话的键，组合归属与会话标识。 */
+    /**
+     * 执行管理器定位隔离会话的键，组合归属与会话标识。
+     */
     @Value
     private static class SessionKey {
-        /** 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。 */
+        /**
+         * 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+         */
         String ownerKey;
 
-        /** 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。 */
+        /**
+         * 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+         */
         String sessionId;
     }
 
-    /** 终态归属；首次原子转换决定谁收敛执行，后续事件不能覆盖它。 */
+    /**
+     * 终态归属；首次原子转换决定谁收敛执行，后续事件不能覆盖它。
+     */
     private enum Ending {
-        /** 由 Runtime 的终态事件收敛。 */
+        /**
+         * 由 Runtime 的终态事件收敛。
+         */
         SOURCE,
-        /** 由宿主取消或总时限收敛。 */
+        /**
+         * 由宿主取消或总时限收敛。
+         */
         CONTROL,
-        /** 由源错误、写入错误或缺少终态收敛。 */
+        /**
+         * 由源错误、写入错误或缺少终态收敛。
+         */
         FAILURE,
-        /** 由宿主关闭收敛。 */
+        /**
+         * 由宿主关闭收敛。
+         */
         SHUTDOWN
     }
 
-    /** 执行句柄；原子状态负责终态竞争，邮箱负责观测及输出顺序。 */
+    /**
+     * 执行句柄；原子状态负责终态竞争，邮箱负责观测及输出顺序。
+     */
     private final class ManagedTurn {
-        /** 所属隔离会话；仅以本句柄移除，避免删除同会话的新执行。 */
+        /**
+         * 所属隔离会话；仅以本句柄移除，避免删除同会话的新执行。
+         */
         private final SessionKey key;
 
-        /** 当前执行请求。 */
+        /**
+         * 当前执行请求。
+         */
         private final AgentTurnRequest request;
 
-        /** 当前执行标识。 */
+        /**
+         * 当前执行标识。
+         */
         private final String turnId;
 
-        /** 本地有界回放输出。 */
+        /**
+         * 本地有界回放输出。
+         */
         private final Sinks.Many<AgentRuntimeEvent> sink;
 
-        /** 串行观测回调，由事件工作线程执行。 */
+        /**
+         * 串行观测回调，由事件工作线程执行。
+         */
         private final Consumer<AgentRuntimeEvent> observer;
 
-        /** 写入错误取得终态后的持久化收敛回调。 */
+        /**
+         * 写入错误取得终态后的持久化收敛回调。
+         */
         private final BiConsumer<AgentRuntimeEvent, RuntimeException> observerFailure;
 
-        /** 串行事件排空后的本地清理钩子，避免源关闭抢先清空仍在持久化的工具事实。 */
+        /**
+         * 串行事件排空后的本地清理钩子，避免源关闭抢先清空仍在持久化的工具事实。
+         */
         private final Runnable settled;
 
-        /** 借用源的订阅，本句柄负责取消。 */
+        /**
+         * 借用源的订阅，本句柄负责取消。
+         */
         private final AtomicReference<Disposable> upstream = new AtomicReference<>();
 
-        /** 总时限调度订阅。 */
+        /**
+         * 总时限调度订阅。
+         */
         private final AtomicReference<Disposable> deadline = new AtomicReference<>();
 
-        /** 终态归属，一次执行最多成功转换一次。 */
+        /**
+         * 终态归属，一次执行最多成功转换一次。
+         */
         private final AtomicReference<Ending> ending = new AtomicReference<>();
 
-        /** 句柄已释放；在持久化排空前保留会话占用。 */
+        /**
+         * 句柄已释放；在持久化排空前保留会话占用。
+         */
         private final AtomicBoolean released = new AtomicBoolean();
 
-        /** 当前观察流已发送结果或异常通知，仅在邮箱线程中读写。 */
+        /**
+         * 当前观察流已发送结果或异常通知，仅在邮箱线程中读写。
+         */
         private boolean resultSeen;
 
-        /** 已发送需要等待用户的交互事件，仅在邮箱线程中读写。 */
+        /**
+         * 已发送需要等待用户的交互事件，仅在邮箱线程中读写。
+         */
         private boolean waitingSeen;
 
-        /** 已请求释放源，包括在注册之前接受的取消。 */
+        /**
+         * 已请求释放源，包括在注册之前接受的取消。
+         */
         private final AtomicBoolean cancelRequested = new AtomicBoolean();
 
-        /** 不等待持久化即可确认开始、停止或失败。 */
+        /**
+         * 不等待持久化即可确认开始、停止或失败。
+         */
         private final CountDownLatch registered = new CountDownLatch(1);
 
-        /** 串行邮箱；源每次请求一个事件，控制和源收尾至多再加入少量命令。 */
+        /**
+         * 串行邮箱；源每次请求一个事件，控制和源收尾至多再加入少量命令。
+         */
         private final ConcurrentLinkedQueue<Runnable> mailbox = new ConcurrentLinkedQueue<>();
 
-        /** 原子保护排空任务的唯一性，不在锁内执行观测或订阅释放。 */
+        /**
+         * 原子保护排空任务的唯一性，不在锁内执行观测或订阅释放。
+         */
         private final AtomicBoolean draining = new AtomicBoolean();
 
-        /** 创建借用 Runtime、拥有源订阅和本地观察通道的执行句柄。 */
+        /**
+         * 创建借用 Runtime、拥有源订阅和本地观察通道的执行句柄。
+         */
         private ManagedTurn(
                 SessionKey key,
                 AgentTurnRequest request,
@@ -471,12 +575,15 @@ public final class TurnExecutionManager implements AutoCloseable {
             this.request = request;
             this.turnId = request.getTurnId();
             this.sink = Sinks.many().replay().limit(replayEvents);
-            this.observer = observer == null ? ignored -> {} : observer;
+            this.observer = observer == null ? ignored -> {
+            } : observer;
             this.observerFailure = observerFailure;
             this.settled = settled;
         }
 
-        /** 将命令排入唯一的串行通道；共享工作线程被占用不影响独立控制池。 */
+        /**
+         * 将命令排入唯一的串行通道；共享工作线程被占用不影响独立控制池。
+         */
         private void enqueue(Runnable action) {
             if (released.get()) return;
             mailbox.add(action);
@@ -485,7 +592,9 @@ public final class TurnExecutionManager implements AutoCloseable {
             }
         }
 
-        /** 回调执行不占状态锁；空邮箱与并发入队通过再次检查防止漏唤醒。 */
+        /**
+         * 回调执行不占状态锁；空邮箱与并发入队通过再次检查防止漏唤醒。
+         */
         private void drain() {
             do {
                 Runnable action;
@@ -497,7 +606,9 @@ public final class TurnExecutionManager implements AutoCloseable {
             } while (!mailbox.isEmpty() && draining.compareAndSet(false, true));
         }
 
-        /** 注册源订阅；停止先于注册发生时也不允许重新启动生产者。 */
+        /**
+         * 注册源订阅；停止先于注册发生时也不允许重新启动生产者。
+         */
         private void bind(Disposable value) {
             if (!upstream.compareAndSet(null, value)) {
                 disposeSource(value);
@@ -506,7 +617,9 @@ public final class TurnExecutionManager implements AutoCloseable {
             }
         }
 
-        /** 注册总时限；执行已经取得终态时立即释放迟到的调度任务。 */
+        /**
+         * 注册总时限；执行已经取得终态时立即释放迟到的调度任务。
+         */
         private void bindDeadline(Disposable value) {
             if (!deadline.compareAndSet(null, value) || ending.get() != null) value.dispose();
         }
@@ -567,7 +680,9 @@ public final class TurnExecutionManager implements AutoCloseable {
             }
         }
 
-        /** 控制终态也由同一通道观测和发布，避免与已经进行的写入并发。 */
+        /**
+         * 控制终态也由同一通道观测和发布，避免与已经进行的写入并发。
+         */
         private void deliver(AgentRuntimeEvent event) {
             try {
                 observer.accept(event);
@@ -579,7 +694,9 @@ public final class TurnExecutionManager implements AutoCloseable {
             sink.tryEmitNext(event);
         }
 
-        /** 仅取得失败归属的事件调用收敛器；停止期间的旧写入失败不能改成 FAILED。 */
+        /**
+         * 仅取得失败归属的事件调用收敛器；停止期间的旧写入失败不能改成 FAILED。
+         */
         private void handleObserverFailure(AgentRuntimeEvent event, RuntimeException error) {
             log.error(
                     "Turn event observer failed [turnId={}, type={}]",
@@ -600,20 +717,26 @@ public final class TurnExecutionManager implements AutoCloseable {
                     event.getType() == AgentRuntimeEvent.Type.TURN_COMPLETED);
         }
 
-        /** 保留 Reactor 的致命错误语义；普通回调 Error 也必须完成失败收敛。 */
+        /**
+         * 保留 Reactor 的致命错误语义；普通回调 Error 也必须完成失败收敛。
+         */
         private RuntimeException callbackFailure(Throwable error) {
             Exceptions.throwIfFatal(error);
             return Exceptions.propagate(error);
         }
 
-        /** 源错误只在没有其他操作取得终态时转为失败。 */
+        /**
+         * 源错误只在没有其他操作取得终态时转为失败。
+         */
         private void fail(Throwable error) {
             if (!ending.compareAndSet(null, Ending.FAILURE)) return;
             reportFailure("EXECUTION_ERROR", error, false);
             release();
         }
 
-        /** 源结束后等待用户可正常收尾；未发出任何终态或等待事件视为协议失败。 */
+        /**
+         * 源结束后等待用户可正常收尾；未发出任何终态或等待事件视为协议失败。
+         */
         private void complete() {
             if (waitingSeen) {
                 if (ending.compareAndSet(null, Ending.SOURCE)) release();
@@ -623,7 +746,9 @@ public final class TurnExecutionManager implements AutoCloseable {
             }
         }
 
-        /** 尽力写入一次失败事实；完成结果可能已经提交时只发结果不确定通知。 */
+        /**
+         * 尽力写入一次失败事实；完成结果可能已经提交时只发结果不确定通知。
+         */
         private void reportFailure(String code, Throwable cause, boolean resultMayBeCommitted) {
             if (resultSeen) return;
             if (!resultMayBeCommitted) {
@@ -672,7 +797,9 @@ public final class TurnExecutionManager implements AutoCloseable {
             sink.tryEmitNext(fallback);
         }
 
-        /** 先停止生产者，不在宿主关闭线程等待阻塞的观测回调。 */
+        /**
+         * 先停止生产者，不在宿主关闭线程等待阻塞的观测回调。
+         */
         private void shutdown() {
             ending.set(Ending.SHUTDOWN);
             registered.countDown();
@@ -681,7 +808,9 @@ public final class TurnExecutionManager implements AutoCloseable {
             enqueue(this::release);
         }
 
-        /** 完成写入后再释放会话占用，最后通知订阅者流结束。 */
+        /**
+         * 完成写入后再释放会话占用，最后通知订阅者流结束。
+         */
         private void release() {
             // 只由唯一邮箱线程调用；资源清理完成后才允许同会话启动新执行。
             if (released.get()) return;
@@ -699,19 +828,25 @@ public final class TurnExecutionManager implements AutoCloseable {
             sink.tryEmitComplete();
         }
 
-        /** 本句柄的只读观察通道。 */
+        /**
+         * 本句柄的只读观察通道。
+         */
         private Flux<AgentRuntimeEvent> events() {
             return sink.asFlux();
         }
 
-        /** 释放订阅可能调用外部 finally 钩子，因此始终在状态锁外执行。 */
+        /**
+         * 释放订阅可能调用外部 finally 钩子，因此始终在状态锁外执行。
+         */
         private void cancelUpstream() {
             cancelRequested.set(true);
             Disposable value = upstream.getAndSet(null);
             if (value != null) disposeSource(value);
         }
 
-        /** 源的用户 finally 钩子即使失败，也不能阻止终态排队与会话释放。 */
+        /**
+         * 源的用户 finally 钩子即使失败，也不能阻止终态排队与会话释放。
+         */
         private void disposeSource(Disposable value) {
             try {
                 value.dispose();
@@ -720,13 +855,17 @@ public final class TurnExecutionManager implements AutoCloseable {
             }
         }
 
-        /** 释放本执行的截止调度。 */
+        /**
+         * 释放本执行的截止调度。
+         */
         private void cancelDeadline() {
             Disposable value = deadline.get();
             if (value != null && !value.isDisposed()) value.dispose();
         }
 
-        /** 只等待执行开始或停止登记，不等待观测和持久化完成。 */
+        /**
+         * 只等待执行开始或停止登记，不等待观测和持久化完成。
+         */
         private void awaitRegistration() {
             try {
                 registered.await(START_REGISTRATION_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
@@ -735,7 +874,9 @@ public final class TurnExecutionManager implements AutoCloseable {
             }
         }
 
-        /** Runtime 协议中真正结束执行的事件类型。 */
+        /**
+         * Runtime 协议中真正结束执行的事件类型。
+         */
         private static boolean terminalEvent(AgentRuntimeEvent.Type type) {
             return type == AgentRuntimeEvent.Type.TURN_COMPLETED
                     || type == AgentRuntimeEvent.Type.TURN_FAILED

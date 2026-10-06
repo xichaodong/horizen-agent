@@ -8,18 +8,28 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-/** 记录通用 Runtime 事件，不依赖 AgentScope 的原生事件模型。 */
+/**
+ * 记录通用 Runtime 事件，不依赖 AgentScope 的原生事件模型。
+ */
 public final class AgentRuntimeEventObserver implements Consumer<AgentRuntimeEvent> {
-    /** 关联本次 Agent 执行的 Trace 标识，用于归并模型与工具观测。 */
+    /**
+     * 关联本次 Agent 执行的 Trace 标识，用于归并模型与工具观测。
+     */
     private final String traceId = UUID.randomUUID().toString().replace("-", "");
 
-    /** 当前观测操作的 Span 标识，供追踪父子操作关系。 */
+    /**
+     * 当前观测操作的 Span 标识，供追踪父子操作关系。
+     */
     private final String spanId = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
 
-    /** 本组件写入事件或观测数据的接收端，具体协议由声明类型确定。 */
+    /**
+     * 本组件写入事件或观测数据的接收端，具体协议由声明类型确定。
+     */
     private final TraceSink sink;
 
-    /** 采集文本的状态标记，用于选择当前组件的处理路径。 */
+    /**
+     * 采集文本的状态标记，用于选择当前组件的处理路径。
+     */
     private final boolean captureText;
 
     /**
@@ -34,7 +44,7 @@ public final class AgentRuntimeEventObserver implements Consumer<AgentRuntimeEve
     /**
      * 创建Agent运行时事件观察器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param sink 当前Agent运行时事件观察器持有的上报端对象，供相应处理步骤使用。
+     * @param sink        当前Agent运行时事件观察器持有的上报端对象，供相应处理步骤使用。
      * @param captureText 采集文本的状态标记，用于选择当前组件的处理路径。
      */
     public AgentRuntimeEventObserver(TraceSink sink, boolean captureText) {
@@ -85,9 +95,9 @@ public final class AgentRuntimeEventObserver implements Consumer<AgentRuntimeEve
     /**
      * 响应错误。
      *
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param error 本次失败的异常，用于分类、传播或诊断。
+     * @param error     本次失败的异常，用于分类、传播或诊断。
      */
     public void onError(String turnId, String sessionId, Throwable error) {
         sink.record(
@@ -104,7 +114,7 @@ public final class AgentRuntimeEventObserver implements Consumer<AgentRuntimeEve
     /**
      * 响应取消。
      *
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      */
     public void onCancel(String turnId, String sessionId) {
@@ -117,8 +127,8 @@ public final class AgentRuntimeEventObserver implements Consumer<AgentRuntimeEve
      * 写入Agent运行时事件观察器。
      *
      * @param target 本次转换、状态更新或内容写入的目标。
-     * @param key 当前对象的查找或写入键。
-     * @param value 待校验、转换或保存的原始值。
+     * @param key    当前对象的查找或写入键。
+     * @param value  待校验、转换或保存的原始值。
      */
     private static void put(Map<String, Object> target, String key, Object value) {
         if (value != null) {

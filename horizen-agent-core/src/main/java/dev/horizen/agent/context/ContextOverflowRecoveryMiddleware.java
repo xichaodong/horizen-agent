@@ -29,15 +29,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-/** 为流式模型调用补充一次上下文超限后的强制压缩与重试。 */
+/**
+ * 为流式模型调用补充一次上下文超限后的强制压缩与重试。
+ */
 public final class ContextOverflowRecoveryMiddleware implements MiddlewareBase {
-    /** 生成上下文摘要的模型，可能与主模型使用同一实例。 */
+    /**
+     * 生成上下文摘要的模型，可能与主模型使用同一实例。
+     */
     private final Model compactionModel;
 
-    /** 上下文超限恢复时采用的强制压缩配置。 */
+    /**
+     * 上下文超限恢复时采用的强制压缩配置。
+     */
     private final CompactionConfig emergencyConfig;
 
-    /** 压缩或恢复时需要优先保留的开头消息数量。 */
+    /**
+     * 压缩或恢复时需要优先保留的开头消息数量。
+     */
     private final int protectedHeadMessages;
 
     /**
@@ -54,8 +62,8 @@ public final class ContextOverflowRecoveryMiddleware implements MiddlewareBase {
     /**
      * 创建上下文超限恢复中间件，初始化该组件所需的状态、配置或依赖。
      *
-     * @param compactionModel 当前上下文超限恢复中间件持有的压缩模型对象，供相应处理步骤使用。
-     * @param emergencyConfig 当前上下文超限恢复中间件持有的emergency配置对象，供相应处理步骤使用。
+     * @param compactionModel       当前上下文超限恢复中间件持有的压缩模型对象，供相应处理步骤使用。
+     * @param emergencyConfig       当前上下文超限恢复中间件持有的emergency配置对象，供相应处理步骤使用。
      * @param protectedHeadMessages 当前上下文超限恢复中间件使用的受保护开头消息集合，供其处理与状态记录使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -82,10 +90,10 @@ public final class ContextOverflowRecoveryMiddleware implements MiddlewareBase {
     /**
      * 拦截模型上下文超限失败，按策略压缩工作上下文并尝试恢复原调用。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -127,9 +135,9 @@ public final class ContextOverflowRecoveryMiddleware implements MiddlewareBase {
      * 从超限请求构造可再次调用模型的工作上下文，保持工具调用与结果的边界。
      * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
+     * @param input   本次处理的输入。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     private Mono<RecoveredCall> recover(Agent agent, RuntimeContext context, ModelCallInput input) {
@@ -185,14 +193,14 @@ public final class ContextOverflowRecoveryMiddleware implements MiddlewareBase {
      * 用恢复后的上下文重建本次模型输入。
      * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param system 系统的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param agent         当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param context       当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param input         本次处理的输入。
+     * @param system        系统的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @param protectedHead 受保护开头的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param result 本次处理已有的结果。
-     * @param tokensBefore 当前上下文超限恢复中间件使用的token处理前，供其处理与状态记录使用。
-     * @param startedAt 当前执行或执行段的开始时间。
+     * @param result        本次处理已有的结果。
+     * @param tokensBefore  当前上下文超限恢复中间件使用的token处理前，供其处理与状态记录使用。
+     * @param startedAt     当前执行或执行段的开始时间。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     private Mono<RecoveredCall> recoveredInput(
@@ -244,7 +252,7 @@ public final class ContextOverflowRecoveryMiddleware implements MiddlewareBase {
                                 "estimatedTokensAfter", tokensAfter,
                                 "estimatedTokensReclaimed", Math.max(0, tokensBefore - tokensAfter),
                                 "durationMs",
-                                        Math.max(0, (System.nanoTime() - startedAt) / 1_000_000)));
+                                Math.max(0, (System.nanoTime() - startedAt) / 1_000_000)));
         return Mono.just(
                 new RecoveredCall(
                         new ModelCallInput(
@@ -256,7 +264,7 @@ public final class ContextOverflowRecoveryMiddleware implements MiddlewareBase {
      * 生成压缩或恢复失败的宿主可观察事件。
      *
      * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param error 本次失败的异常，用于分类、传播或诊断。
+     * @param error    本次失败的异常，用于分类、传播或诊断。
      * @return 本次操作返回的Custom事件结果。
      */
     private static CustomEvent failureEvent(List<Msg> messages, Throwable error) {
@@ -300,13 +308,19 @@ public final class ContextOverflowRecoveryMiddleware implements MiddlewareBase {
         return false;
     }
 
-    /** 上下文超限恢复中间件内部的恢复后的调用，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 上下文超限恢复中间件内部的恢复后的调用，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class RecoveredCall {
-        /** 当前操作的输入数据，格式由所属命令、协议或工具定义。 */
+        /**
+         * 当前操作的输入数据，格式由所属命令、协议或工具定义。
+         */
         private final ModelCallInput input;
 
-        /** 当前记录保存的执行事件或已转换的发送事件。 */
+        /**
+         * 当前记录保存的执行事件或已转换的发送事件。
+         */
         private final CustomEvent event;
     }
 }

@@ -25,13 +25,19 @@ import org.springframework.http.HttpStatus;
 import java.util.Locale;
 import java.util.Map;
 
-/** 将领域和应用值映射为 HTTP 与 SSE 契约。 */
+/**
+ * 将领域和应用值映射为 HTTP 与 SSE 契约。
+ */
 @RequiredArgsConstructor
 public final class AgentApiMapper {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** mock网关的状态标记，用于选择当前组件的处理路径。 */
+    /**
+     * mock网关的状态标记，用于选择当前组件的处理路径。
+     */
     private final boolean mockGateway;
 
     /**
@@ -97,11 +103,11 @@ public final class AgentApiMapper {
                 event.getType() == AgentRuntimeEvent.Type.TURN_COMPLETED
                         ? formatReply(event.getText())
                         : (event.getType() == AgentRuntimeEvent.Type.TURN_FAILED
-                                                || event.getType()
-                                                        == AgentRuntimeEvent.Type.TURN_TIMED_OUT)
-                                        && (event.getText() == null || event.getText().isBlank())
-                                ? failureText(event)
-                                : event.getText();
+                        || event.getType()
+                        == AgentRuntimeEvent.Type.TURN_TIMED_OUT)
+                        && (event.getText() == null || event.getText().isBlank())
+                        ? failureText(event)
+                        : event.getText();
         Object rawDetails =
                 event.getType() == AgentRuntimeEvent.Type.ASK_USER_REQUIRED
                         ? AskUserEventDetails.normalize(event.getDetails())
@@ -266,7 +272,8 @@ public final class AgentApiMapper {
      */
     public Map<String, Object> jsonMap(String value) {
         try {
-            return JSON.readValue(value, new TypeReference<Map<String, Object>>() {});
+            return JSON.readValue(value, new TypeReference<Map<String, Object>>() {
+            });
         } catch (JsonProcessingException error) {
             throw new IllegalStateException("审批工具参数不是有效 JSON", error);
         }

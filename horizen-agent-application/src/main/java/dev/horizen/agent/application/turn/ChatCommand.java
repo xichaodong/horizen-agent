@@ -9,16 +9,24 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
-/** Turn 用例的规范化输入，不依赖 HTTP DTO。 */
+/**
+ * Turn 用例的规范化输入，不依赖 HTTP DTO。
+ */
 @Value
 public class ChatCommand {
-    /** 最大消息字符数的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大消息字符数的固定取值，用于相应策略和边界判断。
+     */
     public static final int MAX_MESSAGE_CHARS = 20_000;
 
-    /** 最大产物集合的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大产物集合的固定取值，用于相应策略和边界判断。
+     */
     public static final int MAX_ARTIFACTS = 20;
 
-    /** 键校验模式的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 键校验模式的固定取值，用于相应策略和边界判断。
+     */
     public static final String KEY_PATTERN = Identifiers.CHAT_KEY_REGEX;
 
     /**
@@ -36,24 +44,32 @@ public class ChatCommand {
         return key;
     }
 
-    /** 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。 */
+    /**
+     * 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     */
     String sessionId;
 
-    /** 用户输入、响应说明或诊断消息，含义由所属协议对象限定。 */
+    /**
+     * 用户输入、响应说明或诊断消息，含义由所属协议对象限定。
+     */
     String message;
 
-    /** 调用方提供的请求标识，用于区分重复提交和关联幂等处理。 */
+    /**
+     * 调用方提供的请求标识，用于区分重复提交和关联幂等处理。
+     */
     String requestId;
 
-    /** 本次操作引用的产物标识集合，内容读取由产物服务处理。 */
+    /**
+     * 本次操作引用的产物标识集合，内容读取由产物服务处理。
+     */
     List<String> artifactIds;
 
     /**
      * 创建对话命令，初始化该组件所需的状态、配置或依赖。
      *
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param message 用户输入、响应说明或诊断消息，含义由所属协议对象限定。
-     * @param requestId 调用方提供的请求标识，用于区分重复提交和关联幂等处理。
+     * @param sessionId   会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param message     用户输入、响应说明或诊断消息，含义由所属协议对象限定。
+     * @param requestId   调用方提供的请求标识，用于区分重复提交和关联幂等处理。
      * @param artifactIds 本次操作引用的产物标识集合，内容读取由产物服务处理。
      * @throws ApplicationError 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

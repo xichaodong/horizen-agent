@@ -11,28 +11,40 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-/** Artifact 上传和签名下载用例的 HTTP 适配器。 */
+/**
+ * Artifact 上传和签名下载用例的 HTTP 适配器。
+ */
 public final class ArtifactApiService {
-    /** 独立构造服务时的默认上传上限，单位为字节，与 Artifact 默认容量一致。 */
+    /**
+     * 独立构造服务时的默认上传上限，单位为字节，与 Artifact 默认容量一致。
+     */
     private static final long DEFAULT_MAX_UPLOAD_BYTES = 100L * 1024 * 1024;
 
-    /** 当前产物接口使用的元数据、内容与交付依赖集合。 */
+    /**
+     * 当前产物接口使用的元数据、内容与交付依赖集合。
+     */
     private final ArtifactSupport support;
 
-    /** 产物管理依赖或产物集合，用于引用、读取与交付资源。 */
+    /**
+     * 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     */
     private final ArtifactApplicationService artifacts;
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final AgentApiMapper mapper;
 
-    /** 读取 MultipartFile 正文前使用的上传字节上限，由内容存储配置提供。 */
+    /**
+     * 读取 MultipartFile 正文前使用的上传字节上限，由内容存储配置提供。
+     */
     private final long maxUploadBytes;
 
     /**
      * 创建产物API服务，初始化该组件所需的状态、配置或依赖。
      *
      * @param support 当前产物API服务持有的支持对象，供相应处理步骤使用。
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param mapper  本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
      */
     public ArtifactApiService(ArtifactSupport support, AgentApiMapper mapper) {
         this(
@@ -41,17 +53,17 @@ public final class ArtifactApiService {
                 support == null
                         ? null
                         : new ArtifactApplicationService(
-                                support.getLifecycle(),
-                                support.getArtifacts(),
-                                support.getContents()),
+                        support.getLifecycle(),
+                        support.getArtifacts(),
+                        support.getContents()),
                 DEFAULT_MAX_UPLOAD_BYTES);
     }
 
     /**
      * 创建产物API服务，初始化该组件所需的状态、配置或依赖。
      *
-     * @param support 当前产物API服务持有的支持对象，供相应处理步骤使用。
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param support   当前产物API服务持有的支持对象，供相应处理步骤使用。
+     * @param mapper    本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
      * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
      */
     public ArtifactApiService(
@@ -62,9 +74,9 @@ public final class ArtifactApiService {
     /**
      * 使用宿主内容存储的字节上限创建上传与下载适配器。
      *
-     * @param support 已启用的 Artifact 依赖集合；null 表示未启用。
-     * @param mapper 将领域结果转换为 HTTP DTO 的映射器。
-     * @param artifacts 上传和下载的应用服务。
+     * @param support        已启用的 Artifact 依赖集合；null 表示未启用。
+     * @param mapper         将领域结果转换为 HTTP DTO 的映射器。
+     * @param artifacts      上传和下载的应用服务。
      * @param maxUploadBytes 上传文件的最大字节数，必须为正数。
      */
     public ArtifactApiService(
@@ -84,7 +96,7 @@ public final class ArtifactApiService {
      * 上传产物API服务。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param file 当前产物API服务持有的文件对象，供相应处理步骤使用。
+     * @param file     当前产物API服务持有的文件对象，供相应处理步骤使用。
      * @return 本次操作返回的产物响应结果。
      * @throws ApiException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -117,7 +129,7 @@ public final class ArtifactApiService {
      * 下载产物API服务。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 本次操作返回的产物下载响应结果。
      * @throws ApiException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -144,6 +156,7 @@ public final class ArtifactApiService {
 
     /**
      * 取得并校验启用。
+     *
      * @throws ApiException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void requireEnabled() {

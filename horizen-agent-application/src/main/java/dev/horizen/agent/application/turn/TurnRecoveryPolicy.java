@@ -5,24 +5,32 @@ import lombok.Value;
 import java.time.Duration;
 import java.util.Objects;
 
-/** 宿主身份和恢复调度周期。 */
+/**
+ * 宿主身份和恢复调度周期。
+ */
 @Value
 public class TurnRecoveryPolicy {
-    /** 当前服务实例标识，用于区分分布式执行与资源统计。 */
+    /**
+     * 当前服务实例标识，用于区分分布式执行与资源统计。
+     */
     String instanceId;
 
-    /** 跨实例执行控制消息的轮询间隔。 */
+    /**
+     * 跨实例执行控制消息的轮询间隔。
+     */
     Duration controlPollInterval;
 
-    /** 执行租约续期的调度间隔。 */
+    /**
+     * 执行租约续期的调度间隔。
+     */
     Duration leaseHeartbeat;
 
     /**
      * 创建执行恢复策略，初始化该组件所需的状态、配置或依赖。
      *
-     * @param instanceId 当前服务实例标识，用于区分分布式执行与资源统计。
+     * @param instanceId          当前服务实例标识，用于区分分布式执行与资源统计。
      * @param controlPollInterval 跨实例执行控制消息的轮询间隔。
-     * @param leaseHeartbeat 执行租约续期的调度间隔。
+     * @param leaseHeartbeat      执行租约续期的调度间隔。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public TurnRecoveryPolicy(

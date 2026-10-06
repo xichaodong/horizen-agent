@@ -12,22 +12,26 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.*;
 
-/** 从单个工作区发布版本的目录派生 ZIP 视图，使用相同的内容提供器。 */
+/**
+ * 从单个工作区发布版本的目录派生 ZIP 视图，使用相同的内容提供器。
+ */
 @RequiredArgsConstructor
 public final class WorkspaceArchiveService {
-    /** 读取受管工作区文件与目录元数据的仓储。 */
+    /**
+     * 读取受管工作区文件与目录元数据的仓储。
+     */
     private final WorkspaceManagementService workspaces;
 
     /**
      * 构造并返回当前操作所需的结果对象。
      *
      * @param project 当前工作区归档服务使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param files 文件集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param prefix 当前工作区归档服务使用的前缀，供其处理与状态记录使用。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param files   文件集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param prefix  当前工作区归档服务使用的前缀，供其处理与状态记录使用。
      * @return 本次操作返回的归档结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public Archive export(
             long project,
@@ -43,7 +47,7 @@ public final class WorkspaceArchiveService {
         if (selected.isEmpty()
                 || selected.size() > 500
                 || selected.stream().mapToLong(WorkspaceCatalogRepository.File::getSize).sum()
-                        > 20L * 1024 * 1024)
+                > 20L * 1024 * 1024)
             throw new IllegalArgumentException("Invalid archive directory or size");
         try (var output = new ByteArrayOutputStream()) {
             try (var zip = new ZipOutputStream(output, StandardCharsets.UTF_8)) {
@@ -73,19 +77,29 @@ public final class WorkspaceArchiveService {
         }
     }
 
-    /** 工作区导出归档及其描述信息。 */
+    /**
+     * 工作区导出归档及其描述信息。
+     */
     @Value
     public static class Archive {
-        /** 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。 */
+        /**
+         * 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。
+         */
         String path;
 
-        /** 内容对象的持久引用，供后续读取实际字节。 */
+        /**
+         * 内容对象的持久引用，供后续读取实际字节。
+         */
         String reference;
 
-        /** 内容的 SHA-256 摘要，参与制品完整性验证。 */
+        /**
+         * 内容的 SHA-256 摘要，参与制品完整性验证。
+         */
         String sha256;
 
-        /** 当前内容或集合的大小，计量方式由所属资源协议定义。 */
+        /**
+         * 当前内容或集合的大小，计量方式由所属资源协议定义。
+         */
         long size;
     }
 }

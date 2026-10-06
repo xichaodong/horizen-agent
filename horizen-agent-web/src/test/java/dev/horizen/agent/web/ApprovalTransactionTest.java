@@ -41,7 +41,9 @@ import java.util.concurrent.atomic.*;
 
 import javax.sql.DataSource;
 
-/** 使用合成数据的仓储测试；显式启用 MySQL 模式后，也仅使用本测试唯一所有者的记录。 */
+/**
+ * 使用合成数据的仓储测试；显式启用 MySQL 模式后，也仅使用本测试唯一所有者的记录。
+ */
 class ApprovalTransactionTest {
     private DataSource dataSource;
     private JdbcSessionTurnStore sessions;
@@ -121,7 +123,7 @@ class ApprovalTransactionTest {
                         (method, args) -> {
                             if (method.getName().equals("transitionTurn")
                                     && ((TransitionTurnCommand) args[0]).getTargetStatus()
-                                            == TurnStatus.RUNNING) {
+                                    == TurnStatus.RUNNING) {
                                 bothReadPending.await(10, TimeUnit.SECONDS);
                             }
                             return invoke(sessions, method, args);
@@ -186,11 +188,11 @@ class ApprovalTransactionTest {
                         });
         AtomicReference<List<Boolean>> resumed = new AtomicReference<>();
         service(
-                        sessions,
-                        decidedElsewhere,
-                        (i, t, r, d) ->
-                                resumed.set(
-                                        r.stream().map(ApprovalResolution::isApproved).toList()))
+                sessions,
+                decidedElsewhere,
+                (i, t, r, d) ->
+                        resumed.set(
+                                r.stream().map(ApprovalResolution::isApproved).toList()))
                 .decide(identity, "session", "turn", choices(true));
         assertEquals(List.of(false, false), resumed.get());
         assertEquals(List.of("DENIED", "DENIED"), statuses());
@@ -244,10 +246,10 @@ class ApprovalTransactionTest {
                 IllegalStateException.class,
                 () ->
                         service(
-                                        failing,
-                                        approvals,
-                                        (i, t, r, d) ->
-                                                fail("Must not dispatch an uncommitted recovery"))
+                                failing,
+                                approvals,
+                                (i, t, r, d) ->
+                                        fail("Must not dispatch an uncommitted recovery"))
                                 .decide(identity, "session", "turn", choices(true)));
         assertEquals(TurnStatus.WAITING_APPROVAL, current().getStatus());
         assertEquals(List.of("PENDING", "PENDING"), statuses());
@@ -270,8 +272,8 @@ class ApprovalTransactionTest {
                                         Object prepared = invoke(connection, operation, values);
                                         if (operation.getName().equals("prepareStatement")
                                                 && ((String) values[0])
-                                                        .stripLeading()
-                                                        .startsWith("UPDATE ha_interaction")) {
+                                                .stripLeading()
+                                                .startsWith("UPDATE ha_interaction")) {
                                             PreparedStatement statement =
                                                     (PreparedStatement) prepared;
                                             return proxy(
@@ -280,14 +282,12 @@ class ApprovalTransactionTest {
                                                     (execution, parameters) ->
                                                             switch (execution.getName()) {
                                                                 case "executeUpdate",
-                                                                        "getUpdateCount" ->
-                                                                        0;
+                                                                     "getUpdateCount" -> 0;
                                                                 case "execute" -> false;
-                                                                default ->
-                                                                        invoke(
-                                                                                statement,
-                                                                                execution,
-                                                                                parameters);
+                                                                default -> invoke(
+                                                                        statement,
+                                                                        execution,
+                                                                        parameters);
                                                             });
                                         }
                                         return prepared;
@@ -313,16 +313,16 @@ class ApprovalTransactionTest {
     void runtimeIsDispatchedOnlyAfterCommittedStateIsVisibleOutsideTransaction() {
         AtomicInteger resumed = new AtomicInteger();
         service(
-                        sessions,
-                        approvals,
-                        (i, turn, resolutions, remaining) -> {
-                            assertFalse(
-                                    TransactionSynchronizationManager.isActualTransactionActive());
-                            assertEquals(TurnStatus.RUNNING, current().getStatus());
-                            assertEquals(List.of("APPROVED", "APPROVED"), statuses());
-                            assertEquals(120, remaining.toSeconds());
-                            resumed.incrementAndGet();
-                        })
+                sessions,
+                approvals,
+                (i, turn, resolutions, remaining) -> {
+                    assertFalse(
+                            TransactionSynchronizationManager.isActualTransactionActive());
+                    assertEquals(TurnStatus.RUNNING, current().getStatus());
+                    assertEquals(List.of("APPROVED", "APPROVED"), statuses());
+                    assertEquals(120, remaining.toSeconds());
+                    resumed.incrementAndGet();
+                })
                 .decide(identity, "session", "turn", choices(true));
         assertEquals(1, resumed.get());
     }
@@ -414,7 +414,7 @@ class ApprovalTransactionTest {
         return type.cast(
                 Proxy.newProxyInstance(
                         type.getClassLoader(),
-                        new Class<?>[] {type},
+                        new Class<?>[]{type},
                         (p, method, args) -> {
                             if (method.getDeclaringClass() == Object.class) {
                                 return switch (method.getName()) {

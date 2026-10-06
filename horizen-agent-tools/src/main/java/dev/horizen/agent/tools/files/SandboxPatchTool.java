@@ -18,15 +18,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-/** 沙箱文件补丁工具，支持文本替换和 V4A 多文件补丁。 */
+/**
+ * 沙箱文件补丁工具，支持文本替换和 V4A 多文件补丁。
+ */
 public final class SandboxPatchTool extends ToolBase {
-    /** 最大补丁字节的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大补丁字节的固定取值，用于相应策略和边界判断。
+     */
     private static final int MAX_PATCH_BYTES = 1024 * 1024;
 
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 创建沙箱补丁工具，初始化该组件所需的状态、配置或依赖。 */
+    /**
+     * 创建沙箱补丁工具，初始化该组件所需的状态、配置或依赖。
+     */
     public SandboxPatchTool() {
         super(
                 ToolBase.builder()
@@ -39,24 +47,24 @@ public final class SandboxPatchTool extends ToolBase {
                                         "properties",
                                         Map.of(
                                                 "mode",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "enum",
-                                                                List.of("replace", "patch"),
-                                                                "default",
-                                                                "replace"),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "enum",
+                                                        List.of("replace", "patch"),
+                                                        "default",
+                                                        "replace"),
                                                 "path", Map.of("type", "string"),
                                                 "old_string", Map.of("type", "string"),
                                                 "new_string", Map.of("type", "string"),
                                                 "replace_all",
-                                                        Map.of("type", "boolean", "default", false),
+                                                Map.of("type", "boolean", "default", false),
                                                 "patch",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "description",
-                                                                "V4A patch 内容")),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "description",
+                                                        "V4A patch 内容")),
                                         "required",
                                         List.of("mode"),
                                         "additionalProperties",
@@ -68,7 +76,7 @@ public final class SandboxPatchTool extends ToolBase {
     /**
      * 检查权限集合。
      *
-     * @param input 本次处理的输入。
+     * @param input   本次处理的输入。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
@@ -166,8 +174,8 @@ public final class SandboxPatchTool extends ToolBase {
     /**
      * 生成当前操作所需的text文本，供调用方继续处理。
      *
-     * @param input 本次处理的输入。
-     * @param key 当前对象的查找或写入键。
+     * @param input    本次处理的输入。
+     * @param key      当前对象的查找或写入键。
      * @param fallback 当前沙箱补丁工具使用的回退，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */

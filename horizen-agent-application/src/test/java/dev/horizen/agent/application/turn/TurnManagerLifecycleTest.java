@@ -22,7 +22,9 @@ class TurnManagerLifecycleTest {
         var events =
                 manager.start(
                         request("turn"), source("turn", cancelled), Duration.ofHours(1), null);
-        var observer = events.subscribe(e -> {}, e -> {}, completed::countDown);
+        var observer = events.subscribe(e -> {
+        }, e -> {
+        }, completed::countDown);
         manager.close();
         manager.close();
         assertTrue(completed.await(1, TimeUnit.SECONDS));

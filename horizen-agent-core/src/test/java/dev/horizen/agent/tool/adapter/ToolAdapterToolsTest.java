@@ -160,9 +160,9 @@ class ToolAdapterToolsTest {
                         return Mono.just(
                                 ToolResultBlock.text(
                                         """
-                    {"safeResult":{"summary":"ok"},"presentation":{"schemaVersion":1,
-                    "blocks":[{"type":"conclusion","title":"诊断完成"}]}}
-                    """));
+                                                {"safeResult":{"summary":"ok"},"presentation":{"schemaVersion":1,
+                                                "blocks":[{"type":"conclusion","title":"诊断完成"}]}}
+                                                """));
                     }
                 };
         Toolkit toolkit = new Toolkit();

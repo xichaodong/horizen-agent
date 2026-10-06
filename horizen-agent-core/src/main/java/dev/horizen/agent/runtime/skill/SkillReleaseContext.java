@@ -6,10 +6,14 @@ import lombok.Data;
 
 import java.util.Objects;
 
-/** 请求级发布绑定，同一 Turn 的所有推理步骤共用。 */
+/**
+ * 请求级发布绑定，同一 Turn 的所有推理步骤共用。
+ */
 @Data
 public final class SkillReleaseContext {
-    /** 本次操作持有的不可变内容或状态快照。 */
+    /**
+     * 本次操作持有的不可变内容或状态快照。
+     */
     private final SkillReleaseSnapshot snapshot;
 
     /**

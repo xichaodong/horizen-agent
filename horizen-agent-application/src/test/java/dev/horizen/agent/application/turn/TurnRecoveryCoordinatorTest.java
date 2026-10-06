@@ -109,15 +109,15 @@ class TurnRecoveryCoordinatorTest {
                                 TransitionTurnResult.Outcome.STATUS_CHANGED, turn));
         var persistence = mock(TurnEventPersistence.class);
         try (var recovery =
-                new TurnRecoveryCoordinator(
-                        controls,
-                        new TurnRecoveryPolicy(
-                                "local", Duration.ofSeconds(30), Duration.ofSeconds(30)),
-                        sessions,
-                        runtime,
-                        new TurnExecutionManager(runtime),
-                        null,
-                        persistence)) {
+                     new TurnRecoveryCoordinator(
+                             controls,
+                             new TurnRecoveryPolicy(
+                                     "local", Duration.ofSeconds(30), Duration.ofSeconds(30)),
+                             sessions,
+                             runtime,
+                             new TurnExecutionManager(runtime),
+                             null,
+                             persistence)) {
             recovery.recover(turn, TurnStatus.FAILED, "EXECUTOR_LOST", Instant.now());
             var command = ArgumentCaptor.forClass(TransitionTurnCommand.class);
             verify(sessions).transitionTurn(command.capture());
@@ -133,15 +133,15 @@ class TurnRecoveryCoordinatorTest {
                 .thenReturn(new TransitionTurnResult(TransitionTurnResult.Outcome.UPDATED, turn));
         var persistence = mock(TurnEventPersistence.class);
         try (var recovery =
-                new TurnRecoveryCoordinator(
-                        controls,
-                        new TurnRecoveryPolicy(
-                                "local", Duration.ofSeconds(30), Duration.ofSeconds(30)),
-                        sessions,
-                        runtime,
-                        new TurnExecutionManager(runtime),
-                        null,
-                        persistence)) {
+                     new TurnRecoveryCoordinator(
+                             controls,
+                             new TurnRecoveryPolicy(
+                                     "local", Duration.ofSeconds(30), Duration.ofSeconds(30)),
+                             sessions,
+                             runtime,
+                             new TurnExecutionManager(runtime),
+                             null,
+                             persistence)) {
             recovery.recover(turn, TurnStatus.FAILED, "EXECUTOR_LOST", Instant.now());
             var order = inOrder(sessions, runtime, persistence);
             order.verify(sessions).transitionTurn(any());
@@ -177,14 +177,14 @@ class TurnRecoveryCoordinatorTest {
                             return Mono.just(List.of());
                         });
         try (var recovery =
-                new TurnRecoveryCoordinator(
-                        controls,
-                        new TurnRecoveryPolicy("local", Duration.ofMillis(10), Duration.ofHours(1)),
-                        sessions,
-                        runtime,
-                        new TurnExecutionManager(runtime),
-                        null,
-                        mock(TurnEventPersistence.class))) {
+                     new TurnRecoveryCoordinator(
+                             controls,
+                             new TurnRecoveryPolicy("local", Duration.ofMillis(10), Duration.ofHours(1)),
+                             sessions,
+                             runtime,
+                             new TurnExecutionManager(runtime),
+                             null,
+                             mock(TurnEventPersistence.class))) {
             recovery.start();
             assertTrue(goodHandled.await(2, TimeUnit.SECONDS));
             assertTrue(polledAgain.await(2, TimeUnit.SECONDS));

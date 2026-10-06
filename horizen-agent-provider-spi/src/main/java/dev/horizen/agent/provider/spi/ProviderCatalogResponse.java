@@ -8,18 +8,26 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-/** Provider 返回的工具目录快照，供运行时注册与治理调用。 */
+/**
+ * Provider 返回的工具目录快照，供运行时注册与治理调用。
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProviderCatalogResponse {
-    /** 协议的版本，供兼容或并发检查使用。 */
+    /**
+     * 协议的版本，供兼容或并发检查使用。
+     */
     private int protocolVersion = ProviderProtocol.CURRENT_VERSION;
 
-    /** 目录的版本，供兼容或并发检查使用。 */
+    /**
+     * 目录的版本，供兼容或并发检查使用。
+     */
     private String catalogVersion = "";
 
-    /** 工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+    /**
+     * 工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     */
     private List<ToolContract> tools = new ArrayList<>();
 
     /**

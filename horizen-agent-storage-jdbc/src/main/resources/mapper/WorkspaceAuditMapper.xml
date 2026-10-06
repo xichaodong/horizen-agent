@@ -7,18 +7,18 @@
         resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceOperationRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_workspace_operation
+        ha_workspace_operation
         WHERE
-            owner_key = #{ownerKey}
-            AND agent_key = #{agentKey}
-            AND scope_key = #{scopeKey}
-            AND audit_sequence &lt; #{auditSequence}
+        owner_key = #{ownerKey}
+        AND agent_key = #{agentKey}
+        AND scope_key = #{scopeKey}
+        AND audit_sequence &lt; #{auditSequence}
         ORDER BY
-            audit_sequence DESC
+        audit_sequence DESC
         LIMIT
-            #{limit}
+        #{limit}
     </select>
 
     <select
@@ -26,19 +26,19 @@
         resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceOperationRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_workspace_operation
+        ha_workspace_operation
         WHERE
-            owner_key = #{ownerKey}
-            AND agent_key = #{agentKey}
-            AND scope_key = #{scopeKey}
-            AND path_hash = #{pathHash}
-            AND audit_sequence &lt; #{auditSequence}
+        owner_key = #{ownerKey}
+        AND agent_key = #{agentKey}
+        AND scope_key = #{scopeKey}
+        AND path_hash = #{pathHash}
+        AND audit_sequence &lt; #{auditSequence}
         ORDER BY
-            audit_sequence DESC
+        audit_sequence DESC
         LIMIT
-            #{limit}
+        #{limit}
     </select>
 
     <select
@@ -46,15 +46,15 @@
         resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceOperationRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_workspace_operation
+        ha_workspace_operation
         WHERE
-            owner_key = #{ownerKey}
-            AND agent_key = #{agentKey}
-            AND scope_key = #{scopeKey}
-            AND path_hash = #{pathHash}
-            AND audit_sequence = #{auditSequence}
+        owner_key = #{ownerKey}
+        AND agent_key = #{agentKey}
+        AND scope_key = #{scopeKey}
+        AND path_hash = #{pathHash}
+        AND audit_sequence = #{auditSequence}
     </select>
 
     <select
@@ -62,14 +62,14 @@
         resultType="java.lang.String"
     >
         SELECT
-            session_id
+        session_id
         FROM
-            ha_session
+        ha_session
         WHERE
-            owner_key = #{ownerKey}
-            AND project_id = #{projectId}
-            AND agent_key = #{agentKey}
+        owner_key = #{ownerKey}
+        AND project_id = #{projectId}
+        AND agent_key = #{agentKey}
         LIMIT
-            1
+        1
     </select>
 </mapper>

@@ -25,21 +25,29 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
-/** 将旧内联文档迁移为云端对象和审计行；迁移需显式执行，且可中断后重新启动。 */
+/**
+ * 将旧内联文档迁移为云端对象和审计行；迁移需显式执行，且可中断后重新启动。
+ */
 public class JdbcWorkspaceFileMigration {
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final WorkspaceFileMigrationMapper mapper;
 
-    /** 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。 */
+    /**
+     * 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     */
     private final UnitOfWork transactions;
 
-    /** 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。 */
+    /**
+     * 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     */
     private final WorkspaceContentRepository contents;
 
     /**
      * 创建JDBC工作区文件迁移，初始化该组件所需的状态、配置或依赖。
      *
-     * @param source 待解析或转换的来源对象。
+     * @param source   待解析或转换的来源对象。
      * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      */
     public JdbcWorkspaceFileMigration(DataSource source, WorkspaceContentRepository contents) {
@@ -170,22 +178,22 @@ public class JdbcWorkspaceFileMigration {
     /**
      * 完成当前操作的insertAudit步骤，按实现更新相应状态或依赖。
      *
-     * @param row 当前JDBC工作区文件迁移持有的存储记录对象，供相应处理步骤使用。
-     * @param type 当前操作使用的目标类型或类别。
+     * @param row    当前JDBC工作区文件迁移持有的存储记录对象，供相应处理步骤使用。
+     * @param type   当前操作使用的目标类型或类别。
      * @param change change的索引映射，供按键查找或归并当前组件的数据。
      */
     private void insertAudit(Legacy row, String type, Map<String, String> change) {
         String operation =
                 "migration-"
                         + hash(
-                                (row.key.getOwnerKey()
-                                                + '\0'
-                                                + row.key.getAgentKey()
-                                                + '\0'
-                                                + row.key.getScopeKey()
-                                                + '\0'
-                                                + row.key.getDocumentPath())
-                                        .getBytes(StandardCharsets.UTF_8));
+                        (row.key.getOwnerKey()
+                                + '\0'
+                                + row.key.getAgentKey()
+                                + '\0'
+                                + row.key.getScopeKey()
+                                + '\0'
+                                + row.key.getDocumentPath())
+                                .getBytes(StandardCharsets.UTF_8));
         try {
             mapper.insertMigrationAudit(
                     row.key.getOwnerKey(),
@@ -202,7 +210,9 @@ public class JdbcWorkspaceFileMigration {
         }
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcWorkspaceFileMigration(
             WorkspaceFileMigrationMapper mapper,
             UnitOfWork transactions,
@@ -242,21 +252,31 @@ public class JdbcWorkspaceFileMigration {
         return DigestUtils.sha256Hex(bytes);
     }
 
-    /** JDBC工作区文件迁移内部的旧格式，封装该步骤需要的状态或输入输出。 */
+    /**
+     * JDBC工作区文件迁移内部的旧格式，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     private static final class Legacy {
-        /** 组合资源归属与作用域的定位键，供仓储查询和更新使用。 */
+        /**
+         * 组合资源归属与作用域的定位键，供仓储查询和更新使用。
+         */
         final WorkspaceDocumentKey key;
 
-        /** 当前记录或资源的正文内容；与资源标识和存储引用分开保存。 */
+        /**
+         * 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+         */
         final String content;
 
         /** 记录版本，用于乐观并发控制或区分协议版本。 */
-        /** 内容大小，单位为字节。 */
+        /**
+         * 内容大小，单位为字节。
+         */
         final long sizeBytes, version;
 
         /** 当前记录最近一次更新的时间。 */
-        /** 当前记录的创建时间。 */
+        /**
+         * 当前记录的创建时间。
+         */
         final Instant createdAt, updatedAt;
     }
 }

@@ -7,12 +7,12 @@
         resultType="java.lang.Long"
     >
         SELECT
-            version
+        version
         FROM
-            ha_workspace
+        ha_workspace
         WHERE
-            project_id = #{projectId}
-            AND agent_key = #{agentKey} FOR
+        project_id = #{projectId}
+        AND agent_key = #{agentKey} FOR
         UPDATE
     </select>
 
@@ -21,26 +21,26 @@
         resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceFileRow"
     >
         SELECT
-            file_path,
-            content_ref,
-            checksum_sha256,
-            size_bytes,
-            media_type
+        file_path,
+        content_ref,
+        checksum_sha256,
+        size_bytes,
+        media_type
         FROM
-            ha_workspace_file
+        ha_workspace_file
         WHERE
-            owner_key = #{ownerKey}
-            AND agent_key = #{agentKey}
-            AND scope_key = 'draft'
+        owner_key = #{ownerKey}
+        AND agent_key = #{agentKey}
+        AND scope_key = 'draft'
         ORDER BY
-            file_path
+        file_path
     </select>
 
     <insert id="insertWorkspaceIfAbsent">
         INSERT IGNORE INTO
-            ha_workspace (project_id, agent_key, version, updated_by)
+        ha_workspace (project_id, agent_key, version, updated_by)
         VALUES
-            (#{projectId}, #{agentKey}, 0, 'system')
+        (#{projectId}, #{agentKey}, 0, 'system')
     </insert>
 
     <resultMap
@@ -70,80 +70,80 @@
         resultMap="workspaceVersionResult"
     >
         SELECT
-            version
+        version
         FROM
-            ha_workspace
+        ha_workspace
         WHERE
-            project_id = #{projectId}
-            AND agent_key = #{agentKey} FOR
+        project_id = #{projectId}
+        AND agent_key = #{agentKey} FOR
         UPDATE
     </select>
 
     <update id="advanceWorkspaceVersion">
         UPDATE ha_workspace
         SET
-            version = version + 1,
-            updated_by = #{updatedBy},
-            updated_at = CURRENT_TIMESTAMP(6)
+        version = version + 1,
+        updated_by = #{updatedBy},
+        updated_at = CURRENT_TIMESTAMP(6)
         WHERE
-            project_id = #{projectId}
-            AND agent_key = #{agentKey}
-            AND version = #{version}
+        project_id = #{projectId}
+        AND agent_key = #{agentKey}
+        AND version = #{version}
     </update>
 
     <insert id="upsertDraftFile">
         INSERT INTO
-            ha_workspace_file (
-                owner_key,
-                agent_key,
-                scope_key,
-                workspace_area,
-                file_kind,
-                write_policy,
-                path_hash,
-                file_path,
-                content_ref,
-                checksum_sha256,
-                size_bytes,
-                media_type,
-                version,
-                created_at,
-                updated_at
-            )
+        ha_workspace_file (
+        owner_key,
+        agent_key,
+        scope_key,
+        workspace_area,
+        file_kind,
+        write_policy,
+        path_hash,
+        file_path,
+        content_ref,
+        checksum_sha256,
+        size_bytes,
+        media_type,
+        version,
+        created_at,
+        updated_at
+        )
         VALUES
-            (
-                #{ownerKey},
-                #{agentKey},
-                'draft',
-                'PROJECT',
-                #{fileKind},
-                'SERVER',
-                #{pathHash},
-                #{filePath},
-                #{contentRef},
-                #{checksumSha256},
-                #{sizeBytes},
-                #{mediaType},
-                1,
-                CURRENT_TIMESTAMP(6),
-                CURRENT_TIMESTAMP(6)
-            )
+        (
+        #{ownerKey},
+        #{agentKey},
+        'draft',
+        'PROJECT',
+        #{fileKind},
+        'SERVER',
+        #{pathHash},
+        #{filePath},
+        #{contentRef},
+        #{checksumSha256},
+        #{sizeBytes},
+        #{mediaType},
+        1,
+        CURRENT_TIMESTAMP(6),
+        CURRENT_TIMESTAMP(6)
+        )
         ON DUPLICATE KEY UPDATE
-            content_ref = VALUES(content_ref),
-            checksum_sha256 = VALUES(checksum_sha256),
-            size_bytes = VALUES(size_bytes),
-            media_type = VALUES(media_type),
-            version = version + 1,
-            updated_at = CURRENT_TIMESTAMP(6)
+        content_ref = VALUES(content_ref),
+        checksum_sha256 = VALUES(checksum_sha256),
+        size_bytes = VALUES(size_bytes),
+        media_type = VALUES(media_type),
+        version = version + 1,
+        updated_at = CURRENT_TIMESTAMP(6)
     </insert>
 
     <delete id="deleteDraftFile">
         DELETE FROM ha_workspace_file
         WHERE
-            owner_key = #{ownerKey}
-            AND agent_key = #{agentKey}
-            AND scope_key = 'draft'
-            AND path_hash = #{pathHash}
+        owner_key = #{ownerKey}
+        AND agent_key = #{agentKey}
+        AND scope_key = 'draft'
+        AND path_hash = #{pathHash}
     </delete>
 
     <select
@@ -151,65 +151,65 @@
         resultType="java.lang.Long"
     >
         SELECT
-            version
+        version
         FROM
-            ha_workspace_file
+        ha_workspace_file
         WHERE
-            owner_key = #{ownerKey}
-            AND agent_key = #{agentKey}
-            AND scope_key = 'draft'
-            AND path_hash = #{pathHash}
+        owner_key = #{ownerKey}
+        AND agent_key = #{agentKey}
+        AND scope_key = 'draft'
+        AND path_hash = #{pathHash}
     </select>
 
     <insert id="insertWorkspaceOperation">
         INSERT INTO
-            ha_workspace_operation (
-                owner_key,
-                agent_key,
-                scope_key,
-                path_hash,
-                file_path,
-                operation_id,
-                operation_type,
-                actor_type,
-                change_json,
-                applied_version,
-                created_at,
-                actor_id,
-                before_version,
-                after_version,
-                before_ref,
-                after_ref,
-                before_checksum,
-                after_checksum,
-                before_size,
-                after_size,
-                media_type
-            )
+        ha_workspace_operation (
+        owner_key,
+        agent_key,
+        scope_key,
+        path_hash,
+        file_path,
+        operation_id,
+        operation_type,
+        actor_type,
+        change_json,
+        applied_version,
+        created_at,
+        actor_id,
+        before_version,
+        after_version,
+        before_ref,
+        after_ref,
+        before_checksum,
+        after_checksum,
+        before_size,
+        after_size,
+        media_type
+        )
         VALUES
-            (
-                #{ownerKey},
-                #{agentKey},
-                'draft',
-                #{pathHash},
-                #{filePath},
-                #{operationId},
-                #{operationType},
-                'SERVER',
-                #{changeJson},
-                #{appliedVersion},
-                CURRENT_TIMESTAMP(6),
-                #{actorId},
-                #{beforeVersion},
-                #{afterVersion},
-                #{beforeRef},
-                #{afterRef},
-                #{beforeChecksum},
-                #{afterChecksum},
-                #{beforeSize},
-                #{afterSize},
-                #{mediaType}
-            )
+        (
+        #{ownerKey},
+        #{agentKey},
+        'draft',
+        #{pathHash},
+        #{filePath},
+        #{operationId},
+        #{operationType},
+        'SERVER',
+        #{changeJson},
+        #{appliedVersion},
+        CURRENT_TIMESTAMP(6),
+        #{actorId},
+        #{beforeVersion},
+        #{afterVersion},
+        #{beforeRef},
+        #{afterRef},
+        #{beforeChecksum},
+        #{afterChecksum},
+        #{beforeSize},
+        #{afterSize},
+        #{mediaType}
+        )
     </insert>
 
     <select
@@ -217,99 +217,99 @@
         resultType="java.lang.Long"
     >
         SELECT
-            version
+        version
         FROM
-            ha_workspace
+        ha_workspace
         WHERE
-            project_id = #{projectId}
-            AND agent_key = #{agentKey}
+        project_id = #{projectId}
+        AND agent_key = #{agentKey}
     </select>
 
     <insert id="insertWorkspaceRelease">
         INSERT INTO
-            ha_workspace_release (project_id, agent_key, release_no, release_hash, manifest_json, notes, created_by)
+        ha_workspace_release (project_id, agent_key, release_no, release_hash, manifest_json, notes, created_by)
         VALUES
-            (
-                #{projectId},
-                #{agentKey},
-                #{releaseNo},
-                #{releaseHash},
-                #{manifestJson},
-                #{notes},
-                #{createdBy}
-            )
+        (
+        #{projectId},
+        #{agentKey},
+        #{releaseNo},
+        #{releaseHash},
+        #{manifestJson},
+        #{notes},
+        #{createdBy}
+        )
     </insert>
 
     <update id="setCurrentRelease">
         UPDATE ha_workspace
         SET
-            current_release_id = #{currentReleaseId}
+        current_release_id = #{currentReleaseId}
         WHERE
-            project_id = #{projectId}
-            AND agent_key = #{agentKey}
-            AND version = #{version}
+        project_id = #{projectId}
+        AND agent_key = #{agentKey}
+        AND version = #{version}
     </update>
     <select
         id="selectByNumber"
         resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceReleaseRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_workspace_release
+        ha_workspace_release
         WHERE
-            project_id = #{projectId}
-            AND agent_key = #{agentKey}
-            AND release_no = #{releaseNo}
+        project_id = #{projectId}
+        AND agent_key = #{agentKey}
+        AND release_no = #{releaseNo}
     </select>
     <select
         id="selectCurrent"
         resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceReleaseRow"
     >
         SELECT
-            r.*
+        r.*
         FROM
-            ha_workspace_release r
-            JOIN ha_workspace w ON w.project_id = r.project_id
-            AND w.agent_key = r.agent_key
-            AND w.current_release_id = r.id
+        ha_workspace_release r
+        JOIN ha_workspace w ON w.project_id = r.project_id
+        AND w.agent_key = r.agent_key
+        AND w.current_release_id = r.id
         WHERE
-            r.project_id = #{projectId}
-            AND r.agent_key = #{agentKey}
+        r.project_id = #{projectId}
+        AND r.agent_key = #{agentKey}
     </select>
     <select
         id="selectById"
         resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceReleaseRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_workspace_release
+        ha_workspace_release
         WHERE
-            project_id = #{projectId}
-            AND agent_key = #{agentKey}
-            AND id = #{id}
+        project_id = #{projectId}
+        AND agent_key = #{agentKey}
+        AND id = #{id}
     </select>
     <select
         id="selectReleases"
         resultType="dev.horizen.agent.storage.jdbc.model.WorkspaceReleaseRow"
     >
         SELECT
-            id,
-            release_no,
-            release_hash,
-            '' AS manifest_json,
-            notes,
-            created_by,
-            created_at
+        id,
+        release_no,
+        release_hash,
+        '' AS manifest_json,
+        notes,
+        created_by,
+        created_at
         FROM
-            ha_workspace_release
+        ha_workspace_release
         WHERE
-            project_id = #{projectId}
-            AND agent_key = #{agentKey}
+        project_id = #{projectId}
+        AND agent_key = #{agentKey}
         ORDER BY
-            release_no DESC
+        release_no DESC
         LIMIT
-            100
+        100
     </select>
 </mapper>

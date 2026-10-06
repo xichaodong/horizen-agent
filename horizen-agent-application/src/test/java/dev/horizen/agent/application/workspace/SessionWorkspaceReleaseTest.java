@@ -44,10 +44,10 @@ class SessionWorkspaceReleaseTest {
         }
         current.set(r2);
         try (var old = service.beginExecution("owner", "old", false);
-                var fresh = service.beginExecution("owner", "new", false);
-                var resumed =
-                        new AgentReleaseService(catalog, repository(current), bindings)
-                                .beginExecution("owner", "old", true)) {
+             var fresh = service.beginExecution("owner", "new", false);
+             var resumed =
+                     new AgentReleaseService(catalog, repository(current), bindings)
+                             .beginExecution("owner", "old", true)) {
             assertEquals(1, old.getManifest().getReleaseId());
             assertEquals(2, fresh.getManifest().getReleaseId());
             assertEquals(1, resumed.getManifest().getReleaseId());
@@ -136,7 +136,7 @@ class SessionWorkspaceReleaseTest {
             var a = pool.submit(() -> service.beginExecution("owner", "same", false));
             var b = pool.submit(() -> service.beginExecution("owner", "same", false));
             try (var first = a.get(5, TimeUnit.SECONDS);
-                    var second = b.get(5, TimeUnit.SECONDS)) {
+                 var second = b.get(5, TimeUnit.SECONDS)) {
                 assertEquals(
                         first.getManifest().getReleaseId(), second.getManifest().getReleaseId());
                 assertEquals(1, closed.get());

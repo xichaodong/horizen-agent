@@ -4,39 +4,39 @@
 <mapper namespace="dev.horizen.agent.storage.jdbc.mapper.AskUserMapper">
     <insert id="insertQuestion">
         INSERT INTO
-            ha_interaction (
-                owner_key,
-                interaction_type,
-                interaction_id,
-                session_id,
-                turn_id,
-                reply_id,
-                tool_call_id,
-                status,
-                request_json,
-                response_json,
-                expires_at,
-                created_at,
-                updated_at,
-                version
-            )
+        ha_interaction (
+        owner_key,
+        interaction_type,
+        interaction_id,
+        session_id,
+        turn_id,
+        reply_id,
+        tool_call_id,
+        status,
+        request_json,
+        response_json,
+        expires_at,
+        created_at,
+        updated_at,
+        version
+        )
         VALUES
-            (
-                #{ownerKey},
-                'ASK_USER',
-                #{interactionId},
-                #{sessionId},
-                #{turnId},
-                #{replyId},
-                #{toolCallId},
-                'PENDING',
-                #{requestJson},
-                #{responseJson},
-                #{expiresAt},
-                #{createdAt},
-                #{updatedAt},
-                0
-            )
+        (
+        #{ownerKey},
+        'ASK_USER',
+        #{interactionId},
+        #{sessionId},
+        #{turnId},
+        #{replyId},
+        #{toolCallId},
+        'PENDING',
+        #{requestJson},
+        #{responseJson},
+        #{expiresAt},
+        #{createdAt},
+        #{updatedAt},
+        0
+        )
     </insert>
 
     <select
@@ -44,13 +44,13 @@
         resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_interaction
+        ha_interaction
         WHERE
-            owner_key = #{ownerKey}
-            AND interaction_type = 'ASK_USER'
-            AND interaction_id = #{interactionId}
+        owner_key = #{ownerKey}
+        AND interaction_type = 'ASK_USER'
+        AND interaction_id = #{interactionId}
     </select>
 
     <select
@@ -58,14 +58,14 @@
         resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_interaction
+        ha_interaction
         WHERE
-            owner_key = #{ownerKey}
-            AND interaction_type = 'ASK_USER'
-            AND turn_id = #{turnId}
-            AND tool_call_id = #{toolCallId}
+        owner_key = #{ownerKey}
+        AND interaction_type = 'ASK_USER'
+        AND turn_id = #{turnId}
+        AND tool_call_id = #{toolCallId}
     </select>
 
     <select
@@ -73,33 +73,33 @@
         resultType="dev.horizen.agent.storage.jdbc.model.InteractionRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_interaction
+        ha_interaction
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND turn_id = #{turnId}
-            AND interaction_type = 'ASK_USER'
-            AND status = 'PENDING'
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND turn_id = #{turnId}
+        AND interaction_type = 'ASK_USER'
+        AND status = 'PENDING'
         ORDER BY
-            created_at,
-            interaction_id
+        created_at,
+        interaction_id
     </select>
 
     <update id="resolveQuestion">
         UPDATE ha_interaction
         SET
-            status = #{status},
-            response_json = #{responseJson},
-            resolved_at = #{resolvedAt},
-            updated_at = #{updatedAt},
-            version = version + 1
+        status = #{status},
+        response_json = #{responseJson},
+        resolved_at = #{resolvedAt},
+        updated_at = #{updatedAt},
+        version = version + 1
         WHERE
-            owner_key = #{ownerKey}
-            AND interaction_type = 'ASK_USER'
-            AND interaction_id = #{interactionId}
-            AND status = 'PENDING'
-            AND version = #{version}
+        owner_key = #{ownerKey}
+        AND interaction_type = 'ASK_USER'
+        AND interaction_id = #{interactionId}
+        AND status = 'PENDING'
+        AND version = #{version}
     </update>
 </mapper>

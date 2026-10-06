@@ -36,25 +36,35 @@ import javax.sql.DataSource;
  * 组合云端文件元数据与不可变对象内容；网络 I/O 不在 SQL 事务中执行。
  */
 public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentRepository {
-    /** 默认最大文档字节的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 默认最大文档字节的固定取值，用于相应策略和边界判断。
+     */
     public static final long DEFAULT_MAX_DOCUMENT_BYTES = 1024L * 1024L;
 
-    /** 重试的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 重试的固定取值，用于相应策略和边界判断。
+     */
     private static final int RETRIES = 4;
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final WorkspaceDocumentMapper mapper;
 
-    /** 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。 */
+    /**
+     * 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     */
     private final UnitOfWork transactions;
 
-    /** 保存工作区实际内容字节的对象存储访问端口。 */
+    /**
+     * 保存工作区实际内容字节的对象存储访问端口。
+     */
     private final WorkspaceObjectContent objects;
 
     /**
      * 创建JDBC工作区文档仓储，初始化该组件所需的状态、配置或依赖。
      *
-     * @param source 待解析或转换的来源对象。
+     * @param source   待解析或转换的来源对象。
      * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      */
     public JdbcWorkspaceDocumentRepository(DataSource source, WorkspaceContentRepository contents) {
@@ -64,8 +74,8 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
     /**
      * 创建JDBC工作区文档仓储，初始化该组件所需的状态、配置或依赖。
      *
-     * @param source 待解析或转换的来源对象。
-     * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     * @param source       待解析或转换的来源对象。
+     * @param contents     资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      * @param maximumBytes 最大的字节数，用于容量或传输限制。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -77,7 +87,9 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
         if (maximumBytes <= 0) throw new IllegalArgumentException("Invalid file limit");
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcWorkspaceDocumentRepository(
             WorkspaceDocumentMapper mapper,
             UnitOfWork transactions,
@@ -147,11 +159,11 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
     /**
      * 查询列表中的JDBC工作区文档仓储。
      *
-     * @param owner 当前JDBC工作区文档仓储使用的数据归属，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param scope 当前JDBC工作区文档仓储使用的作用域，供其处理与状态记录使用。
+     * @param owner  当前JDBC工作区文档仓储使用的数据归属，供其处理与状态记录使用。
+     * @param agent  当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param scope  当前JDBC工作区文档仓储使用的作用域，供其处理与状态记录使用。
      * @param prefix 当前JDBC工作区文档仓储使用的前缀，供其处理与状态记录使用。
-     * @param limit 本次处理或返回数量上限。
+     * @param limit  本次处理或返回数量上限。
      * @param offset 本次读取的起始偏移。
      * @return 本次处理得到的结果集合。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -186,7 +198,7 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
     /**
      * 创建条件Absent。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -226,8 +238,8 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
     /**
      * 替换JDBC工作区文档仓储。
      *
-     * @param key 当前对象的查找或写入键。
-     * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+     * @param key             当前对象的查找或写入键。
+     * @param content         当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @param expectedVersion 调用方观察到的版本，更新时用于识别并发修改。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -273,9 +285,9 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
     /**
      * 追加JDBC工作区文档仓储。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key       当前对象的查找或写入键。
      * @param operation 当前JDBC工作区文档仓储使用的操作，供其处理与状态记录使用。
-     * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+     * @param content   当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @return 本次操作返回的工作区文档追加结果结果。
      */
     @Override
@@ -361,7 +373,7 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
                                         changed ? "UPDATE" : "APPEND",
                                         changed
                                                 ? WorkspaceTextDiff.difference(
-                                                        old.getContent(), after.get(a.getKey()))
+                                                old.getContent(), after.get(a.getKey()))
                                                 : Map.of("added", a.getContent()),
                                         version,
                                         prepared.get(0).at,
@@ -402,7 +414,7 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
     /**
      * 判断是否存在追加操作。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key       当前对象的查找或写入键。
      * @param operation 当前JDBC工作区文档仓储使用的操作，供其处理与状态记录使用。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -421,7 +433,7 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
     /**
      * 删除JDBC工作区文档仓储。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param version 记录版本，用于乐观并发控制或区分协议版本。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -463,8 +475,8 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
     /**
      * 准备JDBC工作区文档仓储。
      *
-     * @param key 当前对象的查找或写入键。
-     * @param text 面向消息或事件消费者的文本内容。
+     * @param key      当前对象的查找或写入键。
+     * @param text     面向消息或事件消费者的文本内容。
      * @param previous 当前JDBC工作区文档仓储持有的previous对象，供相应处理步骤使用。
      * @return 本次操作返回的已准备结果。
      */
@@ -531,16 +543,16 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
     /**
      * 完成当前操作的log步骤，按实现更新相应状态或依赖。
      *
-     * @param key 当前对象的查找或写入键。
-     * @param operation 当前JDBC工作区文档仓储使用的操作，供其处理与状态记录使用。
-     * @param type 当前操作使用的目标类型或类别。
-     * @param change change的索引映射，供按键查找或归并当前组件的数据。
-     * @param version 记录版本，用于乐观并发控制或区分协议版本。
-     * @param time 当前JDBC工作区文档仓储持有的时间对象，供相应处理步骤使用。
-     * @param before 当前JDBC工作区文档仓储持有的处理前对象，供相应处理步骤使用。
-     * @param after 当前JDBC工作区文档仓储持有的处理后对象，供相应处理步骤使用。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param key        当前对象的查找或写入键。
+     * @param operation  当前JDBC工作区文档仓储使用的操作，供其处理与状态记录使用。
+     * @param type       当前操作使用的目标类型或类别。
+     * @param change     change的索引映射，供按键查找或归并当前组件的数据。
+     * @param version    记录版本，用于乐观并发控制或区分协议版本。
+     * @param time       当前JDBC工作区文档仓储持有的时间对象，供相应处理步骤使用。
+     * @param before     当前JDBC工作区文档仓储持有的处理前对象，供相应处理步骤使用。
+     * @param after      当前JDBC工作区文档仓储持有的处理后对象，供相应处理步骤使用。
+     * @param sessionId  会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param turnId     单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
      */
     private void log(
@@ -644,46 +656,71 @@ public class JdbcWorkspaceDocumentRepository implements WorkspaceDocumentReposit
         return DigestUtils.sha256Hex(bytes);
     }
 
-    /** JDBC工作区文档仓储内部的Conflict，封装该步骤需要的状态或输入输出。 */
-    private static final class Conflict extends RuntimeException {}
+    /**
+     * JDBC工作区文档仓储内部的Conflict，封装该步骤需要的状态或输入输出。
+     */
+    private static final class Conflict extends RuntimeException {
+    }
 
-    /** JDBC工作区文档仓储内部的元数据，封装该步骤需要的状态或输入输出。 */
+    /**
+     * JDBC工作区文档仓储内部的元数据，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     private static final class Metadata {
-        /** 组合资源归属与作用域的定位键，供仓储查询和更新使用。 */
+        /**
+         * 组合资源归属与作用域的定位键，供仓储查询和更新使用。
+         */
         final WorkspaceDocumentKey key;
 
         /** 内容校验值，用于确认传输或存储后的内容一致。 */
-        /** 内容对象的持久引用，供后续读取实际字节。 */
+        /**
+         * 内容对象的持久引用，供后续读取实际字节。
+         */
         final String reference, checksum;
 
         /** 记录版本，用于乐观并发控制或区分协议版本。 */
-        /** 当前内容字节或字节计数，用于传输、校验与容量控制。 */
+        /**
+         * 当前内容字节或字节计数，用于传输、校验与容量控制。
+         */
         final long bytes, version;
 
         /** 当前对象最近更新时的时间或版本信息。 */
-        /** 当前对象首次创建时的时间或版本信息。 */
+        /**
+         * 当前对象首次创建时的时间或版本信息。
+         */
         final Instant created, updated;
     }
 
-    /** JDBC工作区文档仓储内部的已准备，封装该步骤需要的状态或输入输出。 */
+    /**
+     * JDBC工作区文档仓储内部的已准备，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     private static final class Prepared {
-        /** 组合资源归属与作用域的定位键，供仓储查询和更新使用。 */
+        /**
+         * 组合资源归属与作用域的定位键，供仓储查询和更新使用。
+         */
         final WorkspaceDocumentKey key;
 
         /** 内容校验值，用于确认传输或存储后的内容一致。 */
         /** 内容对象的持久引用，供后续读取实际字节。 */
-        /** 面向消息或事件消费者的文本内容。 */
+        /**
+         * 面向消息或事件消费者的文本内容。
+         */
         final String text, reference, checksum;
 
-        /** 当前内容字节或字节计数，用于传输、校验与容量控制。 */
+        /**
+         * 当前内容字节或字节计数，用于传输、校验与容量控制。
+         */
         final long bytes;
 
-        /** 当前操作之前的状态、内容引用或作用域，供恢复或回收使用。 */
+        /**
+         * 当前操作之前的状态、内容引用或作用域，供恢复或回收使用。
+         */
         final WorkspaceDocument previous;
 
-        /** 本次记录或提交所使用的时间点。 */
+        /**
+         * 本次记录或提交所使用的时间点。
+         */
         final Instant at;
 
         /**

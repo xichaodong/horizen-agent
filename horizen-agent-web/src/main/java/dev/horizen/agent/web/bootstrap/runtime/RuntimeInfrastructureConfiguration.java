@@ -27,7 +27,9 @@ import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-/** 组装运行时共享的 HTTP、工具网关与沙箱依赖，并由 Spring 管理关闭。 */
+/**
+ * 组装运行时共享的 HTTP、工具网关与沙箱依赖，并由 Spring 管理关闭。
+ */
 @Configuration(proxyBeanMethods = false)
 public class RuntimeInfrastructureConfiguration {
     /**
@@ -153,10 +155,10 @@ public class RuntimeInfrastructureConfiguration {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param gateway 外部工具目录与调用的网关适配器。
-     * @param web 提供Web能力的依赖，具体实现由当前组件的组装方传入。
-     * @param sandbox 提供沙箱能力的依赖，具体实现由当前组件的组装方传入。
-     * @param memory 当前运行时基础设施组装持有的记忆对象，供相应处理步骤使用。
+     * @param gateway        外部工具目录与调用的网关适配器。
+     * @param web            提供Web能力的依赖，具体实现由当前组件的组装方传入。
+     * @param sandbox        提供沙箱能力的依赖，具体实现由当前组件的组装方传入。
+     * @param memory         当前运行时基础设施组装持有的记忆对象，供相应处理步骤使用。
      * @param modelTransport 当前运行时基础设施组装持有的模型传输对象，供相应处理步骤使用。
      * @return 本次操作返回的运行时基础设施结果。
      */
@@ -172,13 +174,19 @@ public class RuntimeInfrastructureConfiguration {
                 gateway.getIfAvailable(), web, sandbox, memory.getIfAvailable(), modelTransport);
     }
 
-    /** 运行时基础设施组装内部的沙箱HTTP资源集合，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 运行时基础设施组装内部的沙箱HTTP资源集合，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     static final class SandboxHttpResources implements AutoCloseable {
-        /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+        /**
+         * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+         */
         private final OkHttpClient client;
 
-        /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+        /**
+         * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+         */
         public void close() {
             client.dispatcher().executorService().shutdown();
             client.connectionPool().evictAll();

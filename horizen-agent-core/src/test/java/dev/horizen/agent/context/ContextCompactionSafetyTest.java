@@ -28,9 +28,12 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** 验证实际 Harness 压缩和持久化状态，不重复实现其算法。 */
+/**
+ * 验证实际 Harness 压缩和持久化状态，不重复实现其算法。
+ */
 class ContextCompactionSafetyTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void failedSummaryContinuesWithOriginalHistoryAndPersistsIt() {

@@ -15,26 +15,36 @@ import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
-/** 容量受限的归档存储；PUT 成功后替换对应槽位，被拒绝或失败时保留原内容。 */
+/**
+ * 容量受限的归档存储；PUT 成功后替换对应槽位，被拒绝或失败时保留原内容。
+ */
 public final class BosWorkspaceSnapshotRepository implements WorkspaceSnapshotRepository {
-    /** 当前组件的诊断日志器。 */
+    /**
+     * 当前组件的诊断日志器。
+     */
     private static final Logger log =
             Logger.getLogger(BosWorkspaceSnapshotRepository.class.getName());
 
-    /** 当前组件的配置与策略参数。 */
+    /**
+     * 当前组件的配置与策略参数。
+     */
     private final BosArtifactContentStoreConfig config;
 
-    /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+    /**
+     * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     */
     private final BosSnapshotObjectClient client;
 
-    /** transfers的并发准入许可，限制同时进行的处理数量。 */
+    /**
+     * transfers的并发准入许可，限制同时进行的处理数量。
+     */
     private final Semaphore transfers;
 
     /**
      * 创建BOS工作区快照仓储，初始化该组件所需的状态、配置或依赖。
      *
-     * @param config 当前组件的配置与策略参数。
-     * @param concurrency 当前BOS工作区快照仓储使用的并发，供其处理与状态记录使用。
+     * @param config         当前组件的配置与策略参数。
+     * @param concurrency    当前BOS工作区快照仓储使用的并发，供其处理与状态记录使用。
      * @param timeoutSeconds 超时，单位为秒。
      */
     public BosWorkspaceSnapshotRepository(
@@ -48,8 +58,8 @@ public final class BosWorkspaceSnapshotRepository implements WorkspaceSnapshotRe
     /**
      * 创建BOS工作区快照仓储，初始化该组件所需的状态、配置或依赖。
      *
-     * @param config 当前组件的配置与策略参数。
-     * @param client 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     * @param config      当前组件的配置与策略参数。
+     * @param client      当前适配器使用的远端客户端，供实际网络或服务请求使用。
      * @param concurrency 当前BOS工作区快照仓储使用的并发，供其处理与状态记录使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -66,7 +76,7 @@ public final class BosWorkspaceSnapshotRepository implements WorkspaceSnapshotRe
      * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
      *
      * @param snapshotId 工作区快照的持久引用，用于后续执行恢复文件内容。
-     * @param archive 当前BOS工作区快照仓储持有的归档对象，供相应处理步骤使用。
+     * @param archive    当前BOS工作区快照仓储持有的归档对象，供相应处理步骤使用。
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
@@ -242,13 +252,16 @@ public final class BosWorkspaceSnapshotRepository implements WorkspaceSnapshotRe
 
     /**
      * 取得BOS工作区快照仓储。
+     *
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void acquire() throws IOException {
         if (!transfers.tryAcquire()) throw new IOException("snapshot transfer capacity exhausted");
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
     public void close() {
         client.close();

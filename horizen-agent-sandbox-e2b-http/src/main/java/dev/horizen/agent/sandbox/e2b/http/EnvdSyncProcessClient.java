@@ -26,25 +26,35 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/** 使用普通 JSON 请求调用 envd 同步命令接口。 */
+/**
+ * 使用普通 JSON 请求调用 envd 同步命令接口。
+ */
 final class EnvdSyncProcessClient {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
-    /** 当前远端协议的 JSON 编解码器。 */
+    /**
+     * 当前远端协议的 JSON 编解码器。
+     */
     private final ObjectMapper json;
 
-    /** 用于实际网络请求的共享 HTTP 客户端。 */
+    /**
+     * 用于实际网络请求的共享 HTTP 客户端。
+     */
     private final OkHttpClient http;
 
-    /** 可供当前请求选择的选项或策略集合。 */
+    /**
+     * 可供当前请求选择的选项或策略集合。
+     */
     private final HttpE2bSandboxClientOptions options;
 
     /**
      * 创建envd同步进程客户端，初始化该组件所需的状态、配置或依赖。
      *
      * @param options 可供当前请求选择的选项或策略集合。
-     * @param json 提供JSON能力的依赖，具体实现由当前组件的组装方传入。
+     * @param json    提供JSON能力的依赖，具体实现由当前组件的组装方传入。
      */
     EnvdSyncProcessClient(HttpE2bSandboxClientOptions options, ObjectMapper json) {
         this.options = options;
@@ -53,18 +63,18 @@ final class EnvdSyncProcessClient {
                 options.getHttpClient() != null
                         ? options.getHttpClient()
                         : new OkHttpClient.Builder()
-                                .connectTimeout(
-                                        options.getConnectTimeoutSeconds(), TimeUnit.SECONDS)
-                                .readTimeout(options.getReadTimeoutSeconds(), TimeUnit.SECONDS)
-                                .build();
+                        .connectTimeout(
+                                options.getConnectTimeoutSeconds(), TimeUnit.SECONDS)
+                        .readTimeout(options.getReadTimeoutSeconds(), TimeUnit.SECONDS)
+                        .build();
     }
 
     /**
      * 通过 envd 同步接口运行 shell 命令，限制可保留的文本输出容量。
      *
-     * @param state 当前工作状态或状态存储对象，供执行与恢复流程使用。
-     * @param cwd 当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
-     * @param command 当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
+     * @param state          当前工作状态或状态存储对象，供执行与恢复流程使用。
+     * @param cwd            当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
+     * @param command        当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
      * @param timeoutSeconds 超时，单位为秒。
      * @return 本次操作返回的Exec结果结果。
      */
@@ -73,9 +83,9 @@ final class EnvdSyncProcessClient {
         Capture capture = run(state, cwd, command, timeoutSeconds);
         boolean truncated =
                 capture.getStdout().getBytes(StandardCharsets.UTF_8).length
-                                > options.getMaxOutputBytes()
+                        > options.getMaxOutputBytes()
                         || capture.getStderr().getBytes(StandardCharsets.UTF_8).length
-                                > options.getMaxOutputBytes();
+                        > options.getMaxOutputBytes();
         ExecResult result =
                 new ExecResult(
                         capture.getExitCode(),
@@ -95,9 +105,9 @@ final class EnvdSyncProcessClient {
     /**
      * 运行命令并保留二进制标准输出，使用单独的传输容量限制。
      *
-     * @param state 当前工作状态或状态存储对象，供执行与恢复流程使用。
-     * @param cwd 当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
-     * @param command 当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
+     * @param state          当前工作状态或状态存储对象，供执行与恢复流程使用。
+     * @param cwd            当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
+     * @param command        当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
      * @param timeoutSeconds 超时，单位为秒。
      * @return 本次处理取得或生成的内容字节。
      */
@@ -110,11 +120,11 @@ final class EnvdSyncProcessClient {
     /**
      * 运行命令并保留二进制标准输出，使用单独的传输容量限制。
      *
-     * @param state 当前工作状态或状态存储对象，供执行与恢复流程使用。
-     * @param cwd 当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
-     * @param command 当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
+     * @param state          当前工作状态或状态存储对象，供执行与恢复流程使用。
+     * @param cwd            当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
+     * @param command        当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
      * @param timeoutSeconds 超时，单位为秒。
-     * @param maxBytes 本次处理或传输允许的最大字节数。
+     * @param maxBytes       本次处理或传输允许的最大字节数。
      * @return 本次处理取得或生成的内容字节。
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -139,9 +149,9 @@ final class EnvdSyncProcessClient {
     /**
      * 构造并发送 envd 同步命令请求，解析进程退出与输出结果。
      *
-     * @param state 当前工作状态或状态存储对象，供执行与恢复流程使用。
-     * @param cwd 当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
-     * @param command 当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
+     * @param state          当前工作状态或状态存储对象，供执行与恢复流程使用。
+     * @param cwd            当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
+     * @param command        当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
      * @param timeoutSeconds 超时，单位为秒。
      * @return 本次操作返回的采集结果。
      */
@@ -153,10 +163,10 @@ final class EnvdSyncProcessClient {
     /**
      * 构造并发送 envd 同步命令请求，解析进程退出与输出结果。
      *
-     * @param state 当前工作状态或状态存储对象，供执行与恢复流程使用。
-     * @param cwd 当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
-     * @param command 当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
-     * @param timeoutSeconds 超时，单位为秒。
+     * @param state            当前工作状态或状态存储对象，供执行与恢复流程使用。
+     * @param cwd              当前envd同步进程客户端使用的cwd，供其处理与状态记录使用。
+     * @param command          当前envd同步进程客户端使用的命令，供其处理与状态记录使用。
+     * @param timeoutSeconds   超时，单位为秒。
      * @param maxResponseBytes 最大响应的字节数，用于容量或传输限制。
      * @return 本次操作返回的采集结果。
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -299,7 +309,7 @@ final class EnvdSyncProcessClient {
      * 生成当前操作所需的required文本，供调用方继续处理。
      *
      * @param value 待校验、转换或保存的原始值。
-     * @param name 需要定位或处理的名称。
+     * @param name  需要定位或处理的名称。
      * @return 本次处理生成或读取的文本。
      */
     private static String required(String value, String name) {
@@ -309,21 +319,31 @@ final class EnvdSyncProcessClient {
         return value.trim();
     }
 
-    /** 同步命令输出的捕获结果，用于限制文本输出容量。 */
+    /**
+     * 同步命令输出的捕获结果，用于限制文本输出容量。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     private static class Capture {
-        /** 远端命令进程的退出码；非零值按命令结果规则解释为失败。 */
+        /**
+         * 远端命令进程的退出码；非零值按命令结果规则解释为失败。
+         */
         private int exitCode;
 
-        /** 命令或进程的标准输出内容。 */
+        /**
+         * 命令或进程的标准输出内容。
+         */
         private String stdout;
 
-        /** 命令或进程的标准错误输出内容。 */
+        /**
+         * 命令或进程的标准错误输出内容。
+         */
         private String stderr;
 
-        /** 用于诊断的响应结构摘要，不作为真实命令输出。 */
+        /**
+         * 用于诊断的响应结构摘要，不作为真实命令输出。
+         */
         private String responseShape;
     }
 }

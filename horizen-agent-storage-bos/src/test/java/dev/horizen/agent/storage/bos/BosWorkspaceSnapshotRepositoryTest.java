@@ -17,12 +17,12 @@ class BosWorkspaceSnapshotRepositoryTest {
     void anotherInstanceDownloadsTheSameSlotAndBadUploadPreservesPreviousObject() throws Exception {
         FakeClient objects = new FakeClient();
         try (var a = repository(objects);
-                var b = repository(objects)) {
+             var b = repository(objects)) {
             assertFalse(a.exists("slot-a"));
-            a.upload("slot-a", new ByteArrayInputStream(new byte[] {1, 2, 3}));
+            a.upload("slot-a", new ByteArrayInputStream(new byte[]{1, 2, 3}));
             assertTrue(b.exists("slot-a"));
             try (var data = b.download("slot-a")) {
-                assertArrayEquals(new byte[] {1, 2, 3}, data.readAllBytes());
+                assertArrayEquals(new byte[]{1, 2, 3}, data.readAllBytes());
             }
             assertThrows(
                     IOException.class,
@@ -30,8 +30,8 @@ class BosWorkspaceSnapshotRepositoryTest {
             objects.failUpload = true;
             assertThrows(
                     IllegalStateException.class,
-                    () -> a.upload("slot-a", new ByteArrayInputStream(new byte[] {4})));
-            assertArrayEquals(new byte[] {1, 2, 3}, objects.values.get("snapshots/slot-a.tar"));
+                    () -> a.upload("slot-a", new ByteArrayInputStream(new byte[]{4})));
+            assertArrayEquals(new byte[]{1, 2, 3}, objects.values.get("snapshots/slot-a.tar"));
             assertFalse(a.exists("slot-b"));
         }
     }
@@ -40,7 +40,7 @@ class BosWorkspaceSnapshotRepositoryTest {
     void downloadHoldsOneCapacitySlotUntilClosedAndOversizeFails() throws Exception {
         FakeClient client = new FakeClient();
         var repository = repository(client);
-        client.values.put("snapshots/one.tar", new byte[] {1});
+        client.values.put("snapshots/one.tar", new byte[]{1});
         try (InputStream stream = repository.download("one")) {
             assertThrows(IOException.class, () -> repository.download("one"));
         }

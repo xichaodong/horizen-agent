@@ -6,10 +6,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-/** 宿主提供的不透明业务上下文，由 Provider 解释，运行时不解读。 */
+/**
+ * 宿主提供的不透明业务上下文，由 Provider 解释，运行时不解读。
+ */
 @Getter
 public final class GatewayCallerAttributes {
-    /** 值集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 值集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, String> values;
 
     /**
@@ -28,17 +32,17 @@ public final class GatewayCallerAttributes {
                             || value.isBlank()
                             || value.length() > 256
                             || Set.of(
-                                            "authorization",
-                                            "token",
-                                            "accesstoken",
-                                            "password",
-                                            "secret",
-                                            "accesskey",
-                                            "secretkey")
-                                    .contains(
-                                            key.replace("_", "")
-                                                    .replace("-", "")
-                                                    .toLowerCase(Locale.ROOT)))
+                                    "authorization",
+                                    "token",
+                                    "accesstoken",
+                                    "password",
+                                    "secret",
+                                    "accesskey",
+                                    "secretkey")
+                            .contains(
+                                    key.replace("_", "")
+                                            .replace("-", "")
+                                            .toLowerCase(Locale.ROOT)))
                         throw new IllegalArgumentException("Invalid Provider context attribute");
                 });
     }

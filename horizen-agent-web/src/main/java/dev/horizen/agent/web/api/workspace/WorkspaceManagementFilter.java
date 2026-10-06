@@ -16,19 +16,27 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
-/** 在 Spring 为 JSON 请求体分配内存前完成认证和容量准入检查。 */
+/**
+ * 在 Spring 为 JSON 请求体分配内存前完成认证和容量准入检查。
+ */
 @RequiredArgsConstructor
 @Component
 @Order(-100)
 @ConditionalOnProperty(name = "horizen.agent.workspace-management.enabled", havingValue = "true")
 public class WorkspaceManagementFilter extends OncePerRequestFilter {
-    /** 上限的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 上限的固定取值，用于相应策略和边界判断。
+     */
     private static final long LIMIT = 32L * 1024 * 1024;
 
-    /** 请求集合的并发准入许可，限制同时进行的处理数量。 */
+    /**
+     * 请求集合的并发准入许可，限制同时进行的处理数量。
+     */
     private final Semaphore requests = new Semaphore(2);
 
-    /** 宿主绑定的配置对象，供组件组装与策略校验使用。 */
+    /**
+     * 宿主绑定的配置对象，供组件组装与策略校验使用。
+     */
     private final WorkspaceManagementProperties properties;
 
     /**
@@ -45,9 +53,9 @@ public class WorkspaceManagementFilter extends OncePerRequestFilter {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @param response 当前操作得到的响应。
-     * @param chain 当前工作区管理过滤持有的chain对象，供相应处理步骤使用。
+     * @param chain    当前工作区管理过滤持有的chain对象，供相应处理步骤使用。
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
@@ -170,8 +178,8 @@ public class WorkspaceManagementFilter extends OncePerRequestFilter {
      * 完成当前操作的reject步骤，按实现更新相应状态或依赖。
      *
      * @param response 当前操作得到的响应。
-     * @param code 当前工作区管理过滤使用的代码，供其处理与状态记录使用。
-     * @param message 用户输入、响应说明或诊断消息，含义由所属协议对象限定。
+     * @param code     当前工作区管理过滤使用的代码，供其处理与状态记录使用。
+     * @param message  用户输入、响应说明或诊断消息，含义由所属协议对象限定。
      */
     private static void reject(HttpServletResponse response, int code, String message)
             throws IOException {

@@ -30,57 +30,93 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
-/** 管理 SSE 连接限制、心跳、背压缓冲和写入线程。 */
+/**
+ * 管理 SSE 连接限制、心跳、背压缓冲和写入线程。
+ */
 public final class SseConnectionManager implements AutoCloseable {
-    /** 所有权Executors的状态标记，用于选择当前组件的处理路径。 */
+    /**
+     * 所有权Executors的状态标记，用于选择当前组件的处理路径。
+     */
     private final boolean ownsExecutors;
 
-    /** 连接的去重集合，供成员查找或范围检查使用。 */
+    /**
+     * 连接的去重集合，供成员查找或范围检查使用。
+     */
     private final Set<Connection> connections = ConcurrentHashMap.newKeySet();
 
-    /** stopped的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * stopped的原子状态，供并发更新与统计读取使用。
+     */
     private final AtomicBoolean stopped = new AtomicBoolean();
 
-    /** 宿主绑定的配置对象，供组件组装与策略校验使用。 */
+    /**
+     * 宿主绑定的配置对象，供组件组装与策略校验使用。
+     */
     private final SseProperties properties;
 
-    /** 当前仍处于观察状态的 SSE 连接数。 */
+    /**
+     * 当前仍处于观察状态的 SSE 连接数。
+     */
     private final AtomicInteger activeConnections = new AtomicInteger();
 
-    /** 当前 SSE 连接队列中等待发送的事件数量。 */
+    /**
+     * 当前 SSE 连接队列中等待发送的事件数量。
+     */
     private final AtomicInteger queuedEvents = new AtomicInteger();
 
-    /** 当前 SSE 连接队列中等待发送的内容字节数。 */
+    /**
+     * 当前 SSE 连接队列中等待发送的内容字节数。
+     */
     private final AtomicLong queuedBytes = new AtomicLong();
 
-    /** 观察期间 SSE 待发送内容字节数的峰值。 */
+    /**
+     * 观察期间 SSE 待发送内容字节数的峰值。
+     */
     private final AtomicLong peakQueuedBytes = new AtomicLong();
 
-    /** 自本实例启动以来接收的 SSE 连接总数。 */
+    /**
+     * 自本实例启动以来接收的 SSE 连接总数。
+     */
     private final LongAdder totalConnections = new LongAdder();
 
-    /** 因连接容量或准入条件被拒绝的 SSE 连接累计次数。 */
+    /**
+     * 因连接容量或准入条件被拒绝的 SSE 连接累计次数。
+     */
     private final LongAdder rejectedConnections = new LongAdder();
 
-    /** 自本实例启动以来正常结束的 SSE 连接次数。 */
+    /**
+     * 自本实例启动以来正常结束的 SSE 连接次数。
+     */
     private final LongAdder normalCloses = new LongAdder();
 
-    /** 因写入或连接错误而结束的 SSE 连接累计次数。 */
+    /**
+     * 因写入或连接错误而结束的 SSE 连接累计次数。
+     */
     private final LongAdder errorCloses = new LongAdder();
 
-    /** 因客户端消费过慢而结束的 SSE 连接累计次数。 */
+    /**
+     * 因客户端消费过慢而结束的 SSE 连接累计次数。
+     */
     private final LongAdder slowClientCloses = new LongAdder();
 
-    /** 因观察连接时限到期而结束的 SSE 连接累计次数。 */
+    /**
+     * 因观察连接时限到期而结束的 SSE 连接累计次数。
+     */
     private final LongAdder timeoutCloses = new LongAdder();
 
-    /** 因浏览器或网络断开而结束的 SSE 连接累计次数。 */
+    /**
+     * 因浏览器或网络断开而结束的 SSE 连接累计次数。
+     */
     private final LongAdder disconnectedCloses = new LongAdder();
 
-    /** 按间隔发送 SSE 保活信息的调度资源。 */
+    /**
+     * 按间隔发送 SSE 保活信息的调度资源。
+     */
     private final ScheduledExecutorService heartbeats;
 
-    /** 处理 SSE 发送工作的有界线程池。 */
+    /**
+     * 处理 SSE 发送工作的有界线程池。
+     */
     private final ThreadPoolExecutor writers;
 
     /**
@@ -119,7 +155,7 @@ public final class SseConnectionManager implements AutoCloseable {
      *
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
      * @param heartbeats 提供heartbeats能力的依赖，具体实现由当前组件的组装方传入。
-     * @param writers 当前SSE连接管理器持有的writers对象，供相应处理步骤使用。
+     * @param writers    当前SSE连接管理器持有的writers对象，供相应处理步骤使用。
      */
     public SseConnectionManager(
             SseProperties properties,
@@ -135,7 +171,7 @@ public final class SseConnectionManager implements AutoCloseable {
     /**
      * 创建一个只负责观察的 SSE 连接，建立有界发送队列与关闭处理。
      *
-     * @param events 当前执行或历史事件集合，供持久化、回放与观测使用。
+     * @param events  当前执行或历史事件集合，供持久化、回放与观测使用。
      * @param emitter 当前SSE连接管理器持有的发送器对象，供相应处理步骤使用。
      * @return 本次操作返回的SSE发送器结果。
      * @throws ResponseStatusException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -204,40 +240,64 @@ public final class SseConnectionManager implements AutoCloseable {
         }
     }
 
-    /** 一个浏览器观察连接的队列、写入与关闭状态。 */
+    /**
+     * 一个浏览器观察连接的队列、写入与关闭状态。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private final class Connection {
-        /** 单个 HTTP 观察连接的 SSE 发送器。 */
+        /**
+         * 单个 HTTP 观察连接的 SSE 发送器。
+         */
         private final SseEmitter emitter;
 
-        /** 连接关闭后归还本实例连接容量的回调。 */
+        /**
+         * 连接关闭后归还本实例连接容量的回调。
+         */
         private final Runnable releaseConnection;
 
-        /** 当前响应或事件输入流的订阅，取消时终止后续数据接收。 */
+        /**
+         * 当前响应或事件输入流的订阅，取消时终止后续数据接收。
+         */
         private final AtomicReference<Disposable> subscription = new AtomicReference<>();
 
-        /** 心跳的原子状态，供并发更新与统计读取使用。 */
+        /**
+         * 心跳的原子状态，供并发更新与统计读取使用。
+         */
         private final AtomicReference<ScheduledFuture<?>> heartbeat = new AtomicReference<>();
 
-        /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+        /**
+         * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+         */
         private final AtomicBoolean closed = new AtomicBoolean();
 
-        /** draining的原子状态，供并发更新与统计读取使用。 */
+        /**
+         * draining的原子状态，供并发更新与统计读取使用。
+         */
         private final AtomicBoolean draining = new AtomicBoolean();
 
-        /** 心跳待发送的原子状态，供并发更新与统计读取使用。 */
+        /**
+         * 心跳待发送的原子状态，供并发更新与统计读取使用。
+         */
         private final AtomicBoolean heartbeatQueued = new AtomicBoolean();
 
-        /** upstream完成的原子状态，供并发更新与统计读取使用。 */
+        /**
+         * upstream完成的原子状态，供并发更新与统计读取使用。
+         */
         private final AtomicBoolean upstreamCompleted = new AtomicBoolean();
 
-        /** 连接Released的原子状态，供并发更新与统计读取使用。 */
+        /**
+         * 连接Released的原子状态，供并发更新与统计读取使用。
+         */
         private final AtomicBoolean connectionReleased = new AtomicBoolean();
 
-        /** 待处理的字节数，用于容量或传输限制。 */
+        /**
+         * 待处理的字节数，用于容量或传输限制。
+         */
         private final AtomicInteger pendingBytes = new AtomicInteger();
 
-        /** outbound的待处理队列，由当前组件的消费者取出处理。 */
+        /**
+         * outbound的待处理队列，由当前组件的消费者取出处理。
+         */
         private final ArrayBlockingQueue<PendingEvent> outbound =
                 new ArrayBlockingQueue<>(properties.getOutboundMaxEvents());
 
@@ -381,7 +441,9 @@ public final class SseConnectionManager implements AutoCloseable {
             scheduleDrain();
         }
 
-        /** 写入心跳。 */
+        /**
+         * 写入心跳。
+         */
         private synchronized void writeHeartbeat() {
             if (closed.get()) return;
             try {
@@ -419,14 +481,18 @@ public final class SseConnectionManager implements AutoCloseable {
             }
         }
 
-        /** 收敛处理后排空。 */
+        /**
+         * 收敛处理后排空。
+         */
         private void finishAfterDrain() {
             upstreamCompleted.set(true);
             if (outbound.isEmpty() && !draining.get()) completeNow();
             else scheduleDrain();
         }
 
-        /** 完成当前时间。 */
+        /**
+         * 完成当前时间。
+         */
         private void completeNow() {
             if (!closeOnce(CloseReason.NORMAL)) return;
             disposeResources();
@@ -436,7 +502,9 @@ public final class SseConnectionManager implements AutoCloseable {
             }
         }
 
-        /** 完成当前操作的timeoutNow步骤，按实现更新相应状态或依赖。 */
+        /**
+         * 完成当前操作的timeoutNow步骤，按实现更新相应状态或依赖。
+         */
         private void timeoutNow() {
             if (!closeOnce(CloseReason.TIMEOUT)) return;
             disposeResources();
@@ -535,77 +603,127 @@ public final class SseConnectionManager implements AutoCloseable {
         return value == null ? 0 : value.length() * 2;
     }
 
-    /** 本实例 SSE 连接与发送队列的资源统计快照。 */
+    /**
+     * 本实例 SSE 连接与发送队列的资源统计快照。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     @Getter
     public static final class Snapshot {
-        /** 当前仍处于观察状态的 SSE 连接数。 */
+        /**
+         * 当前仍处于观察状态的 SSE 连接数。
+         */
         private final int activeConnections;
 
-        /** 自本实例启动以来接收的 SSE 连接总数。 */
+        /**
+         * 自本实例启动以来接收的 SSE 连接总数。
+         */
         private final long totalConnections;
 
-        /** 因连接容量或准入条件被拒绝的 SSE 连接累计次数。 */
+        /**
+         * 因连接容量或准入条件被拒绝的 SSE 连接累计次数。
+         */
         private final long rejectedConnections;
 
-        /** 当前 SSE 连接队列中等待发送的事件数量。 */
+        /**
+         * 当前 SSE 连接队列中等待发送的事件数量。
+         */
         private final int queuedEvents;
 
-        /** 当前 SSE 连接队列中等待发送的内容字节数。 */
+        /**
+         * 当前 SSE 连接队列中等待发送的内容字节数。
+         */
         private final long queuedBytes;
 
-        /** 观察期间 SSE 待发送内容字节数的峰值。 */
+        /**
+         * 观察期间 SSE 待发送内容字节数的峰值。
+         */
         private final long peakQueuedBytes;
 
-        /** SSE 写入线程池当前正在执行工作的线程数。 */
+        /**
+         * SSE 写入线程池当前正在执行工作的线程数。
+         */
         private final int writerActiveThreads;
 
-        /** SSE 写入线程池当前保留的线程数。 */
+        /**
+         * SSE 写入线程池当前保留的线程数。
+         */
         private final int writerPoolSize;
 
-        /** SSE 写入线程池尚未开始处理的任务数。 */
+        /**
+         * SSE 写入线程池尚未开始处理的任务数。
+         */
         private final int writerQueueSize;
 
-        /** 自本实例启动以来正常结束的 SSE 连接次数。 */
+        /**
+         * 自本实例启动以来正常结束的 SSE 连接次数。
+         */
         private final long normalCloses;
 
-        /** 因写入或连接错误而结束的 SSE 连接累计次数。 */
+        /**
+         * 因写入或连接错误而结束的 SSE 连接累计次数。
+         */
         private final long errorCloses;
 
-        /** 因客户端消费过慢而结束的 SSE 连接累计次数。 */
+        /**
+         * 因客户端消费过慢而结束的 SSE 连接累计次数。
+         */
         private final long slowClientCloses;
 
-        /** 因观察连接时限到期而结束的 SSE 连接累计次数。 */
+        /**
+         * 因观察连接时限到期而结束的 SSE 连接累计次数。
+         */
         private final long timeoutCloses;
 
-        /** 因浏览器或网络断开而结束的 SSE 连接累计次数。 */
+        /**
+         * 因浏览器或网络断开而结束的 SSE 连接累计次数。
+         */
         private final long disconnectedCloses;
     }
 
-    /** SSE 观察连接的关闭原因分类。 */
+    /**
+     * SSE 观察连接的关闭原因分类。
+     */
     private enum CloseReason {
-        /** 观察连接正常结束。 */
+        /**
+         * 观察连接正常结束。
+         */
         NORMAL,
-        /** 观察连接因发送或处理异常而关闭。 */
+        /**
+         * 观察连接因发送或处理异常而关闭。
+         */
         ERROR,
-        /** 客户端消费过慢，超过连接发送队列的限制。 */
+        /**
+         * 客户端消费过慢，超过连接发送队列的限制。
+         */
         SLOW_CLIENT,
-        /** 观察连接超过允许的持续或等待时间。 */
+        /**
+         * 观察连接超过允许的持续或等待时间。
+         */
         TIMEOUT,
-        /** 浏览器或网络连接已断开。 */
+        /**
+         * 浏览器或网络连接已断开。
+         */
         DISCONNECTED
     }
 
-    /** 单个 SSE 连接队列中等待发送的事件及其容量信息。 */
+    /**
+     * 单个 SSE 连接队列中等待发送的事件及其容量信息。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class PendingEvent {
-        /** 当前记录保存的执行事件或已转换的发送事件。 */
+        /**
+         * 当前记录保存的执行事件或已转换的发送事件。
+         */
         private final ChatStreamEvent event;
 
-        /** 当前内容字节或字节计数，用于传输、校验与容量控制。 */
+        /**
+         * 当前内容字节或字节计数，用于传输、校验与容量控制。
+         */
         private final int bytes;
 
-        /** 事件进入发送队列时的单调时钟值，供计算排队耗时。 */
+        /**
+         * 事件进入发送队列时的单调时钟值，供计算排队耗时。
+         */
         private final long enqueuedAtNanos;
     }
 }

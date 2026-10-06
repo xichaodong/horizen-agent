@@ -12,13 +12,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-/** 使用 AgentScope 声明解析器；目录完整性仍由发布规则保证。 */
+/**
+ * 使用 AgentScope 声明解析器；目录完整性仍由发布规则保证。
+ */
 public final class AgentScopePublicationValidator implements WorkspacePublicationValidator {
     /**
      * 校验当前Agent作用域发布校验器的输入与状态约束，不满足条件时拒绝继续处理。
      *
      * @param files 文件集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param read 将输入转换为目标结果的函数。
+     * @param read  将输入转换为目标结果的函数。
      * @return 本次处理得到的结果集合。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

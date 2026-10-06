@@ -14,9 +14,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-/** 沙箱内容和文件搜索工具，底层使用沙箱内的 rg/find。 */
+/**
+ * 沙箱内容和文件搜索工具，底层使用沙箱内的 rg/find。
+ */
 public final class SandboxSearchFilesTool extends ToolBase {
-    /** 创建沙箱检索文件集合工具，初始化该组件所需的状态、配置或依赖。 */
+    /**
+     * 创建沙箱检索文件集合工具，初始化该组件所需的状态、配置或依赖。
+     */
     public SandboxSearchFilesTool() {
         super(
                 ToolBase.builder()
@@ -30,38 +34,38 @@ public final class SandboxSearchFilesTool extends ToolBase {
                                         Map.of(
                                                 "pattern", Map.of("type", "string"),
                                                 "target",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "enum",
-                                                                List.of("content", "files"),
-                                                                "default",
-                                                                "content"),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "enum",
+                                                        List.of("content", "files"),
+                                                        "default",
+                                                        "content"),
                                                 "path", Map.of("type", "string", "default", "."),
                                                 "file_glob", Map.of("type", "string"),
                                                 "limit",
-                                                        Map.of(
-                                                                "type", "integer", "minimum", 1,
-                                                                "maximum", 500, "default", 50),
+                                                Map.of(
+                                                        "type", "integer", "minimum", 1,
+                                                        "maximum", 500, "default", 50),
                                                 "offset",
-                                                        Map.of(
-                                                                "type", "integer", "minimum", 0,
-                                                                "default", 0),
+                                                Map.of(
+                                                        "type", "integer", "minimum", 0,
+                                                        "default", 0),
                                                 "output_mode",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "enum",
-                                                                List.of(
-                                                                        "content",
-                                                                        "files_only",
-                                                                        "count"),
-                                                                "default",
-                                                                "content"),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "enum",
+                                                        List.of(
+                                                                "content",
+                                                                "files_only",
+                                                                "count"),
+                                                        "default",
+                                                        "content"),
                                                 "context",
-                                                        Map.of(
-                                                                "type", "integer", "minimum", 0,
-                                                                "maximum", 20, "default", 0)),
+                                                Map.of(
+                                                        "type", "integer", "minimum", 0,
+                                                        "maximum", 20, "default", 0)),
                                         "required",
                                         List.of("pattern"),
                                         "additionalProperties",
@@ -154,8 +158,8 @@ public final class SandboxSearchFilesTool extends ToolBase {
                         + command
                         + "; code=$?; "
                         + ("files".equals(target)
-                                ? "exit \"$code\""
-                                : "if [ \"$code\" -eq 1 ]; then exit 0; else exit \"$code\"; fi");
+                        ? "exit \"$code\""
+                        : "if [ \"$code\" -eq 1 ]; then exit 0; else exit \"$code\"; fi");
         return command;
     }
 
@@ -179,8 +183,8 @@ public final class SandboxSearchFilesTool extends ToolBase {
     /**
      * 生成当前操作所需的text文本，供调用方继续处理。
      *
-     * @param param 当前沙箱检索文件集合工具持有的参数对象，供相应处理步骤使用。
-     * @param key 当前对象的查找或写入键。
+     * @param param    当前沙箱检索文件集合工具持有的参数对象，供相应处理步骤使用。
+     * @param key      当前对象的查找或写入键。
      * @param fallback 当前沙箱检索文件集合工具使用的回退，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */
@@ -192,11 +196,11 @@ public final class SandboxSearchFilesTool extends ToolBase {
     /**
      * 计算或取得本方法声明的结果，供当前SandboxSearchFilesTool处理步骤使用。
      *
-     * @param param 当前沙箱检索文件集合工具持有的参数对象，供相应处理步骤使用。
-     * @param key 当前对象的查找或写入键。
+     * @param param    当前沙箱检索文件集合工具持有的参数对象，供相应处理步骤使用。
+     * @param key      当前对象的查找或写入键。
      * @param fallback 当前沙箱检索文件集合工具使用的回退，供其处理与状态记录使用。
-     * @param min 当前沙箱检索文件集合工具使用的最小，供其处理与状态记录使用。
-     * @param max 当前沙箱检索文件集合工具使用的最大，供其处理与状态记录使用。
+     * @param min      当前沙箱检索文件集合工具使用的最小，供其处理与状态记录使用。
+     * @param max      当前沙箱检索文件集合工具使用的最大，供其处理与状态记录使用。
      * @return 本次操作返回的整数结果。
      */
     private static int integer(ToolCallParam param, String key, int fallback, int min, int max) {

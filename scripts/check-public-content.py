@@ -17,6 +17,7 @@ PATTERNS = {
 }
 LINK = re.compile(r"!?\[[^\]\n]*\]\(([^)\n]+)\)")
 PUBLIC_ENV_TEMPLATES = {".env.yml.example"}
+PUBLIC_IDEA_FILES = {".idea/codeStyles/Project.xml", ".idea/codeStyles/codeStyleConfig.xml"}
 
 
 def is_process_artifact(name):
@@ -42,7 +43,8 @@ def check(root, staged=False):
         parts = PurePosixPath(name).parts
         if is_process_artifact(name):
             problems.append((name, 0, "local process artifact"))
-        if any(part in {".agentscope", "node_modules", "target", ".idea"} for part in parts):
+        if (any(part in {".agentscope", "node_modules", "target"} for part in parts)
+                or (".idea" in parts and name not in PUBLIC_IDEA_FILES)):
             problems.append((name, 0, "private/generated directory"))
         public_template = len(parts) == 1 and name in PUBLIC_ENV_TEMPLATES
         if not public_template and any(part.startswith(".env") and part != ".env.example" for part in parts):

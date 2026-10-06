@@ -15,21 +15,29 @@ import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-/** 将产物保存到按 owner 和 session 隔离的本地目录，适合单机宿主和开发环境。 */
+/**
+ * 将产物保存到按 owner 和 session 隔离的本地目录，适合单机宿主和开发环境。
+ */
 public final class OwnerScopedLocalArtifactTarget implements ArtifactDeliveryTarget {
-    /** 校验安全键的模式，限定允许接受的输入形式。 */
+    /**
+     * 校验安全键的模式，限定允许接受的输入形式。
+     */
     private static final Pattern SAFE_KEY = Pattern.compile("[A-Za-z0-9][A-Za-z0-9._:-]{0,255}");
 
-    /** 本组件使用的根路径或根对象，限定后续读取与定位范围。 */
+    /**
+     * 本组件使用的根路径或根对象，限定后续读取与定位范围。
+     */
     private final Path root;
 
-    /** 最大产物的字节数，用于容量或传输限制。 */
+    /**
+     * 最大产物的字节数，用于容量或传输限制。
+     */
     private final long maxArtifactBytes;
 
     /**
      * 创建数据归属隔离范围内本地产物目标，初始化该组件所需的状态、配置或依赖。
      *
-     * @param root 当前操作允许使用的根路径。
+     * @param root             当前操作允许使用的根路径。
      * @param maxArtifactBytes 最大产物的字节数，用于容量或传输限制。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -45,7 +53,7 @@ public final class OwnerScopedLocalArtifactTarget implements ArtifactDeliveryTar
      * 在归属限定的本地开发存储中登记并写入产物，返回可引用的资源描述。
      *
      * @param runtimeContext 当前数据归属隔离范围内本地产物目标持有的运行时上下文对象，供相应处理步骤使用。
-     * @param request 当前操作的请求参数。
+     * @param request        当前操作的请求参数。
      * @return 本次操作返回的产物交付结果结果。
      */
     @Override
@@ -99,9 +107,9 @@ public final class OwnerScopedLocalArtifactTarget implements ArtifactDeliveryTar
     /**
      * 在原归属范围内解析已登记产物的本地内容位置。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param fileName 文件名称，用于内容识别与交付展示。
+     * @param fileName  文件名称，用于内容识别与交付展示。
      * @return 本次操作返回的路径结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -119,9 +127,9 @@ public final class OwnerScopedLocalArtifactTarget implements ArtifactDeliveryTar
     /**
      * 用准备好的内容替换目标文件，避免读取到部分写入的结果。
      *
-     * @param directory 当前资源目录，供内容准备、读取与清理使用。
+     * @param directory   当前资源目录，供内容准备、读取与清理使用。
      * @param destination 当前数据归属隔离范围内本地产物目标持有的destination对象，供相应处理步骤使用。
-     * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+     * @param content     当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      */
     private static void replaceAtomically(Path directory, Path destination, byte[] content)
             throws IOException {

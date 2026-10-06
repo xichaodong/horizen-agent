@@ -1,16 +1,16 @@
-import React, { useRef } from 'react';
+import React, {useRef} from 'react';
 
 const P = 'horizen-console';
 const displayValue = (value) =>
     typeof value === 'string' ? value : JSON.stringify(value, null, 2);
 
-export default function ApprovalCard({ message, onDecide }) {
+export default function ApprovalCard({message, onDecide}) {
     const submitting = useRef(false);
     const decide = async (decision) => {
         if (submitting.current || message.status !== 'waiting') return;
         submitting.current = true;
         try {
-            await onDecide({ ...message, decision });
+            await onDecide({...message, decision});
         } finally {
             submitting.current = false;
         }
@@ -23,11 +23,11 @@ export default function ApprovalCard({ message, onDecide }) {
     const status = expired
         ? '已过期，请重新发起操作'
         : {
-              waiting: '等待确认',
-              submitting: '正在提交',
-              approved: '已同意，执行结果见后续回复',
-              denied: '已拒绝',
-          }[message.status];
+            waiting: '等待确认',
+            submitting: '正在提交',
+            approved: '已同意，执行结果见后续回复',
+            denied: '已拒绝',
+        }[message.status];
     return (
         <article className={`${P}__approval-block`} aria-label="操作确认">
             <div className={`${P}__approval-banner ${P}__approval-detail`}>

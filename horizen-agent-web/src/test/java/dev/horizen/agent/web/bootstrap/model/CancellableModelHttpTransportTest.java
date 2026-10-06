@@ -50,9 +50,9 @@ class CancellableModelHttpTransportTest {
         server.start();
         var config = HttpTransportConfig.defaults();
         try (var transport =
-                new CancellableModelHttpTransport(
-                        new OkHttpClient.Builder().readTimeout(Duration.ofSeconds(20)).build(),
-                        config)) {
+                     new CancellableModelHttpTransport(
+                             new OkHttpClient.Builder().readTimeout(Duration.ofSeconds(20)).build(),
+                             config)) {
             var request =
                     HttpRequest.builder()
                             .url("http://127.0.0.1:" + server.getAddress().getPort() + "/stream")

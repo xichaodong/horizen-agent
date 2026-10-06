@@ -11,10 +11,15 @@ import io.agentscope.harness.agent.memory.compaction.CompactionConfig;
 import java.nio.file.Paths;
 import java.time.Duration;
 
-/** 真实模型的两轮对话示例；凭据只从进程环境变量读取。 */
+/**
+ * 真实模型的两轮对话示例；凭据只从进程环境变量读取。
+ */
 public final class HarnessConversationDemo {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private HarnessConversationDemo() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private HarnessConversationDemo() {
+    }
 
     /**
      * 完成当前操作的main步骤，按实现更新相应状态或依赖。
@@ -34,18 +39,18 @@ public final class HarnessConversationDemo {
                         .build();
 
         try (HarnessAgent agent =
-                HarnessAgent.builder()
-                        .name("note-taker")
-                        .sysPrompt("你是一个帮助用户做笔记的助手。")
-                        .model(model)
-                        .workspace(Paths.get(".agentscope/workspace"))
-                        .disableShellTool()
-                        .compaction(
-                                CompactionConfig.builder()
-                                        .triggerMessages(30)
-                                        .keepMessages(10)
-                                        .build())
-                        .build()) {
+                     HarnessAgent.builder()
+                             .name("note-taker")
+                             .sysPrompt("你是一个帮助用户做笔记的助手。")
+                             .model(model)
+                             .workspace(Paths.get(".agentscope/workspace"))
+                             .disableShellTool()
+                             .compaction(
+                                     CompactionConfig.builder()
+                                             .triggerMessages(30)
+                                             .keepMessages(10)
+                                             .build())
+                             .build()) {
             RuntimeContext context =
                     RuntimeContext.builder().sessionId("demo-session").userId("demo-owner").build();
             printReply(
@@ -86,7 +91,7 @@ public final class HarnessConversationDemo {
     /**
      * 生成当前操作所需的environmentOr文本，供调用方继续处理。
      *
-     * @param name 需要定位或处理的名称。
+     * @param name     需要定位或处理的名称。
      * @param fallback 当前Harness对话演示使用的回退，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */

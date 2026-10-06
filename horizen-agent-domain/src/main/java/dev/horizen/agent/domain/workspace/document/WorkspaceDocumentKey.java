@@ -2,27 +2,37 @@ package dev.horizen.agent.domain.workspace.document;
 
 import lombok.Data;
 
-/** 云端持久化工作区小文档的唯一身份。 */
+/**
+ * 云端持久化工作区小文档的唯一身份。
+ */
 @Data
 public final class WorkspaceDocumentKey {
-    /** 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。 */
+    /**
+     * 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     */
     private final String ownerKey;
 
-    /** 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。 */
+    /**
+     * 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
+     */
     private final String agentKey;
 
-    /** 工作区内的作用域键，用于把会话任务文件与 Agent 共享文档分开定位。 */
+    /**
+     * 工作区内的作用域键，用于把会话任务文件与 Agent 共享文档分开定位。
+     */
     private final String scopeKey;
 
-    /** 文档在当前作用域内的相对路径。 */
+    /**
+     * 文档在当前作用域内的相对路径。
+     */
     private final String documentPath;
 
     /**
      * 创建工作区文档键，初始化该组件所需的状态、配置或依赖。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param agentKey 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
-     * @param scopeKey 当前工作区文档键使用的作用域键，供其处理与状态记录使用。
+     * @param ownerKey     宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param agentKey     宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
+     * @param scopeKey     当前工作区文档键使用的作用域键，供其处理与状态记录使用。
      * @param documentPath 当前工作区文档键使用的文档路径，供其处理与状态记录使用。
      */
     public WorkspaceDocumentKey(
@@ -36,8 +46,8 @@ public final class WorkspaceDocumentKey {
     /**
      * 取得并校验Identifier。
      *
-     * @param value 待校验、转换或保存的原始值。
-     * @param field 当前工作区文档键使用的字段，供其处理与状态记录使用。
+     * @param value     待校验、转换或保存的原始值。
+     * @param field     当前工作区文档键使用的字段，供其处理与状态记录使用。
      * @param maxLength 当前工作区文档键使用的最大长度，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。

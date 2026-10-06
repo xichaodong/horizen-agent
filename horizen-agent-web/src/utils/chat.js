@@ -56,23 +56,23 @@ export const groupSessionsByTime = (sessions, now = Date.now()) => {
     todayStart.setHours(0, 0, 0, 0);
     const recentStart = new Date(todayStart);
     recentStart.setDate(recentStart.getDate() - 6);
-    const groups = { today: [], recent: [], older: [] };
+    const groups = {today: [], recent: [], older: []};
     sessions.forEach((session) => {
         const timestamp = Number(session.updatedAt) || 0;
         const key =
             timestamp >= todayStart.getTime()
                 ? 'today'
                 : timestamp >= recentStart.getTime()
-                  ? 'recent'
-                  : 'older';
+                    ? 'recent'
+                    : 'older';
         groups[key].push(session);
     });
     return [
-        { key: 'today', label: '今日' },
-        { key: 'recent', label: '近7日' },
-        { key: 'older', label: '7天前' },
+        {key: 'today', label: '今日'},
+        {key: 'recent', label: '近7日'},
+        {key: 'older', label: '7天前'},
     ]
-        .map((group) => ({ ...group, sessions: groups[group.key] }))
+        .map((group) => ({...group, sessions: groups[group.key]}))
         .filter((group) => group.sessions.length);
 };
 

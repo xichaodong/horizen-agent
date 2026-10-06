@@ -21,9 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-/** 执行领域内部的 JDBC 行和时间戳转换。 */
+/**
+ * 执行领域内部的 JDBC 行和时间戳转换。
+ */
 public final class JdbcExecutionMappings {
-    /** 会话的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 会话的固定取值，用于相应策略和边界判断。
+     */
     public static final Function<SessionRow, AgentSession> SESSION =
             rs -> {
                 AgentSession session =
@@ -52,7 +56,9 @@ public final class JdbcExecutionMappings {
                 return session;
             };
 
-    /** 执行的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 执行的固定取值，用于相应策略和边界判断。
+     */
     public static final Function<TurnRow, AgentTurn> TURN =
             rs ->
                     new AgentTurn(
@@ -72,7 +78,9 @@ public final class JdbcExecutionMappings {
                             RowValues.instant(rs.getUpdatedAt()),
                             rs.getVersion());
 
-    /** 消息的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 消息的固定取值，用于相应策略和边界判断。
+     */
     public static final Function<ConversationHistoryRow, ConversationMessage> MESSAGE =
             rs -> {
                 var payload = JdbcHistoryJson.object(rs.getPayloadJson());
@@ -94,8 +102,11 @@ public final class JdbcExecutionMappings {
                 return message;
             };
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private JdbcExecutionMappings() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private JdbcExecutionMappings() {
+    }
 
     /**
      * 计算或取得本方法声明的结果，供当前JdbcExecutionMappings处理步骤使用。

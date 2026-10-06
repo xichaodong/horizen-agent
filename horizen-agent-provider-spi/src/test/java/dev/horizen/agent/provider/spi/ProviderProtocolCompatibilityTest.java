@@ -75,13 +75,13 @@ class ProviderProtocolCompatibilityTest {
 
         ProviderInvokeRequest invoke =
                 new ProviderInvokeRequest(
-                                1,
-                                "owner",
-                                "session",
-                                "turn",
-                                "call",
-                                "domain_lookup",
-                                Map.of("id", "1"))
+                        1,
+                        "owner",
+                        "session",
+                        "turn",
+                        "call",
+                        "domain_lookup",
+                        Map.of("id", "1"))
                         .validate();
         assertEquals(
                 "owner",
@@ -97,15 +97,15 @@ class ProviderProtocolCompatibilityTest {
                                         "conclusion", 1, Map.of("title", "complete"))));
         ProviderInvokeResponse result =
                 new ProviderInvokeResponse(
-                                1,
-                                ProviderResultStatus.SUCCESS,
-                                Map.of("summary", "ok"),
-                                null,
-                                null,
-                                presentation,
-                                List.of(
-                                        new ArtifactReferenceContract(
-                                                "art_1", "report.md", "text/markdown", 12L)))
+                        1,
+                        ProviderResultStatus.SUCCESS,
+                        Map.of("summary", "ok"),
+                        null,
+                        null,
+                        presentation,
+                        List.of(
+                                new ArtifactReferenceContract(
+                                        "art_1", "report.md", "text/markdown", 12L)))
                         .validate();
         ProviderInvokeResponse restored =
                 JSON.readValue(JSON.writeValueAsString(result), ProviderInvokeResponse.class)

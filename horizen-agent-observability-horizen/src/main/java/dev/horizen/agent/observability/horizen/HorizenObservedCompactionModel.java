@@ -11,9 +11,13 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 import java.util.Objects;
 
-/** 为 AgentScope 内部直接调用的压缩模型补充 Horizen LLM Span。 */
+/**
+ * 为 AgentScope 内部直接调用的压缩模型补充 Horizen LLM Span。
+ */
 public final class HorizenObservedCompactionModel implements Model {
-    /** 被包装的原始实现，由本组件补充隔离、观测或恢复行为。 */
+    /**
+     * 被包装的原始实现，由本组件补充隔离、观测或恢复行为。
+     */
     private final Model delegate;
 
     /**
@@ -29,8 +33,8 @@ public final class HorizenObservedCompactionModel implements Model {
      * 产生执行流并返回HorizenObserved压缩模型。
      *
      * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param tools 工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param options 可供当前请求选择的选项或策略集合。
+     * @param tools    工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param options  可供当前请求选择的选项或策略集合。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override

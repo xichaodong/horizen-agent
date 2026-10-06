@@ -16,16 +16,20 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
 
-/** 用 BCE BOS SDK 读写快照对象内容，保留快照存储端口的边界。 */
+/**
+ * 用 BCE BOS SDK 读写快照对象内容，保留快照存储端口的边界。
+ */
 final class BceBosSnapshotObjectClient implements BosSnapshotObjectClient {
-    /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+    /**
+     * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     */
     private final BosClient client;
 
     /**
      * 创建BCEBOS快照对象客户端，初始化该组件所需的状态、配置或依赖。
      *
-     * @param config 当前组件的配置与策略参数。
-     * @param concurrency 当前BCEBOS快照对象客户端使用的并发，供其处理与状态记录使用。
+     * @param config         当前组件的配置与策略参数。
+     * @param concurrency    当前BCEBOS快照对象客户端使用的并发，供其处理与状态记录使用。
      * @param timeoutSeconds 超时，单位为秒。
      */
     BceBosSnapshotObjectClient(
@@ -44,8 +48,8 @@ final class BceBosSnapshotObjectClient implements BosSnapshotObjectClient {
      * 写入BCEBOS快照对象客户端。
      *
      * @param bucket 对象存储桶名称，限定内容对象的存储位置。
-     * @param key 当前对象的查找或写入键。
-     * @param file 当前BCEBOS快照对象客户端持有的文件对象，供相应处理步骤使用。
+     * @param key    当前对象的查找或写入键。
+     * @param file   当前BCEBOS快照对象客户端持有的文件对象，供相应处理步骤使用。
      * @param sha256 内容的 SHA-256 摘要，参与制品完整性验证。
      */
     @Override
@@ -60,7 +64,7 @@ final class BceBosSnapshotObjectClient implements BosSnapshotObjectClient {
      * 读取BCEBOS快照对象客户端。
      *
      * @param bucket 对象存储桶名称，限定内容对象的存储位置。
-     * @param key 当前对象的查找或写入键。
+     * @param key    当前对象的查找或写入键。
      * @return 本次操作返回的输入事件流结果。
      */
     @Override
@@ -83,7 +87,7 @@ final class BceBosSnapshotObjectClient implements BosSnapshotObjectClient {
      * 检查是否存在BCEBOS快照对象客户端。
      *
      * @param bucket 对象存储桶名称，限定内容对象的存储位置。
-     * @param key 当前对象的查找或写入键。
+     * @param key    当前对象的查找或写入键。
      * @return 本次检查是否通过或本次更新是否成功。
      */
     @Override
@@ -107,7 +111,7 @@ final class BceBosSnapshotObjectClient implements BosSnapshotObjectClient {
      * 删除BCEBOS快照对象客户端。
      *
      * @param bucket 对象存储桶名称，限定内容对象的存储位置。
-     * @param key 当前对象的查找或写入键。
+     * @param key    当前对象的查找或写入键。
      */
     @Override
     public void delete(String bucket, String key) {
@@ -118,7 +122,7 @@ final class BceBosSnapshotObjectClient implements BosSnapshotObjectClient {
      * 下载URL。
      *
      * @param bucket 对象存储桶名称，限定内容对象的存储位置。
-     * @param key 当前对象的查找或写入键。
+     * @param key    当前对象的查找或写入键。
      * @return 本次操作返回的URI结果。
      */
     @Override
@@ -126,7 +130,9 @@ final class BceBosSnapshotObjectClient implements BosSnapshotObjectClient {
         return URI.create(client.generatePresignedUrl(bucket, key, -1).toString());
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
     public void close() {
         client.shutdown();

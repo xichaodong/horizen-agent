@@ -4,21 +4,31 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** 外部工具结果中的产物引用契约，不承载实际文件内容。 */
+/**
+ * 外部工具结果中的产物引用契约，不承载实际文件内容。
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArtifactReferenceContract {
-    /** 产物资源标识；访问内容时仍需校验所属隔离范围。 */
+    /**
+     * 产物资源标识；访问内容时仍需校验所属隔离范围。
+     */
     private String artifactId;
 
-    /** 当前产物引用契约的可读标题，供宿主界面展示。 */
+    /**
+     * 当前产物引用契约的可读标题，供宿主界面展示。
+     */
     private String title;
 
-    /** 内容的 MIME 媒体类型，供传输、展示与解析策略选择使用。 */
+    /**
+     * 内容的 MIME 媒体类型，供传输、展示与解析策略选择使用。
+     */
     private String mediaType;
 
-    /** 内容大小，单位为字节。 */
+    /**
+     * 内容大小，单位为字节。
+     */
     private Long sizeBytes;
 
     /**

@@ -24,7 +24,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class PublicationConcurrencyTest {
-    @TempDir Path root;
+    @TempDir
+    Path root;
 
     private static AgentReleaseManifest manifest(int version) {
         byte[] content = ("AGENTS R" + version).getBytes(StandardCharsets.UTF_8);
@@ -57,7 +58,7 @@ class PublicationConcurrencyTest {
                 (WorkspaceCatalogRepository)
                         Proxy.newProxyInstance(
                                 getClass().getClassLoader(),
-                                new Class<?>[] {WorkspaceCatalogRepository.class},
+                                new Class<?>[]{WorkspaceCatalogRepository.class},
                                 (proxy, method, args) -> {
                                     throw new AssertionError("Catalog is not consulted by acquire");
                                 });
@@ -106,7 +107,7 @@ class PublicationConcurrencyTest {
             assertTrue(entered.await(2, TimeUnit.SECONDS));
             Future<AgentReleaseSnapshot> other = workers.submit(() -> repo.acquire(manifest(2)));
             try (var second = other.get(2, TimeUnit.SECONDS);
-                    var warm = repo.acquire(manifest(2))) {
+                 var warm = repo.acquire(manifest(2))) {
                 assertEquals(
                         "AGENTS R2",
                         new String(warm.open("AGENTS.md").readAllBytes(), StandardCharsets.UTF_8));
@@ -149,7 +150,7 @@ class PublicationConcurrencyTest {
             Future<AgentReleaseSnapshot> second = workers.submit(() -> repo.acquire(manifest(1)));
             release.countDown();
             try (var a = first.get(2, TimeUnit.SECONDS);
-                    var b = second.get(2, TimeUnit.SECONDS)) {
+                 var b = second.get(2, TimeUnit.SECONDS)) {
                 assertEquals(1, downloads.get());
                 assertThrows(IllegalStateException.class, () -> repo.acquire(manifest(2)));
                 assertEquals(

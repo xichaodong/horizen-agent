@@ -18,13 +18,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-/** 在批量压缩时将会话开头移出压缩区，并在模型调用前原样放回。 */
+/**
+ * 在批量压缩时将会话开头移出压缩区，并在模型调用前原样放回。
+ */
 public final class ProtectedHeadContextMiddleware {
-    /** 开头键的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 开头键的固定取值，用于相应策略和边界判断。
+     */
     private static final String HEAD_KEY = ProtectedHeadContextMiddleware.class.getName();
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private ProtectedHeadContextMiddleware() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private ProtectedHeadContextMiddleware() {
+    }
 
     /**
      * 在处理前准备压缩。
@@ -45,9 +52,13 @@ public final class ProtectedHeadContextMiddleware {
         return new AfterMiddleware();
     }
 
-    /** 受保护开头上下文中间件执行前的中间件钩子，接入对应上下文与观测策略。 */
+    /**
+     * 受保护开头上下文中间件执行前的中间件钩子，接入对应上下文与观测策略。
+     */
     private static final class BeforeMiddleware implements MiddlewareBase {
-        /** 当前处理段需要保留的开头消息视图。 */
+        /**
+         * 当前处理段需要保留的开头消息视图。
+         */
         private final int protectedMessages;
 
         /**
@@ -76,10 +87,10 @@ public final class ProtectedHeadContextMiddleware {
         /**
          * 响应模型推理。
          *
-         * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+         * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
          * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-         * @param input 本次处理的输入。
-         * @param next 将输入转换为目标结果的函数。
+         * @param input   本次处理的输入。
+         * @param next    将输入转换为目标结果的函数。
          * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
          */
         @Override
@@ -106,7 +117,9 @@ public final class ProtectedHeadContextMiddleware {
         }
     }
 
-    /** 受保护开头上下文中间件执行后的中间件钩子，接入对应上下文与观测策略。 */
+    /**
+     * 受保护开头上下文中间件执行后的中间件钩子，接入对应上下文与观测策略。
+     */
     private static final class AfterMiddleware implements MiddlewareBase {
         /**
          * 返回本策略在中间件链中的执行顺序，供运行时排列处理步骤。
@@ -121,10 +134,10 @@ public final class ProtectedHeadContextMiddleware {
         /**
          * 响应模型推理。
          *
-         * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+         * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
          * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-         * @param input 本次处理的输入。
-         * @param next 将输入转换为目标结果的函数。
+         * @param input   本次处理的输入。
+         * @param next    将输入转换为目标结果的函数。
          * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
          */
         @Override
@@ -151,22 +164,30 @@ public final class ProtectedHeadContextMiddleware {
         }
     }
 
-    /** 受保护开头上下文中间件内部的切分，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 受保护开头上下文中间件内部的切分，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class Split {
-        /** 系统的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+        /**
+         * 系统的有序集合，保留当前组件处理或协议输出所需的顺序。
+         */
         private final List<Msg> system;
 
-        /** 开头的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+        /**
+         * 开头的有序集合，保留当前组件处理或协议输出所需的顺序。
+         */
         private final List<Msg> head;
 
-        /** 缺省开头的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+        /**
+         * 缺省开头的有序集合，保留当前组件处理或协议输出所需的顺序。
+         */
         private final List<Msg> withoutHead;
 
         /**
          * 从输入构造切分。
          *
-         * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+         * @param messages          消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
          * @param protectedMessages 当前切分使用的受保护消息集合，供其处理与状态记录使用。
          * @return 本次操作返回的切分结果。
          */
@@ -204,8 +225,8 @@ public final class ProtectedHeadContextMiddleware {
                     messages == null
                             ? List.of()
                             : messages.stream()
-                                    .filter(message -> message.getRole() == MsgRole.SYSTEM)
-                                    .toList();
+                            .filter(message -> message.getRole() == MsgRole.SYSTEM)
+                            .toList();
             List<Msg> restored = new ArrayList<>(currentSystem.isEmpty() ? system : currentSystem);
             restored.addAll(head);
             if (messages != null) {

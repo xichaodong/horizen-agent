@@ -35,14 +35,14 @@ class MyBatisStatementBudgetTest {
                         return (Connection)
                                 Proxy.newProxyInstance(
                                         Connection.class.getClassLoader(),
-                                        new Class<?>[] {Connection.class},
+                                        new Class<?>[]{Connection.class},
                                         (proxy, method, args) -> {
                                             Object result = invoke(connection, method, args);
                                             if (!(result instanceof PreparedStatement statement))
                                                 return result;
                                             return Proxy.newProxyInstance(
                                                     PreparedStatement.class.getClassLoader(),
-                                                    new Class<?>[] {PreparedStatement.class},
+                                                    new Class<?>[]{PreparedStatement.class},
                                                     (ignored, statementMethod, parameters) -> {
                                                         if (statementMethod
                                                                 .getName()

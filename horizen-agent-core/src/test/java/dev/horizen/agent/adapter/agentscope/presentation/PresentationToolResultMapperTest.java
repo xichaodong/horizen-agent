@@ -19,11 +19,11 @@ class PresentationToolResultMapperTest {
         ToolResultBlock result =
                 ToolResultBlock.text(
                                 """
-                {"safeResult":{"answer":"ok","presentation":{"schemaVersion":1,"blocks":[
-                  {"type":"conclusion","severity":"P1","title":"流量下降"},
-                  {"type":"action","data":{"title":"回滚主图","actionLabel":"去修改"}}
-                ]}}}
-                """)
+                                        {"safeResult":{"answer":"ok","presentation":{"schemaVersion":1,"blocks":[
+                                          {"type":"conclusion","severity":"P1","title":"流量下降"},
+                                          {"type":"action","data":{"title":"回滚主图","actionLabel":"去修改"}}
+                                        ]}}}
+                                        """)
                         .withState(ToolResultState.SUCCESS);
 
         List<PresentationBlock> blocks = PresentationToolResultMapper.extract(result, "call-1");
@@ -43,8 +43,8 @@ class PresentationToolResultMapperTest {
         ToolResultBlock result =
                 ToolResultBlock.text(
                         """
-            {"title":"looks like a card","metrics":[{"value":42}]}
-            """);
+                                {"title":"looks like a card","metrics":[{"value":42}]}
+                                """);
         assertTrue(PresentationToolResultMapper.extract(result, "call-1").isEmpty());
     }
 
@@ -53,8 +53,8 @@ class PresentationToolResultMapperTest {
         ToolResultBlock malformed =
                 ToolResultBlock.text(
                         """
-            {"presentation":{"schemaVersion":1,"blocks":[{"title":"missing type"}]}}
-            """);
+                                {"presentation":{"schemaVersion":1,"blocks":[{"title":"missing type"}]}}
+                                """);
         ToolResultBlock failed = ToolResultBlock.error("failed");
         var originalState = malformed.getState();
         var notified = new AtomicBoolean();

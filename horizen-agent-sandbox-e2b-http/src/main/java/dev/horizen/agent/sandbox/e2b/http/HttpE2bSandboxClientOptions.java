@@ -11,57 +11,116 @@ import okhttp3.OkHttpClient;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** 普通 JSON 管理接口与同步 envd 命令接口的配置。 */
+/**
+ * 普通 JSON 管理接口与同步 envd 命令接口的配置。
+ */
 public class HttpE2bSandboxClientOptions extends SandboxClientOptions {
-    /** 共享的 HTTP 客户端，复用连接并应用当前传输超时配置。 */
-    @Setter @Getter private OkHttpClient httpClient;
+    /**
+     * 共享的 HTTP 客户端，复用连接并应用当前传输超时配置。
+     */
+    @Setter
+    @Getter
+    private OkHttpClient httpClient;
 
-    /** 模型或服务访问凭据，只供服务端调用使用。 */
-    @Setter @Getter private String apiKey;
+    /**
+     * 模型或服务访问凭据，只供服务端调用使用。
+     */
+    @Setter
+    @Getter
+    private String apiKey;
 
-    /** 远端沙箱管理 API 的基础地址。 */
-    @Setter @Getter private String apiBaseUrl;
+    /**
+     * 远端沙箱管理 API 的基础地址。
+     */
+    @Setter
+    @Getter
+    private String apiBaseUrl;
 
-    /** 根据沙箱标识构造运行端访问地址的模板。 */
-    @Setter @Getter private String runtimeBaseUrlPattern;
+    /**
+     * 根据沙箱标识构造运行端访问地址的模板。
+     */
+    @Setter
+    @Getter
+    private String runtimeBaseUrlPattern;
 
-    /** 模板的标识，用于关联相应记录或执行。 */
-    @Setter @Getter private String templateId;
+    /**
+     * 模板的标识，用于关联相应记录或执行。
+     */
+    @Setter
+    @Getter
+    private String templateId;
 
-    /** 执行工作区的根目录，用于解析任务文件与脚本路径。 */
+    /**
+     * 执行工作区的根目录，用于解析任务文件与脚本路径。
+     */
     @Getter(onMethod_ = @Override)
     @Setter
     private String workspaceRoot = "/tmp/horizen-agent";
 
-    /** 沙箱超时，单位为秒。 */
-    @Setter @Getter private int sandboxTimeoutSeconds = 300;
+    /**
+     * 沙箱超时，单位为秒。
+     */
+    @Setter
+    @Getter
+    private int sandboxTimeoutSeconds = 300;
 
-    /** 连接超时，单位为秒。 */
-    @Setter @Getter private int connectTimeoutSeconds = 30;
+    /**
+     * 连接超时，单位为秒。
+     */
+    @Setter
+    @Getter
+    private int connectTimeoutSeconds = 30;
 
-    /** 读取超时，单位为秒。 */
-    @Setter @Getter private int readTimeoutSeconds = 180;
+    /**
+     * 读取超时，单位为秒。
+     */
+    @Setter
+    @Getter
+    private int readTimeoutSeconds = 180;
 
-    /** 命令输出允许保留的最大字节数，超出时按执行器策略处理。 */
-    @Setter @Getter private int maxOutputBytes = 512 * 1024;
+    /**
+     * 命令输出允许保留的最大字节数，超出时按执行器策略处理。
+     */
+    @Setter
+    @Getter
+    private int maxOutputBytes = 512 * 1024;
 
-    /** 最大快照的字节数，用于容量或传输限制。 */
-    @Getter private long maxSnapshotBytes = 64L * 1024 * 1024;
+    /**
+     * 最大快照的字节数，用于容量或传输限制。
+     */
+    @Getter
+    private long maxSnapshotBytes = 64L * 1024 * 1024;
 
-    /** 单个工作区快照允许包含的条目数量上限。 */
-    @Getter private int maxSnapshotEntries = 10000;
+    /**
+     * 单个工作区快照允许包含的条目数量上限。
+     */
+    @Getter
+    private int maxSnapshotEntries = 10000;
 
-    /** 快照超时，单位为秒。 */
-    @Getter private int snapshotTimeoutSeconds = 120;
+    /**
+     * 快照超时，单位为秒。
+     */
+    @Getter
+    private int snapshotTimeoutSeconds = 120;
 
-    /** 运行环境的标识，供远端按环境组织观测数据。 */
-    @Getter private Map<String, String> environment = Map.of();
+    /**
+     * 运行环境的标识，供远端按环境组织观测数据。
+     */
+    @Getter
+    private Map<String, String> environment = Map.of();
 
-    /** 与当前对象关联的附加元数据，不替代领域状态或授权校验。 */
-    @Getter private Map<String, String> metadata = Map.of();
+    /**
+     * 与当前对象关联的附加元数据，不替代领域状态或授权校验。
+     */
+    @Getter
+    private Map<String, String> metadata = Map.of();
 
-    /** refresh已发布工作区的状态标记，用于选择当前组件的处理路径。 */
-    @Getter @Setter private boolean refreshPublishedWorkspace;
+    /**
+     * refresh已发布工作区的状态标记，用于选择当前组件的处理路径。
+     */
+    @Getter
+    @Setter
+    private boolean refreshPublishedWorkspace;
 
     /**
      * 读取类型。

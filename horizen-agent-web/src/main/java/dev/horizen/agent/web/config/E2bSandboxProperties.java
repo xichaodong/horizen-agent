@@ -14,71 +14,95 @@ import java.beans.ConstructorProperties;
 import java.net.URI;
 import java.util.Map;
 
-/** 本地 Web 测试宿主使用的 E2B 沙箱配置。 */
+/**
+ * 本地 Web 测试宿主使用的 E2B 沙箱配置。
+ */
 @ConfigurationProperties(prefix = "horizen.agent.sandbox.e2b")
 @Getter
 @EqualsAndHashCode
 public class E2bSandboxProperties {
-    /** 是否启用2B沙箱对应的功能。 */
+    /**
+     * 是否启用2B沙箱对应的功能。
+     */
     private final boolean enabled;
 
-    /** 模型或服务访问凭据，只供服务端调用使用。 */
+    /**
+     * 模型或服务访问凭据，只供服务端调用使用。
+     */
     private final String apiKey;
 
-    /** 远端沙箱管理 API 的基础地址。 */
+    /**
+     * 远端沙箱管理 API 的基础地址。
+     */
     private final String apiBaseUrl;
 
-    /** 根据沙箱标识构造运行端访问地址的模板。 */
+    /**
+     * 根据沙箱标识构造运行端访问地址的模板。
+     */
     private final String runtimeBaseUrlPattern;
 
-    /** 模板的标识，用于关联相应记录或执行。 */
+    /**
+     * 模板的标识，用于关联相应记录或执行。
+     */
     private final String templateId;
 
-    /** 执行工作区的根目录，用于解析任务文件与脚本路径。 */
+    /**
+     * 执行工作区的根目录，用于解析任务文件与脚本路径。
+     */
     private final String workspaceRoot;
 
-    /** 沙箱超时，单位为秒。 */
+    /**
+     * 沙箱超时，单位为秒。
+     */
     private final Integer sandboxTimeoutSeconds;
 
-    /** 沙箱或状态隔离范围，由宿主选择并传给运行时。 */
+    /**
+     * 沙箱或状态隔离范围，由宿主选择并传给运行时。
+     */
     private final IsolationScope isolationScope;
 
-    /** 连接超时，单位为秒。 */
+    /**
+     * 连接超时，单位为秒。
+     */
     private final Integer connectTimeoutSeconds;
 
-    /** 读取超时，单位为秒。 */
+    /**
+     * 读取超时，单位为秒。
+     */
     private final Integer readTimeoutSeconds;
 
-    /** 命令输出允许保留的最大字节数，超出时按执行器策略处理。 */
+    /**
+     * 命令输出允许保留的最大字节数，超出时按执行器策略处理。
+     */
     private final Integer maxOutputBytes;
 
     /**
      * 创建2B沙箱配置，初始化该组件所需的状态、配置或依赖。
      *
-     * @param enabled 是否启用2B沙箱对应的功能。
-     * @param apiKey 模型或服务访问凭据，只供服务端调用使用。
-     * @param apiBaseUrl 当前2B沙箱配置使用的API基础URL，供其处理与状态记录使用。
+     * @param enabled               是否启用2B沙箱对应的功能。
+     * @param apiKey                模型或服务访问凭据，只供服务端调用使用。
+     * @param apiBaseUrl            当前2B沙箱配置使用的API基础URL，供其处理与状态记录使用。
      * @param runtimeBaseUrlPattern 当前2B沙箱配置使用的运行时基础URL校验模式，供其处理与状态记录使用。
-     * @param templateId 模板的标识，用于关联相应记录或执行。
-     * @param workspaceRoot 执行工作区的根目录，用于解析任务文件与脚本路径。
+     * @param templateId            模板的标识，用于关联相应记录或执行。
+     * @param workspaceRoot         执行工作区的根目录，用于解析任务文件与脚本路径。
      * @param sandboxTimeoutSeconds 沙箱超时，单位为秒。
-     * @param isolationScope 沙箱或状态隔离范围，由宿主选择并传给运行时。
+     * @param isolationScope        沙箱或状态隔离范围，由宿主选择并传给运行时。
      * @param connectTimeoutSeconds 连接超时，单位为秒。
-     * @param readTimeoutSeconds 读取超时，单位为秒。
-     * @param maxOutputBytes 命令输出允许保留的最大字节数，超出时按执行器策略处理。
+     * @param readTimeoutSeconds    读取超时，单位为秒。
+     * @param maxOutputBytes        命令输出允许保留的最大字节数，超出时按执行器策略处理。
      */
     @ConstructorProperties({
-        "enabled",
-        "apiKey",
-        "apiBaseUrl",
-        "runtimeBaseUrlPattern",
-        "templateId",
-        "workspaceRoot",
-        "sandboxTimeoutSeconds",
-        "isolationScope",
-        "connectTimeoutSeconds",
-        "readTimeoutSeconds",
-        "maxOutputBytes"
+            "enabled",
+            "apiKey",
+            "apiBaseUrl",
+            "runtimeBaseUrlPattern",
+            "templateId",
+            "workspaceRoot",
+            "sandboxTimeoutSeconds",
+            "isolationScope",
+            "connectTimeoutSeconds",
+            "readTimeoutSeconds",
+            "maxOutputBytes"
     })
     public E2bSandboxProperties(
             boolean enabled,
@@ -214,9 +238,9 @@ public class E2bSandboxProperties {
     /**
      * 计算或取得本方法声明的结果，供当前E2bSandboxProperties处理步骤使用。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value    待校验、转换或保存的原始值。
      * @param fallback 当前2B沙箱配置使用的回退，供其处理与状态记录使用。
-     * @param name 需要定位或处理的名称。
+     * @param name     需要定位或处理的名称。
      * @return 本次操作返回的整数结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -231,7 +255,7 @@ public class E2bSandboxProperties {
     /**
      * 生成当前操作所需的text文本，供调用方继续处理。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value    待校验、转换或保存的原始值。
      * @param fallback 当前2B沙箱配置使用的回退，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */
@@ -255,7 +279,7 @@ public class E2bSandboxProperties {
      * 取得并校验2B沙箱配置。
      *
      * @param value 待校验、转换或保存的原始值。
-     * @param name 需要定位或处理的名称。
+     * @param name  需要定位或处理的名称。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private static void require(String value, String name) {

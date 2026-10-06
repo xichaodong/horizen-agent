@@ -1,12 +1,19 @@
 package dev.horizen.agent.execution.session;
 
-/** 首次 Turn 创建 Session 时采用的默认标题策略。 */
+/**
+ * 首次 Turn 创建 Session 时采用的默认标题策略。
+ */
 public final class SessionTitlePolicy {
-    /** 最大代码POINTS的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大代码POINTS的固定取值，用于相应策略和边界判断。
+     */
     private static final int MAX_CODE_POINTS = 20;
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private SessionTitlePolicy() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private SessionTitlePolicy() {
+    }
 
     /**
      * 从输入构造首个消息。

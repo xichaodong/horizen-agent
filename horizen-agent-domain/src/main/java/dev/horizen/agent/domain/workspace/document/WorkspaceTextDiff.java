@@ -2,15 +2,20 @@ package dev.horizen.agent.domain.workspace.document;
 
 import java.util.Map;
 
-/** 工作区审计事实中的最小连续文本变更。 */
+/**
+ * 工作区审计事实中的最小连续文本变更。
+ */
 public final class WorkspaceTextDiff {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private WorkspaceTextDiff() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private WorkspaceTextDiff() {
+    }
 
     /**
      * 计算或取得本方法声明的结果，供当前WorkspaceTextDiff处理步骤使用。
      *
-     * @param old 当前工作区文本Diff使用的old，供其处理与状态记录使用。
+     * @param old  当前工作区文本Diff使用的old，供其处理与状态记录使用。
      * @param next 当前工作区文本Diff使用的下一个，供其处理与状态记录使用。
      * @return 按返回类型约定组织的结果映射。
      */

@@ -9,12 +9,18 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-/** 使用 BOS 保存 Artifact 内容，contentRef 始终是受限的 BOS object key。 */
+/**
+ * 使用 BOS 保存 Artifact 内容，contentRef 始终是受限的 BOS object key。
+ */
 public final class BosArtifactContentStore implements ArtifactContentStore {
-    /** 当前组件的配置与策略参数。 */
+    /**
+     * 当前组件的配置与策略参数。
+     */
     private final BosArtifactContentStoreConfig config;
 
-    /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+    /**
+     * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     */
     private final BosObjectClient client;
 
     /**
@@ -71,7 +77,7 @@ public final class BosArtifactContentStore implements ArtifactContentStore {
     /**
      * 创建下载URL。
      *
-     * @param contentRef 内容存储引用；它定位实际字节内容，不等同于临时下载 URL。
+     * @param contentRef       内容存储引用；它定位实际字节内容，不等同于临时下载 URL。
      * @param expiresInSeconds 资源访问的有效时长，单位为秒。
      * @return 本次操作返回的URI结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -98,7 +104,7 @@ public final class BosArtifactContentStore implements ArtifactContentStore {
     /**
      * 生成当前操作所需的keyFor文本，供调用方继续处理。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey   宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param artifactId 产物资源标识；访问内容时仍需校验所属隔离范围。
      * @return 本次处理生成或读取的文本。
      */

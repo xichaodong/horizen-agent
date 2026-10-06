@@ -30,12 +30,18 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-/** 通用远程 Tool Provider 客户端；调用失败不自动重试，重定向时也不转发凭据。 */
+/**
+ * 通用远程 Tool Provider 客户端；调用失败不自动重试，重定向时也不转发凭据。
+ */
 public final class GatewayClient implements GatewayBackend {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 受保护字段集合的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 受保护字段集合的固定取值，用于相应策略和边界判断。
+     */
     private static final Set<String> PROTECTED_FIELDS =
             Set.of(
                     "runid",
@@ -62,41 +68,55 @@ public final class GatewayClient implements GatewayBackend {
                     "token",
                     "accesstoken");
 
-    /** 密钥字段集合的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 密钥字段集合的固定取值，用于相应策略和边界判断。
+     */
     private static final Set<String> SECRET_FIELDS =
             Set.of("authorization", "token", "accesstoken");
 
-    /** 远端服务的基础地址，用于拼接接口路径。 */
+    /**
+     * 远端服务的基础地址，用于拼接接口路径。
+     */
     private final URI baseUrl;
 
-    /** 服务访问令牌，由宿主配置提供，用于请求认证。 */
+    /**
+     * 服务访问令牌，由宿主配置提供，用于请求认证。
+     */
     private final String token;
 
-    /** 超时的时间配置，供等待、调度或失效判断使用。 */
+    /**
+     * 超时的时间配置，供等待、调度或失效判断使用。
+     */
     private final Duration timeout;
 
-    /** 宿主允许调用的工具名称集合，供目录过滤与执行治理使用。 */
+    /**
+     * 宿主允许调用的工具名称集合，供目录过滤与执行治理使用。
+     */
     private final Set<String> allowedTools;
 
-    /** 用于实际网络请求的共享 HTTP 客户端。 */
+    /**
+     * 用于实际网络请求的共享 HTTP 客户端。
+     */
     private final HttpClient http;
 
     /**
      * 创建网关客户端，初始化该组件所需的状态、配置或依赖。
      *
      * @param baseUrl 远端服务的基础地址，用于拼接接口路径。
-     * @param token 服务访问令牌，由宿主配置提供，用于请求认证。
+     * @param token   服务访问令牌，由宿主配置提供，用于请求认证。
      * @param timeout 本次等待允许持续的最长时间。
      */
     public GatewayClient(URI baseUrl, String token, Duration timeout) {
         this(baseUrl, token, timeout, Set.of());
     }
 
-    /** 空白名单表示工具授权完全交给网关当前目录和策略决定。 */
+    /**
+     * 空白名单表示工具授权完全交给网关当前目录和策略决定。
+     */
     public GatewayClient(URI baseUrl, String token, Duration timeout, Set<String> allowedTools) {
         Objects.requireNonNull(baseUrl, "baseUrl");
         if (!("http".equalsIgnoreCase(baseUrl.getScheme())
-                        || "https".equalsIgnoreCase(baseUrl.getScheme()))
+                || "https".equalsIgnoreCase(baseUrl.getScheme()))
                 || baseUrl.getHost() == null
                 || baseUrl.getUserInfo() != null
                 || baseUrl.getQuery() != null
@@ -138,10 +158,10 @@ public final class GatewayClient implements GatewayBackend {
     /**
      * 调用网关客户端。
      *
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param context    当前执行上下文，提供关联标识和宿主绑定信息。
      * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
-     * @param toolName 可调用工具的注册名称，须与目录中声明的名称一致。
-     * @param input 本次处理的输入。
+     * @param toolName   可调用工具的注册名称，须与目录中声明的名称一致。
+     * @param input      本次处理的输入。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -237,8 +257,8 @@ public final class GatewayClient implements GatewayBackend {
                                         entry.hasNonNull("inputSchema")
                                                 ? entry.get("inputSchema")
                                                 : entry.hasNonNull("input_schema")
-                                                        ? entry.get("input_schema")
-                                                        : entry.get("tool_input");
+                                                ? entry.get("input_schema")
+                                                : entry.get("tool_input");
                                 try {
                                     if (schema != null && schema.isTextual()) {
                                         schema = JSON.readTree(schema.asText());
@@ -291,8 +311,8 @@ public final class GatewayClient implements GatewayBackend {
     /**
      * 计算或取得本方法声明的结果，供当前GatewayClient处理步骤使用。
      *
-     * @param path 需要读取、写入或校验的路径。
-     * @param body 当前网关客户端持有的正文对象，供相应处理步骤使用。
+     * @param path    需要读取、写入或校验的路径。
+     * @param body    当前网关客户端持有的正文对象，供相应处理步骤使用。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      * @throws GatewayException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -348,7 +368,7 @@ public final class GatewayClient implements GatewayBackend {
                             }
                             if (bodyNode.has("protocolVersion")
                                     && bodyNode.path("protocolVersion").asInt(-1)
-                                            != ProviderProtocol.CURRENT_VERSION) {
+                                    != ProviderProtocol.CURRENT_VERSION) {
                                 throw new GatewayException(
                                         error(
                                                 "provider_protocol_version_unsupported",
@@ -368,18 +388,15 @@ public final class GatewayClient implements GatewayBackend {
         String status = body.path("status").asText("").toLowerCase(Locale.ROOT);
         return switch (status) {
             case "success" -> result(ProviderResultStatus.SUCCESS, body);
-            case "approval_required" ->
-                    error(
-                            "provider_protocol_violation",
-                            "Provider requested approval during invoke; approvalPolicy must be declared before"
-                                    + " execution");
-            case "denied", "rejected", "expired", "cancelled" ->
-                    result(ProviderResultStatus.DENIED, body);
+            case "approval_required" -> error(
+                    "provider_protocol_violation",
+                    "Provider requested approval during invoke; approvalPolicy must be declared before"
+                            + " execution");
+            case "denied", "rejected", "expired", "cancelled" -> result(ProviderResultStatus.DENIED, body);
             case "failed", "error" -> result(ProviderResultStatus.ERROR, body);
-            default ->
-                    error(
-                            "gateway_invalid_response",
-                            "Gateway response has an unknown or missing status");
+            default -> error(
+                    "gateway_invalid_response",
+                    "Gateway response has an unknown or missing status");
         };
     }
 
@@ -443,7 +460,7 @@ public final class GatewayClient implements GatewayBackend {
     /**
      * 脱敏网关客户端。
      *
-     * @param node 当前网关客户端持有的节点对象，供相应处理步骤使用。
+     * @param node    当前网关客户端持有的节点对象，供相应处理步骤使用。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
      * @return 本次操作返回的JSON节点结果。
      */
@@ -459,15 +476,15 @@ public final class GatewayClient implements GatewayBackend {
                                     result.set(
                                             field.getKey(),
                                             (SECRET_FIELDS.contains(normalize(field.getKey()))
-                                                            || Set.of(
-                                                                            "ownerkey",
-                                                                            "sessionid",
-                                                                            "turnid",
-                                                                            "callerattributes")
-                                                                    .contains(
-                                                                            normalize(
-                                                                                    field
-                                                                                            .getKey())))
+                                                    || Set.of(
+                                                            "ownerkey",
+                                                            "sessionid",
+                                                            "turnid",
+                                                            "callerattributes")
+                                                    .contains(
+                                                            normalize(
+                                                                    field
+                                                                            .getKey())))
                                                     ? JSON.getNodeFactory().textNode("[redacted]")
                                                     : redact(field.getValue(), context)));
             return result;
@@ -483,7 +500,7 @@ public final class GatewayClient implements GatewayBackend {
     /**
      * 脱敏文本。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value   待校验、转换或保存的原始值。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
      * @return 本次处理生成或读取的文本。
      */
@@ -540,7 +557,7 @@ public final class GatewayClient implements GatewayBackend {
     /**
      * 计算或取得本方法声明的结果，供当前GatewayClient处理步骤使用。
      *
-     * @param code 当前网关客户端使用的代码，供其处理与状态记录使用。
+     * @param code    当前网关客户端使用的代码，供其处理与状态记录使用。
      * @param message 用户输入、响应说明或诊断消息，含义由所属协议对象限定。
      * @return 本次操作返回的网关结果结果。
      */
@@ -557,11 +574,12 @@ public final class GatewayClient implements GatewayBackend {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param body 当前网关客户端持有的正文对象，供相应处理步骤使用。
+     * @param body   当前网关客户端持有的正文对象，供相应处理步骤使用。
      * @return 本次操作返回的网关结果结果。
      */
     private static GatewayResult result(ProviderResultStatus status, JsonNode body) {
         return new GatewayResult(
-                status, JSON.convertValue(body, new TypeReference<Map<String, Object>>() {}));
+                status, JSON.convertValue(body, new TypeReference<Map<String, Object>>() {
+        }));
     }
 }

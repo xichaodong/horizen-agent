@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     CheckCircleFilled,
     CloseCircleFilled,
@@ -37,13 +37,13 @@ import {
 import MessageContent from '../MessageContent.jsx';
 import ActivityIcon from './ActivityIcon.jsx';
 
-const ActivityItem = ({ message, onRetry }) => {
+const ActivityItem = ({message, onRetry}) => {
     const hasBody = Boolean(message.content || message.input || message.output || message.details);
     const [expanded, setExpanded] = useState(
         message.activityType === 'reasoning' ||
-            message.activityType === 'error' ||
-            message.activityType === 'notice' ||
-            ['error', 'failed', 'interrupted'].includes(message.status)
+        message.activityType === 'error' ||
+        message.activityType === 'notice' ||
+        ['error', 'failed', 'interrupted'].includes(message.status)
     );
     const [clock, setClock] = useState(Date.now());
     useEffect(() => {
@@ -55,13 +55,13 @@ const ActivityItem = ({ message, onRetry }) => {
     }, [message.status, message.startedAt]);
     const duration = formatDuration(
         message.durationMs ??
-            (message.status === 'running' && message.startedAt ? clock - message.startedAt : null)
+        (message.status === 'running' && message.startedAt ? clock - message.startedAt : null)
     );
     return (
         <article className={`${PREFIX}__timeline-item is-${message.activityType || 'turn'}`}>
-            <span className={`${PREFIX}__timeline-rail`} aria-hidden="true" />
+            <span className={`${PREFIX}__timeline-rail`} aria-hidden="true"/>
             <span className={`${PREFIX}__timeline-node`}>
-                <ActivityIcon message={message} />
+                <ActivityIcon message={message}/>
             </span>
             <div className={`${PREFIX}__timeline-main`}>
                 {hasBody ? (
@@ -79,11 +79,11 @@ const ActivityItem = ({ message, onRetry }) => {
                             <span className={`${PREFIX}__timeline-status is-${message.status}`}>
                                 {statusLabel(message.status)}
                             </span>
-                            <DownOutlined className={`${PREFIX}__timeline-chevron`} />
+                            <DownOutlined className={`${PREFIX}__timeline-chevron`}/>
                         </summary>
                         {message.content ? (
                             <div className={`${PREFIX}__timeline-copy`}>
-                                <MessageContent content={message.content} />
+                                <MessageContent content={message.content}/>
                             </div>
                         ) : null}
                         {message.input ? (
@@ -107,7 +107,7 @@ const ActivityItem = ({ message, onRetry }) => {
                                 className={`${PREFIX}__retry-button`}
                                 onClick={onRetry}
                             >
-                                <ReloadOutlined /> 重新执行
+                                <ReloadOutlined/> 重新执行
                             </button>
                         ) : null}
                     </details>

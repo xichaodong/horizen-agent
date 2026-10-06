@@ -152,7 +152,8 @@ class ApplicationServicesTest {
                                     ExecutionIdentity identity,
                                     AgentTurn turn,
                                     AskUserRequest request,
-                                    String answersJson) {}
+                                    String answersJson) {
+                            }
 
                             @Override
                             public void timeout(
@@ -397,25 +398,25 @@ class ApplicationServicesTest {
                             .orElseThrow();
             stored =
                     new ApprovalRequest(
-                                    stored.getOwnerKey(),
-                                    stored.getSessionId(),
-                                    stored.getTurnId(),
-                                    stored.getApprovalId(),
-                                    stored.getRequestReplyId(),
-                                    stored.getToolCallId(),
-                                    stored.getToolName(),
-                                    stored.getToolContent(),
-                                    stored.getToolArgumentsJson(),
-                                    command.isApproved()
-                                            ? ApprovalStatus.APPROVED
-                                            : ApprovalStatus.DENIED,
-                                    stored.getRequestedBy(),
-                                    stored.getExpiresAt(),
-                                    command.getDecidedBy(),
-                                    command.getDecidedAt(),
-                                    stored.getCreatedAt(),
-                                    command.getDecidedAt(),
-                                    stored.getVersion() + 1)
+                            stored.getOwnerKey(),
+                            stored.getSessionId(),
+                            stored.getTurnId(),
+                            stored.getApprovalId(),
+                            stored.getRequestReplyId(),
+                            stored.getToolCallId(),
+                            stored.getToolName(),
+                            stored.getToolContent(),
+                            stored.getToolArgumentsJson(),
+                            command.isApproved()
+                                    ? ApprovalStatus.APPROVED
+                                    : ApprovalStatus.DENIED,
+                            stored.getRequestedBy(),
+                            stored.getExpiresAt(),
+                            command.getDecidedBy(),
+                            command.getDecidedAt(),
+                            stored.getCreatedAt(),
+                            command.getDecidedAt(),
+                            stored.getVersion() + 1)
                             .withPresentationJson(stored.getPresentationJson());
             return new ApprovalDecisionResult(ApprovalDecisionResult.Outcome.UPDATED, stored);
         }

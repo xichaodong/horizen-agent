@@ -4,21 +4,31 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** 分组元数据由 Provider 管理，Horizen 不根据名称推断语义。 */
+/**
+ * 分组元数据由 Provider 管理，Horizen 不根据名称推断语义。
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ToolGroupContract {
-    /** 当前工具分组契约的定位标识。 */
+    /**
+     * 当前工具分组契约的定位标识。
+     */
     private String id = "external";
 
-    /** 当前工具分组契约的用途说明，供目录或配置阅读者理解。 */
+    /**
+     * 当前工具分组契约的用途说明，供目录或配置阅读者理解。
+     */
     private String description = "";
 
-    /** 活跃按条件默认的状态标记，用于选择当前组件的处理路径。 */
+    /**
+     * 活跃按条件默认的状态标记，用于选择当前组件的处理路径。
+     */
     private boolean activeByDefault = true;
 
-    /** 是否允许通过匹配 Skill 激活当前工具组。 */
+    /**
+     * 是否允许通过匹配 Skill 激活当前工具组。
+     */
     private String activateOnSkill = "";
 
     /**

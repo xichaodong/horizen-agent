@@ -6,17 +6,22 @@ import dev.horizen.agent.web.stream.RedisTurnEventBridge;
 
 import java.util.*;
 
-/** 合并持久化事实与实时片段，不重复回放已被完整工具快照覆盖的片段。 */
+/**
+ * 合并持久化事实与实时片段，不重复回放已被完整工具快照覆盖的片段。
+ */
 final class ToolHistoryRecovery {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private ToolHistoryRecovery() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private ToolHistoryRecovery() {
+    }
 
     /**
      * 计算或取得本方法声明的结果，供当前ToolHistoryRecovery处理步骤使用。
      *
      * @param snapshot 当前工具历史恢复持有的快照对象，供相应处理步骤使用。
      * @param timeline 时间线的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param mapper   本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
      * @return 本次处理得到的结果集合。
      */
     static List<AgentRuntimeEvent> uncovered(

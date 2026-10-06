@@ -11,15 +11,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-/** 每个 RuntimeContext Turn 最多解析一次适配器目录。 */
+/**
+ * 每个 RuntimeContext Turn 最多解析一次适配器目录。
+ */
 public final class ToolCatalogResolver {
-    /** 把外部 Provider 契约连接到当前运行时的调用适配器。 */
+    /**
+     * 把外部 Provider 契约连接到当前运行时的调用适配器。
+     */
     private final ToolProvider adapter;
 
-    /** 适配器的标识，用于关联相应记录或执行。 */
+    /**
+     * 适配器的标识，用于关联相应记录或执行。
+     */
     private final String adapterId;
 
-    /** 时间来源，用于计算更新时间、过期时间或执行时限。 */
+    /**
+     * 时间来源，用于计算更新时间、过期时间或执行时限。
+     */
     private final Clock clock;
 
     /**
@@ -34,9 +42,9 @@ public final class ToolCatalogResolver {
     /**
      * 创建工具目录解析器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param adapter 当前工具目录解析器持有的适配器对象，供相应处理步骤使用。
+     * @param adapter   当前工具目录解析器持有的适配器对象，供相应处理步骤使用。
      * @param adapterId 适配器的标识，用于关联相应记录或执行。
-     * @param clock 时间来源，用于计算更新时间、过期时间或执行时限。
+     * @param clock     时间来源，用于计算更新时间、过期时间或执行时限。
      */
     ToolCatalogResolver(ToolProvider adapter, String adapterId, Clock clock) {
         this.adapter = Objects.requireNonNull(adapter, "adapter");

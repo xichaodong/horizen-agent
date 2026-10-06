@@ -46,76 +46,122 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
 
-/** Web 宿主持有的 MySQL 与 Redis 客户端集合。 */
+/**
+ * Web 宿主持有的 MySQL 与 Redis 客户端集合。
+ */
 public final class RuntimeStorage implements AutoCloseable {
 
-    /** 当前对象是否拥有连接池的关闭权，避免释放调用方持有的资源。 */
+    /**
+     * 当前对象是否拥有连接池的关闭权，避免释放调用方持有的资源。
+     */
     private final boolean ownsPools;
 
-    /** 当前存储适配器使用的数据源；资源所有权由组装方约定。 */
+    /**
+     * 当前存储适配器使用的数据源；资源所有权由组装方约定。
+     */
     private final HikariDataSource dataSource;
 
-    /** 用于状态与事件读写的 Redis 命令客户端。 */
+    /**
+     * 用于状态与事件读写的 Redis 命令客户端。
+     */
     private final JedisPooled redisCommands;
 
-    /** 用于订阅或专用连接的 Redis 连接池。 */
+    /**
+     * 用于订阅或专用连接的 Redis 连接池。
+     */
     private final JedisPool redisSubscriptions;
 
-    /** 负责会话占用、执行事实与正式消息的持久化端口。 */
-    @Getter private final SessionTurnStore sessionTurns;
+    /**
+     * 负责会话占用、执行事实与正式消息的持久化端口。
+     */
+    @Getter
+    private final SessionTurnStore sessionTurns;
 
-    /** 审批存储或待处理审批集合，用于原执行的暂停与恢复。 */
-    @Getter private final ApprovalStore approvals;
+    /**
+     * 审批存储或待处理审批集合，用于原执行的暂停与恢复。
+     */
+    @Getter
+    private final ApprovalStore approvals;
 
-    /** 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。 */
-    @Getter private final UnitOfWork transactions;
+    /**
+     * 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     */
+    @Getter
+    private final UnitOfWork transactions;
 
-    /** 产物管理依赖或产物集合，用于引用、读取与交付资源。 */
-    @Getter private final ArtifactStore artifacts;
+    /**
+     * 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     */
+    @Getter
+    private final ArtifactStore artifacts;
 
-    /** 澄清请求的存储或服务，用于回答处理与执行恢复。 */
-    @Getter private final AskUserStore askUsers;
+    /**
+     * 澄清请求的存储或服务，用于回答处理与执行恢复。
+     */
+    @Getter
+    private final AskUserStore askUsers;
 
-    /** 需要持久化或展示的结构化呈现块集合。 */
-    @Getter private final PresentationStore presentations;
+    /**
+     * 需要持久化或展示的结构化呈现块集合。
+     */
+    @Getter
+    private final PresentationStore presentations;
 
-    /** 存储正式过程事件的时间线端口，供持久化与刷新恢复使用。 */
-    @Getter private final TurnTimelineStore timeline;
+    /**
+     * 存储正式过程事件的时间线端口，供持久化与刷新恢复使用。
+     */
+    @Getter
+    private final TurnTimelineStore timeline;
 
-    /** 保存原会话与完整发布绑定的仓储。 */
-    @Getter private final SessionWorkspaceReleaseRepository workspaceReleases;
+    /**
+     * 保存原会话与完整发布绑定的仓储。
+     */
+    @Getter
+    private final SessionWorkspaceReleaseRepository workspaceReleases;
 
-    /** 跨会话记忆与受管文本工作区的文档仓储。 */
-    @Getter private final WorkspaceDocumentRepository workspaceDocuments;
+    /**
+     * 跨会话记忆与受管文本工作区的文档仓储。
+     */
+    @Getter
+    private final WorkspaceDocumentRepository workspaceDocuments;
 
-    /** 保存会话最近工作区快照引用的仓储。 */
-    @Getter private final WorkspaceSnapshotPointerRepository snapshotPointers;
+    /**
+     * 保存会话最近工作区快照引用的仓储。
+     */
+    @Getter
+    private final WorkspaceSnapshotPointerRepository snapshotPointers;
 
-    /** 共享的 Agent 工作状态存储，用于跨实例执行与恢复。 */
-    @Getter private final RedisAgentRuntimeStore distributedStore;
+    /**
+     * 共享的 Agent 工作状态存储，用于跨实例执行与恢复。
+     */
+    @Getter
+    private final RedisAgentRuntimeStore distributedStore;
 
-    /** 当前服务实例标识，用于区分分布式执行与资源统计。 */
-    @Getter private final String instanceId;
+    /**
+     * 当前服务实例标识，用于区分分布式执行与资源统计。
+     */
+    @Getter
+    private final String instanceId;
 
     /**
      * 创建运行时存储，初始化该组件所需的状态、配置或依赖。
      *
-     * @param dataSource 当前存储适配器使用的数据源；资源所有权由组装方约定。
-     * @param redisCommands 用于状态与事件读写的 Redis 命令客户端。
+     * @param dataSource         当前存储适配器使用的数据源；资源所有权由组装方约定。
+     * @param redisCommands      用于状态与事件读写的 Redis 命令客户端。
      * @param redisSubscriptions 用于订阅或专用连接的 Redis 连接池。
-     * @param sessionTurns 提供会话执行集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param approvals 审批存储或待处理审批集合，用于原执行的暂停与恢复。
-     * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
-     * @param askUsers 澄清请求的存储或服务，用于回答处理与执行恢复。
-     * @param presentations 需要持久化或展示的结构化呈现块集合。
-     * @param timeline 提供时间线能力的依赖，具体实现由当前组件的组装方传入。
-     * @param workspaceReleases 提供工作区发布集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param sessionTurns       提供会话执行集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param approvals          审批存储或待处理审批集合，用于原执行的暂停与恢复。
+     * @param artifacts          产物管理依赖或产物集合，用于引用、读取与交付资源。
+     * @param askUsers           澄清请求的存储或服务，用于回答处理与执行恢复。
+     * @param presentations      需要持久化或展示的结构化呈现块集合。
+     * @param timeline           提供时间线能力的依赖，具体实现由当前组件的组装方传入。
+     * @param workspaceReleases  提供工作区发布集合能力的依赖，具体实现由当前组件的组装方传入。
      * @param workspaceDocuments 提供工作区文档集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param distributedStore 共享的 Agent 工作状态存储，用于跨实例执行与恢复。
-     * @param instanceId 当前服务实例标识，用于区分分布式执行与资源统计。
-     * @param pointers 提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param transactions 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
-     * @param ownsPools 当前对象是否拥有连接池的关闭权，避免释放调用方持有的资源。
+     * @param distributedStore   共享的 Agent 工作状态存储，用于跨实例执行与恢复。
+     * @param instanceId         当前服务实例标识，用于区分分布式执行与资源统计。
+     * @param pointers           提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param transactions       执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     * @param ownsPools          当前对象是否拥有连接池的关闭权，避免释放调用方持有的资源。
      */
     private RuntimeStorage(
             HikariDataSource dataSource,
@@ -156,7 +202,7 @@ public final class RuntimeStorage implements AutoCloseable {
      * 计算或取得本方法声明的结果，供当前RuntimeStorage处理步骤使用。
      *
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
-     * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     * @param contents   资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      * @return 本次操作返回的运行时存储结果。
      */
     public static RuntimeStorage open(
@@ -167,10 +213,10 @@ public final class RuntimeStorage implements AutoCloseable {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
-     * @param leaseQueryTimeout 租约查询允许持续的最长等待时间。
+     * @param properties               宿主绑定的配置对象，供组件组装与策略校验使用。
+     * @param leaseQueryTimeout        租约查询允许持续的最长等待时间。
      * @param connectionAcquireTimeout 连接取得租约允许持续的最长等待时间。
-     * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     * @param contents                 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      * @return 本次操作返回的运行时存储结果。
      */
     public static RuntimeStorage open(
@@ -249,21 +295,21 @@ public final class RuntimeStorage implements AutoCloseable {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param source 待解析或转换的来源对象。
-     * @param commands 当前运行时存储持有的命令集合对象，供相应处理步骤使用。
+     * @param source        待解析或转换的来源对象。
+     * @param commands      当前运行时存储持有的命令集合对象，供相应处理步骤使用。
      * @param subscriptions 当前运行时存储持有的订阅集合对象，供相应处理步骤使用。
-     * @param turns 提供执行集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param approvals 审批存储或待处理审批集合，用于原执行的暂停与恢复。
-     * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
-     * @param asks 提供提问集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param turns         提供执行集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param approvals     审批存储或待处理审批集合，用于原执行的暂停与恢复。
+     * @param artifacts     产物管理依赖或产物集合，用于引用、读取与交付资源。
+     * @param asks          提供提问集合能力的依赖，具体实现由当前组件的组装方传入。
      * @param presentations 需要持久化或展示的结构化呈现块集合。
-     * @param timeline 提供时间线能力的依赖，具体实现由当前组件的组装方传入。
-     * @param releases 提供发布集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param documents 提供文档集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param pointers 提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param transactions 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
-     * @param distributed 提供分布式能力的依赖，具体实现由当前组件的组装方传入。
-     * @param instanceId 当前服务实例标识，用于区分分布式执行与资源统计。
+     * @param timeline      提供时间线能力的依赖，具体实现由当前组件的组装方传入。
+     * @param releases      提供发布集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param documents     提供文档集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param pointers      提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param transactions  执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     * @param distributed   提供分布式能力的依赖，具体实现由当前组件的组装方传入。
+     * @param instanceId    当前服务实例标识，用于区分分布式执行与资源统计。
      * @return 本次操作返回的运行时存储结果。
      */
     public static RuntimeStorage managed(
@@ -345,7 +391,9 @@ public final class RuntimeStorage implements AutoCloseable {
                         redisSubscriptions.getNumWaiters(), redisSubscriptions.getMaxTotal()));
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
     public void close() {
         if (!ownsPools) return;
@@ -354,54 +402,82 @@ public final class RuntimeStorage implements AutoCloseable {
         dataSource.close();
     }
 
-    /** JDBC 连接池当前活跃、空闲、等待与容量统计。 */
+    /**
+     * JDBC 连接池当前活跃、空闲、等待与容量统计。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DatabasePoolStatus {
-        /** 当前仍处于观察状态的 SSE 连接数。 */
+        /**
+         * 当前仍处于观察状态的 SSE 连接数。
+         */
         private int activeConnections;
 
-        /** 连接池中当前空闲可复用的连接数量。 */
+        /**
+         * 连接池中当前空闲可复用的连接数量。
+         */
         private int idleConnections;
 
-        /** 自本实例启动以来接收的 SSE 连接总数。 */
+        /**
+         * 自本实例启动以来接收的 SSE 连接总数。
+         */
         private int totalConnections;
 
-        /** 当前等待从连接池取得连接的线程数量。 */
+        /**
+         * 当前等待从连接池取得连接的线程数量。
+         */
         private int threadsAwaitingConnection;
 
-        /** 该连接池配置的最大连接数量。 */
+        /**
+         * 该连接池配置的最大连接数量。
+         */
         private int maximumPoolSize;
     }
 
-    /** Redis 命令池和订阅池的运行资源快照。 */
+    /**
+     * Redis 命令池和订阅池的运行资源快照。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RedisPoolsStatus {
-        /** 当前组件用于普通状态读写的 Redis 命令客户端。 */
+        /**
+         * 当前组件用于普通状态读写的 Redis 命令客户端。
+         */
         private RedisPoolStatus commands;
 
-        /** 当前组件用于实时订阅的专用连接或连接池。 */
+        /**
+         * 当前组件用于实时订阅的专用连接或连接池。
+         */
         private RedisPoolStatus subscriptions;
     }
 
-    /** 单个 Redis 连接池当前连接与等待统计。 */
+    /**
+     * 单个 Redis 连接池当前连接与等待统计。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RedisPoolStatus {
-        /** 当前仍处于观察状态的 SSE 连接数。 */
+        /**
+         * 当前仍处于观察状态的 SSE 连接数。
+         */
         private int activeConnections;
 
-        /** 连接池中当前空闲可复用的连接数量。 */
+        /**
+         * 连接池中当前空闲可复用的连接数量。
+         */
         private int idleConnections;
 
-        /** 当前等待从连接池取得连接的线程数量。 */
+        /**
+         * 当前等待从连接池取得连接的线程数量。
+         */
         private int threadsAwaitingConnection;
 
-        /** 该连接池配置的最大连接数量。 */
+        /**
+         * 该连接池配置的最大连接数量。
+         */
         private int maximumPoolSize;
     }
 }

@@ -11,48 +11,78 @@ import java.beans.ConstructorProperties;
 import java.time.Instant;
 import java.util.Objects;
 
-/** 长期存在的对话容器，通过 activeTurnId 指向当前执行。 */
+/**
+ * 长期存在的对话容器，通过 activeTurnId 指向当前执行。
+ */
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 public class AgentSession {
-    /** 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。 */
-    @EqualsAndHashCode.Include private final String ownerKey;
+    /**
+     * 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     */
+    @EqualsAndHashCode.Include
+    private final String ownerKey;
 
-    /** 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。 */
-    @EqualsAndHashCode.Include private final String sessionId;
+    /**
+     * 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     */
+    @EqualsAndHashCode.Include
+    private final String sessionId;
 
-    /** 当前记录或执行的状态，具体取值由所属领域或协议约定。 */
+    /**
+     * 当前记录或执行的状态，具体取值由所属领域或协议约定。
+     */
     private SessionStatus status;
 
-    /** 会话当前占用的执行标识；无活跃执行时为空。 */
+    /**
+     * 会话当前占用的执行标识；无活跃执行时为空。
+     */
     private String activeTurnId;
 
-    /** 工作区快照的持久引用，用于后续执行恢复文件内容。 */
+    /**
+     * 工作区快照的持久引用，用于后续执行恢复文件内容。
+     */
     private String snapshotId;
 
-    /** 该会话已经绑定的完整工作区发布，后续执行继续使用该版本。 */
+    /**
+     * 该会话已经绑定的完整工作区发布，后续执行继续使用该版本。
+     */
     private SessionWorkspaceRelease workspaceRelease;
 
-    /** 创建该记录的操作方标识，用于审计来源。 */
+    /**
+     * 创建该记录的操作方标识，用于审计来源。
+     */
     private String createdBy;
 
-    /** 当前Agent会话的可读标题，供宿主界面展示。 */
+    /**
+     * 当前Agent会话的可读标题，供宿主界面展示。
+     */
     private String title;
 
-    /** 会话是否置顶，影响会话目录展示顺序。 */
+    /**
+     * 会话是否置顶，影响会话目录展示顺序。
+     */
     private boolean pinned;
 
-    /** 会话最近一条正式消息的时间，供会话排序使用。 */
+    /**
+     * 会话最近一条正式消息的时间，供会话排序使用。
+     */
     private Instant lastMessageAt;
 
-    /** 当前记录的创建时间。 */
+    /**
+     * 当前记录的创建时间。
+     */
     private Instant createdAt;
 
-    /** 当前记录最近一次更新的时间。 */
+    /**
+     * 当前记录最近一次更新的时间。
+     */
     private Instant updatedAt;
 
-    /** 记录版本，用于乐观并发控制或区分协议版本。 */
+    /**
+     * 记录版本，用于乐观并发控制或区分协议版本。
+     */
     private long version;
 
     /**
@@ -80,31 +110,31 @@ public class AgentSession {
     /**
      * 创建Agent会话，初始化该组件所需的状态、配置或依赖。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param activeTurnId 会话当前占用的执行标识；无活跃执行时为空。
-     * @param createdBy 当前Agent会话使用的创建按条件，供其处理与状态记录使用。
-     * @param title 当前Agent会话的可读标题，供宿主界面展示。
-     * @param pinned 会话是否置顶，影响会话目录展示顺序。
+     * @param ownerKey      宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId     会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param status        当前记录或执行的状态，具体取值由所属领域或协议约定。
+     * @param activeTurnId  会话当前占用的执行标识；无活跃执行时为空。
+     * @param createdBy     当前Agent会话使用的创建按条件，供其处理与状态记录使用。
+     * @param title         当前Agent会话的可读标题，供宿主界面展示。
+     * @param pinned        会话是否置顶，影响会话目录展示顺序。
      * @param lastMessageAt 会话最近一条正式消息的时间，供会话排序使用。
-     * @param createdAt 当前记录的创建时间。
-     * @param updatedAt 当前记录最近一次更新的时间。
-     * @param version 记录版本，用于乐观并发控制或区分协议版本。
+     * @param createdAt     当前记录的创建时间。
+     * @param updatedAt     当前记录最近一次更新的时间。
+     * @param version       记录版本，用于乐观并发控制或区分协议版本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @ConstructorProperties({
-        "ownerKey",
-        "sessionId",
-        "status",
-        "activeTurnId",
-        "createdBy",
-        "title",
-        "pinned",
-        "lastMessageAt",
-        "createdAt",
-        "updatedAt",
-        "version"
+            "ownerKey",
+            "sessionId",
+            "status",
+            "activeTurnId",
+            "createdBy",
+            "title",
+            "pinned",
+            "lastMessageAt",
+            "createdAt",
+            "updatedAt",
+            "version"
     })
     public AgentSession(
             String ownerKey,

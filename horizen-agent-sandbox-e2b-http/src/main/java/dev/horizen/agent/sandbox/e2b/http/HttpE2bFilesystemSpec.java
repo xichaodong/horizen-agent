@@ -16,24 +16,34 @@ import okhttp3.OkHttpClient;
 import java.nio.file.Path;
 import java.util.Map;
 
-/** 普通 JSON/HTTP E2B 后端的 Harness 文件系统配置。 */
+/**
+ * 普通 JSON/HTTP E2B 后端的 Harness 文件系统配置。
+ */
 public final class HttpE2bFilesystemSpec extends SandboxFilesystemSpec {
-    /** 可供当前请求选择的选项或策略集合。 */
+    /**
+     * 可供当前请求选择的选项或策略集合。
+     */
     @Getter(value = AccessLevel.PROTECTED, onMethod_ = @Override)
     @Accessors(fluent = true)
     private final HttpE2bSandboxClientOptions clientOptions = new HttpE2bSandboxClientOptions();
 
-    /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+    /**
+     * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     */
     @Setter
     @Accessors(fluent = true, chain = true)
     private SandboxClient<?> client;
 
-    /** 远程快照保存与恢复能力的配置。 */
+    /**
+     * 远程快照保存与恢复能力的配置。
+     */
     @Getter(value = AccessLevel.PROTECTED, onMethod_ = @Override)
     @Accessors(fluent = true)
     private SandboxSnapshotSpec snapshotSpec = new NoopSnapshotSpec();
 
-    /** 本次执行工作目录与文件系统能力的配置。 */
+    /**
+     * 本次执行工作目录与文件系统能力的配置。
+     */
     @Getter(value = AccessLevel.PROTECTED, onMethod_ = @Override)
     @Accessors(fluent = true)
     @Setter
@@ -174,8 +184,8 @@ public final class HttpE2bFilesystemSpec extends SandboxFilesystemSpec {
     /**
      * 读取快照中的限制集合。
      *
-     * @param bytes 当前操作处理的内容字节。
-     * @param entries 当前HTTP2B文件系统规范使用的条目集合，供其处理与状态记录使用。
+     * @param bytes          当前操作处理的内容字节。
+     * @param entries        当前HTTP2B文件系统规范使用的条目集合，供其处理与状态记录使用。
      * @param timeoutSeconds 超时，单位为秒。
      * @return 本次操作返回的HTTP2B文件系统规范结果。
      */
@@ -222,6 +232,7 @@ public final class HttpE2bFilesystemSpec extends SandboxFilesystemSpec {
 
     /**
      * 校验当前HTTP2B文件系统规范的输入与状态约束，不满足条件时拒绝继续处理。
+     *
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void validate() {
@@ -241,7 +252,7 @@ public final class HttpE2bFilesystemSpec extends SandboxFilesystemSpec {
      * 取得并校验HTTP2B文件系统规范。
      *
      * @param value 待校验、转换或保存的原始值。
-     * @param name 需要定位或处理的名称。
+     * @param name  需要定位或处理的名称。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private static void require(String value, String name) {

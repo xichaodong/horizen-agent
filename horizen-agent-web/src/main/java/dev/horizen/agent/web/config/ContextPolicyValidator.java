@@ -1,9 +1,14 @@
 package dev.horizen.agent.web.config;
 
-/** 跨字段策略校验，不依赖 AgentScope 组装。 */
+/**
+ * 跨字段策略校验，不依赖 AgentScope 组装。
+ */
 public final class ContextPolicyValidator {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private ContextPolicyValidator() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private ContextPolicyValidator() {
+    }
 
     /**
      * 校验当前上下文策略校验器的输入与状态约束，不满足条件时拒绝继续处理。
@@ -80,7 +85,7 @@ public final class ContextPolicyValidator {
     /**
      * 取得并校验正值。
      *
-     * @param name 需要定位或处理的名称。
+     * @param name  需要定位或处理的名称。
      * @param value 待校验、转换或保存的原始值。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -93,7 +98,7 @@ public final class ContextPolicyValidator {
     /**
      * 取得并校验非Negative。
      *
-     * @param name 需要定位或处理的名称。
+     * @param name  需要定位或处理的名称。
      * @param value 待校验、转换或保存的原始值。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

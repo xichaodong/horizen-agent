@@ -9,19 +9,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/** Horizen API 适配器，附加按内容寻址且可重建的本地缓存。 */
+/**
+ * Horizen API 适配器，附加按内容寻址且可重建的本地缓存。
+ */
 public final class CachedHorizenSkillReleaseRepository implements SkillReleaseRepository {
-    /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+    /**
+     * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     */
     private final HorizenSkillReleaseClient client;
 
-    /** 本组件使用的 {@code SkillReleaseCache} 状态或依赖，用于 cache 的处理。 */
+    /**
+     * 本组件使用的 {@code SkillReleaseCache} 状态或依赖，用于 cache 的处理。
+     */
     private final SkillReleaseCache cache;
 
     /**
      * 创建缓存HorizenSkill发布仓储，初始化该组件所需的状态、配置或依赖。
      *
      * @param client 当前适配器使用的远端客户端，供实际网络或服务请求使用。
-     * @param cache 当前缓存HorizenSkill发布仓储持有的缓存对象，供相应处理步骤使用。
+     * @param cache  当前缓存HorizenSkill发布仓储持有的缓存对象，供相应处理步骤使用。
      */
     public CachedHorizenSkillReleaseRepository(
             HorizenSkillReleaseClient client, SkillReleaseCache cache) {
@@ -48,7 +54,7 @@ public final class CachedHorizenSkillReleaseRepository implements SkillReleaseRe
     /**
      * 查找按条件哈希。
      *
-     * @param catalog 当前资源目录或目录定位键，用于查找可用发布与工具。
+     * @param catalog     当前资源目录或目录定位键，用于查找可用发布与工具。
      * @param releaseHash 发布内容哈希，用于完整性校验和锁定会话的发布内容。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -78,7 +84,7 @@ public final class CachedHorizenSkillReleaseRepository implements SkillReleaseRe
     /**
      * 取得并校验目录。
      *
-     * @param catalog 当前资源目录或目录定位键，用于查找可用发布与工具。
+     * @param catalog  当前资源目录或目录定位键，用于查找可用发布与工具。
      * @param manifest 当前缓存HorizenSkill发布仓储持有的清单对象，供相应处理步骤使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

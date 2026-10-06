@@ -223,10 +223,10 @@ class JdbcHistoryConsolidationTest {
     void draftMessagesRemainExcludedFromFormalHistory() {
         jdbc.update(
                 """
-        INSERT INTO ha_conversation_history (owner_key, session_id, turn_id, record_type,
-            record_id, message_sequence, payload_json, created_at, updated_at)
-        VALUES ('owner', 'session', 'turn', 'MESSAGE', 'draft', 1, ?, ?, ?)
-        """,
+                        INSERT INTO ha_conversation_history (owner_key, session_id, turn_id, record_type,
+                            record_id, message_sequence, payload_json, created_at, updated_at)
+                        VALUES ('owner', 'session', 'turn', 'MESSAGE', 'draft', 1, ?, ?, ?)
+                        """,
                 "{\"role\":\"ASSISTANT\",\"status\":\"DRAFT\",\"content\":\"unfinished\"}",
                 Timestamp.from(now),
                 Timestamp.from(now));

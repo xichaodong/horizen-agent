@@ -26,7 +26,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-/** 双实例黑盒验收使用的确定性模型，不访问外部模型服务。 */
+/**
+ * 双实例黑盒验收使用的确定性模型，不访问外部模型服务。
+ */
 public final class ScriptedWebModel extends ChatModelBase {
 
     /**
@@ -43,8 +45,8 @@ public final class ScriptedWebModel extends ChatModelBase {
      * 计算或取得本方法声明的结果，供当前ScriptedWebModel处理步骤使用。
      *
      * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param tools 工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param options 可供当前请求选择的选项或策略集合。
+     * @param tools    工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param options  可供当前请求选择的选项或策略集合。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -107,8 +109,8 @@ public final class ScriptedWebModel extends ChatModelBase {
                     input.contains("approval")
                             ? "child approval delegated task"
                             : input.contains("clarification")
-                                    ? "child ask delegated task"
-                                    : "child delegated task";
+                            ? "child ask delegated task"
+                            : "child delegated task";
             Map<String, Object> arguments =
                     Map.of("agent_id", "general_worker", "task", task, "timeout_seconds", 30);
             return Flux.just(
@@ -173,8 +175,8 @@ public final class ScriptedWebModel extends ChatModelBase {
                                                                                                     "最近一月"))))))
                                                     .content(
                                                             """
-{"questions":[{"questionId":"scope","type":"single","title":"请选择范围","required":true,"options":[{"optionId":"week","label":"最近一周"},{"optionId":"month","label":"最近一月"}]}]}
-""")
+                                                                    {"questions":[{"questionId":"scope","type":"single","title":"请选择范围","required":true,"options":[{"optionId":"week","label":"最近一周"},{"optionId":"month","label":"最近一月"}]}]}
+                                                                    """)
                                                     .build()))
                             .build());
         }
@@ -206,14 +208,14 @@ public final class ScriptedWebModel extends ChatModelBase {
                                                                                     "medium"))))
                                                     .content(
                                                             """
-{"todos":[{"content":"核验经营数据","status":"completed","priority":"high"},{"content":"输出诊断结论","status":"in_progress","priority":"medium"}]}
-""")
+                                                                    {"todos":[{"content":"核验经营数据","status":"completed","priority":"high"},{"content":"输出诊断结论","status":"in_progress","priority":"medium"}]}
+                                                                    """)
                                                     .build()))
                             .build());
         }
         if (input.startsWith("provider")
                 && tools.stream()
-                        .anyMatch(tool -> "acceptance_provider_tool".equals(tool.getName()))) {
+                .anyMatch(tool -> "acceptance_provider_tool".equals(tool.getName()))) {
             return Flux.just(
                     ChatResponse.builder()
                             .content(
@@ -270,10 +272,14 @@ public final class ScriptedWebModel extends ChatModelBase {
                         .build());
     }
 
-    /** 脚本Web模型内部的审批工具，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 脚本Web模型内部的审批工具，封装该步骤需要的状态或输入输出。
+     */
     public static final class ApprovalTool extends ToolBase
             implements ApprovalPresentationProvider {
-        /** 创建审批工具，初始化该组件所需的状态、配置或依赖。 */
+        /**
+         * 创建审批工具，初始化该组件所需的状态、配置或依赖。
+         */
         public ApprovalTool() {
             super(
                     ToolBase.builder()
@@ -296,7 +302,7 @@ public final class ScriptedWebModel extends ChatModelBase {
         /**
          * 构造并返回当前操作所需的结果对象。
          *
-         * @param input 本次处理的输入。
+         * @param input   本次处理的输入。
          * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
          * @return 本次操作返回的审批呈现结果。
          */

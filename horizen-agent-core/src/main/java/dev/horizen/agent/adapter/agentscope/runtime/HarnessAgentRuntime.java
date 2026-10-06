@@ -41,30 +41,48 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-/** AgentScope Harness 实现；隔离键由宿主生成，本类只负责一致地应用它。 */
+/**
+ * AgentScope Harness 实现；隔离键由宿主生成，本类只负责一致地应用它。
+ */
 public final class HarnessAgentRuntime implements AgentRuntime {
-    /** 当前配置的 Agent 实例，承担模型与工具循环执行。 */
+    /**
+     * 当前配置的 Agent 实例，承担模型与工具循环执行。
+     */
     private final HarnessAgent agent;
 
-    /** 在共享状态中维护会话活跃执行与状态转换的协调器。 */
+    /**
+     * 在共享状态中维护会话活跃执行与状态转换的协调器。
+     */
     private final AgentScopeSessionExecutionCoordinator sessionExecution;
 
-    /** 把 AgentScope 原生事件转换为宿主事件的映射器。 */
+    /**
+     * 把 AgentScope 原生事件转换为宿主事件的映射器。
+     */
     private final HarnessAgentEventMapper eventMapper;
 
-    /** 进入执行前补充工作区与宿主绑定上下文的回调。 */
+    /**
+     * 进入执行前补充工作区与宿主绑定上下文的回调。
+     */
     private final Consumer<RuntimeContext> prepareContext;
 
-    /** 保存会话最近工作区快照引用的仓储。 */
+    /**
+     * 保存会话最近工作区快照引用的仓储。
+     */
     private final WorkspaceSnapshotPointerRepository snapshotPointers;
 
-    /** 活跃Contexts的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 活跃Contexts的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, RuntimeContext> activeContexts = new ConcurrentHashMap<>();
 
-    /** 本组件使用的 {@code Object} 状态或依赖，用于 lifecycle 的处理。 */
+    /**
+     * 本组件使用的 {@code Object} 状态或依赖，用于 lifecycle 的处理。
+     */
     private final Object lifecycle = new Object();
 
-    /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+    /**
+     * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+     */
     private final AtomicBoolean closed = new AtomicBoolean();
 
     /**
@@ -73,14 +91,15 @@ public final class HarnessAgentRuntime implements AgentRuntime {
      * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
      */
     public HarnessAgentRuntime(HarnessAgent agent) {
-        this(agent, context -> {}, null);
+        this(agent, context -> {
+        }, null);
     }
 
     /**
      * 创建HarnessAgent运行时，初始化该组件所需的状态、配置或依赖。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param prepareContext 当前HarnessAgent运行时持有的准备上下文对象，供相应处理步骤使用。
+     * @param agent            当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param prepareContext   当前HarnessAgent运行时持有的准备上下文对象，供相应处理步骤使用。
      * @param snapshotPointers 提供快照指针集合能力的依赖，具体实现由当前组件的组装方传入。
      */
     public HarnessAgentRuntime(
@@ -98,7 +117,9 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                                 : new InMemoryAgentStateStore());
     }
 
-    /** 按所有者和会话隔离的后台子 Agent 任务宿主视图。 */
+    /**
+     * 按所有者和会话隔离的后台子 Agent 任务宿主视图。
+     */
     public List<Map<String, Object>> listSubtasks(String ownerKey, String sessionId) {
         var repository = agent.getTaskRepository();
         if (repository == null) return List.of();
@@ -124,9 +145,9 @@ public final class HarnessAgentRuntime implements AgentRuntime {
     /**
      * 在当前归属与会话范围内请求停止指定的委派任务。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param taskId 任务的标识，用于关联相应记录或执行。
+     * @param taskId    任务的标识，用于关联相应记录或执行。
      * @return 本次检查是否通过或本次更新是否成功。
      */
     public boolean cancelSubtask(String ownerKey, String sessionId, String taskId) {
@@ -169,21 +190,21 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                     boolean accepted =
                             !request.getAskUserDecisions().isEmpty()
                                     ? sessionExecution.resumeAskUser(
+                                    request.getOwnerKey(),
+                                    request.getSessionId(),
+                                    request.getTurnId())
+                                    : request.getApprovalDecisions().isEmpty()
+                                    ? sessionExecution
+                                    .tryStart(
                                             request.getOwnerKey(),
                                             request.getSessionId(),
-                                            request.getTurnId())
-                                    : request.getApprovalDecisions().isEmpty()
-                                            ? sessionExecution
-                                                    .tryStart(
-                                                            request.getOwnerKey(),
-                                                            request.getSessionId(),
-                                                            request.getTurnId(),
-                                                            startedAt)
-                                                    .isPresent()
-                                            : sessionExecution.resumeApproval(
-                                                    request.getOwnerKey(),
-                                                    request.getSessionId(),
-                                                    request.getTurnId());
+                                            request.getTurnId(),
+                                            startedAt)
+                                    .isPresent()
+                                    : sessionExecution.resumeApproval(
+                                    request.getOwnerKey(),
+                                    request.getSessionId(),
+                                    request.getTurnId());
                     if (!accepted) {
                         return Flux.error(new SessionTurnBusyException());
                     }
@@ -217,7 +238,7 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                                             new HistoryRecoveryScope(
                                                     request.getApprovalDecisions().isEmpty()
                                                             && request.getAskUserDecisions()
-                                                                    .isEmpty()))
+                                                            .isEmpty()))
                                     .put(
                                             AbstractFilesystem.class,
                                             agent.getWorkspaceManager().getFilesystem());
@@ -232,8 +253,8 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                             !request.getAskUserDecisions().isEmpty()
                                     ? "ask_user_resume"
                                     : !request.getApprovalDecisions().isEmpty()
-                                            ? "approval_resume"
-                                            : "turn");
+                                    ? "approval_resume"
+                                    : "turn");
                     RuntimeContext runtimeContext = context.build();
                     String invocationKey = UUID.randomUUID().toString();
                     AtomicBoolean released = new AtomicBoolean();
@@ -279,18 +300,17 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                                                 if (events.stream()
                                                         .anyMatch(
                                                                 event ->
-                                                                        event.getType()
-                                                                                        == AgentRuntimeEvent
-                                                                                                .Type
-                                                                                                .TURN_COMPLETED
+                                                                        event.getType() == AgentRuntimeEvent
+                                                                                .Type
+                                                                                .TURN_COMPLETED
                                                                                 || event.getType()
-                                                                                        == AgentRuntimeEvent
-                                                                                                .Type
-                                                                                                .APPROVAL_REQUIRED
+                                                                                == AgentRuntimeEvent
+                                                                                .Type
+                                                                                .APPROVAL_REQUIRED
                                                                                 || event.getType()
-                                                                                        == AgentRuntimeEvent
-                                                                                                .Type
-                                                                                                .ASK_USER_REQUIRED)) {
+                                                                                == AgentRuntimeEvent
+                                                                                .Type
+                                                                                .ASK_USER_REQUIRED)) {
                                                     SandboxSnapshotCheckpoint.save(
                                                             runtimeContext,
                                                             agent.getStateStore(),
@@ -318,7 +338,7 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                                                 }
                                                 if (event.getType()
                                                         == AgentRuntimeEvent.Type
-                                                                .APPROVAL_REQUIRED) {
+                                                        .APPROVAL_REQUIRED) {
                                                     terminalRecorded.set(true);
                                                     sessionExecution.pauseForApproval(
                                                             request.getOwnerKey(),
@@ -327,7 +347,7 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                                                 }
                                                 if (event.getType()
                                                         == AgentRuntimeEvent.Type
-                                                                .ASK_USER_REQUIRED) {
+                                                        .ASK_USER_REQUIRED) {
                                                     terminalRecorded.set(true);
                                                     sessionExecution.pauseForAskUser(
                                                             request.getOwnerKey(),
@@ -335,34 +355,34 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                                                             request.getTurnId());
                                                 }
                                                 if (event.getType()
-                                                                == AgentRuntimeEvent.Type
-                                                                        .TURN_FAILED
+                                                        == AgentRuntimeEvent.Type
+                                                        .TURN_FAILED
                                                         || event.getType()
-                                                                == AgentRuntimeEvent.Type
-                                                                        .TURN_CANCELLED
+                                                        == AgentRuntimeEvent.Type
+                                                        .TURN_CANCELLED
                                                         || event.getType()
-                                                                == AgentRuntimeEvent.Type
-                                                                        .TURN_TIMED_OUT) {
+                                                        == AgentRuntimeEvent.Type
+                                                        .TURN_TIMED_OUT) {
                                                     terminalRecorded.set(true);
                                                     TurnStatus status =
                                                             event.getType()
-                                                                            == AgentRuntimeEvent
-                                                                                    .Type
-                                                                                    .TURN_CANCELLED
+                                                                    == AgentRuntimeEvent
+                                                                    .Type
+                                                                    .TURN_CANCELLED
                                                                     ? TurnStatus.CANCELLED
                                                                     : event.getType()
-                                                                                    == AgentRuntimeEvent
-                                                                                            .Type
-                                                                                            .TURN_TIMED_OUT
-                                                                            ? TurnStatus.TIMED_OUT
-                                                                            : TurnStatus.FAILED;
+                                                                    == AgentRuntimeEvent
+                                                                    .Type
+                                                                    .TURN_TIMED_OUT
+                                                                    ? TurnStatus.TIMED_OUT
+                                                                    : TurnStatus.FAILED;
                                                     String code =
                                                             event.getDetails()
-                                                                            instanceof
-                                                                            Map<?, ?> details
+                                                                    instanceof
+                                                                    Map<?, ?> details
                                                                     ? String.valueOf(
-                                                                            details.get(
-                                                                                    "errorCode"))
+                                                                    details.get(
+                                                                            "errorCode"))
                                                                     : "EXECUTION_ERROR";
                                                     sessionExecution.finish(
                                                             request.getOwnerKey(),
@@ -410,15 +430,15 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                                                                 : TurnStatus.FAILED;
                                                 String failureCode =
                                                         error
-                                                                        instanceof
-                                                                        SandboxSnapshotCheckpoint
-                                                                                .SnapshotCheckpointException
+                                                                instanceof
+                                                                SandboxSnapshotCheckpoint
+                                                                        .SnapshotCheckpointException
                                                                 ? "WORKSPACE_SNAPSHOT_FAILED"
                                                                 : status == TurnStatus.TIMED_OUT
-                                                                        ? "TURN_TIMEOUT"
-                                                                        : RuntimeFailureClassifier
-                                                                                .executionFailureCode(
-                                                                                        stepStarts);
+                                                                ? "TURN_TIMEOUT"
+                                                                : RuntimeFailureClassifier
+                                                                .executionFailureCode(
+                                                                        stepStarts);
                                                 terminalRecorded.set(true);
                                                 sessionExecution.finish(
                                                         request.getOwnerKey(),
@@ -430,9 +450,9 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                                                 AgentRuntimeEvent.Type type =
                                                         status == TurnStatus.TIMED_OUT
                                                                 ? AgentRuntimeEvent.Type
-                                                                        .TURN_TIMED_OUT
+                                                                .TURN_TIMED_OUT
                                                                 : AgentRuntimeEvent.Type
-                                                                        .TURN_FAILED;
+                                                                .TURN_FAILED;
                                                 AgentRuntimeEvent failed =
                                                         RuntimeEventFactory.event(
                                                                         request,
@@ -527,7 +547,7 @@ public final class HarnessAgentRuntime implements AgentRuntime {
     /**
      * 读取会话执行的当前值。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return {@link #sessionExecution} 中保存的值。
      */
@@ -539,7 +559,7 @@ public final class HarnessAgentRuntime implements AgentRuntime {
     /**
      * 核对原执行并请求 AgentScope 中断，记录宿主侧的超时结果。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -552,8 +572,8 @@ public final class HarnessAgentRuntime implements AgentRuntime {
     /**
      * 核对原执行并请求 AgentScope 中断，记录宿主侧的超时结果。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param ownerKey       宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId      会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param expectedTurnId 调用方期望操作的执行标识，用于防止旧页面误操作后续执行。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -578,8 +598,8 @@ public final class HarnessAgentRuntime implements AgentRuntime {
     /**
      * 核对期望执行标识后中断原执行，避免停止同一会话中的后续任务。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param ownerKey       宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId      会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param expectedTurnId 调用方期望操作的执行标识，用于防止旧页面误操作后续执行。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -599,10 +619,10 @@ public final class HarnessAgentRuntime implements AgentRuntime {
     /**
      * 在执行实例失联等宿主失败情形下结束共享运行状态。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param ownerKey       宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId      会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param expectedTurnId 调用方期望操作的执行标识，用于防止旧页面误操作后续执行。
-     * @param failureCode 机器可识别的失败分类，供状态恢复与错误展示使用。
+     * @param failureCode    机器可识别的失败分类，供状态恢复与错误展示使用。
      * @return 本次检查是否通过或本次更新是否成功。
      */
     @Override

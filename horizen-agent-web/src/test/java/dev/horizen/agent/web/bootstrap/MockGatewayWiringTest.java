@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 class MockGatewayWiringTest {
-    @TempDir Path directory;
+    @TempDir
+    Path directory;
 
     @Test
     void mockModeIgnoresRemoteConfigurationAndNeedsNoSessionOrToken() throws Exception {
@@ -29,10 +30,10 @@ class MockGatewayWiringTest {
         Files.writeString(
                 fixture,
                 """
-        {"tools":[{"name":"inspect_sample","description":"Mock sample",
-          "inputSchema":{"type":"object","additionalProperties":false},
-          "response":{"count":3}}]}
-        """);
+                        {"tools":[{"name":"inspect_sample","description":"Mock sample",
+                          "inputSchema":{"type":"object","additionalProperties":false},
+                          "response":{"count":3}}]}
+                        """);
         GatewayProperties properties =
                 new GatewayProperties(
                         "unused-invalid-remote-url",

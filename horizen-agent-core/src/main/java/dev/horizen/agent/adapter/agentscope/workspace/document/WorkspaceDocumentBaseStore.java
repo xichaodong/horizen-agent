@@ -24,25 +24,39 @@ import java.util.Objects;
  * 需要追加时应使用工作区应用服务的幂等追加操作。
  */
 public final class WorkspaceDocumentBaseStore implements BaseStore {
-    /** Agent集合使用的固定标识或协议文本。 */
+    /**
+     * Agent集合使用的固定标识或协议文本。
+     */
     private static final String AGENTS = "agents";
 
-    /** 使用者使用的固定标识或协议文本。 */
+    /**
+     * 使用者使用的固定标识或协议文本。
+     */
     private static final String USERS = "users";
 
-    /** 根使用的固定标识或协议文本。 */
+    /**
+     * 根使用的固定标识或协议文本。
+     */
     private static final String ROOT = "root";
 
-    /** 记忆使用的固定标识或协议文本。 */
+    /**
+     * 记忆使用的固定标识或协议文本。
+     */
     private static final String MEMORY = "memory";
 
-    /** 记忆Markdown使用的固定标识或协议文本。 */
+    /**
+     * 记忆Markdown使用的固定标识或协议文本。
+     */
     private static final String MEMORY_MD = "MEMORY.md";
 
-    /** GLOBAL作用域使用的固定标识或协议文本。 */
+    /**
+     * GLOBAL作用域使用的固定标识或协议文本。
+     */
     private static final String GLOBAL_SCOPE = "global";
 
-    /** 按归属和作用域访问工作区文档的仓储。 */
+    /**
+     * 按归属和作用域访问工作区文档的仓储。
+     */
     private final WorkspaceDocumentRepository documents;
 
     /**
@@ -58,7 +72,7 @@ public final class WorkspaceDocumentBaseStore implements BaseStore {
      * 读取工作区文档基础存储。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
+     * @param key       当前对象的查找或写入键。
      * @return 本次操作返回的存储条目结果。
      */
     @Override
@@ -71,8 +85,8 @@ public final class WorkspaceDocumentBaseStore implements BaseStore {
      * 根据文档路由策略提交可写工作区内容，不允许通过此视图改写只读发布文件。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
-     * @param value 待校验、转换或保存的原始值。
+     * @param key       当前对象的查找或写入键。
+     * @param value     待校验、转换或保存的原始值。
      * @throws UnsupportedOperationException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
@@ -89,9 +103,9 @@ public final class WorkspaceDocumentBaseStore implements BaseStore {
     /**
      * 在原版本仍匹配时提交文档内容，冲突时不覆盖新版本。
      *
-     * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
-     * @param value 待校验、转换或保存的原始值。
+     * @param namespace       命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param key             当前对象的查找或写入键。
+     * @param value           待校验、转换或保存的原始值。
      * @param expectedVersion 调用方观察到的版本，更新时用于识别并发修改。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -109,8 +123,8 @@ public final class WorkspaceDocumentBaseStore implements BaseStore {
      * 在允许的文档范围内检索工作区内容。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param limit 本次处理或返回数量上限。
-     * @param offset 本次读取的起始偏移。
+     * @param limit     本次处理或返回数量上限。
+     * @param offset    本次读取的起始偏移。
      * @return 本次处理得到的结果集合。
      */
     @Override
@@ -138,7 +152,7 @@ public final class WorkspaceDocumentBaseStore implements BaseStore {
      * 删除工作区文档基础存储。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
+     * @param key       当前对象的查找或写入键。
      * @throws UnsupportedOperationException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
@@ -151,7 +165,7 @@ public final class WorkspaceDocumentBaseStore implements BaseStore {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
+     * @param key       当前对象的查找或写入键。
      * @return 本次操作返回的工作区文档键结果。
      */
     private WorkspaceDocumentKey key(List<String> namespace, String key) {
@@ -265,18 +279,26 @@ public final class WorkspaceDocumentBaseStore implements BaseStore {
         return new UnsupportedOperationException("Unsupported cloud memory path: " + path);
     }
 
-    /** 工作区文档基础存储内部的路由，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 工作区文档基础存储内部的路由，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class Route {
-        /** 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。 */
+        /**
+         * 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+         */
         @Getter(AccessLevel.PACKAGE)
         private final String ownerKey;
 
-        /** 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。 */
+        /**
+         * 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
+         */
         @Getter(AccessLevel.PACKAGE)
         private final String agentKey;
 
-        /** 当前路径路由中的作用域片段，用于区分文档与发布内容。 */
+        /**
+         * 当前路径路由中的作用域片段，用于区分文档与发布内容。
+         */
         @Getter(AccessLevel.PACKAGE)
         private final String segment;
     }

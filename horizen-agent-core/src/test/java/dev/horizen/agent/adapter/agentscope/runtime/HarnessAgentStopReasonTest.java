@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 class HarnessAgentStopReasonTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
     private HarnessAgent agent;
     private HarnessAgentEventMapper mapper;
 
@@ -85,14 +86,11 @@ class HarnessAgentStopReasonTest {
         for (GenerateReason reason : GenerateReason.values()) {
             var events = map(new AgentResultEvent(message().withGenerateReason(reason)));
             switch (reason) {
-                case PERMISSION_ASKING, TOOL_SUSPENDED, MIDDLEWARE_STOP_REQUESTED ->
-                        assertTrue(events.isEmpty());
-                case MODEL_STOP, STRUCTURED_OUTPUT ->
-                        assertEquals(
-                                AgentRuntimeEvent.Type.TURN_COMPLETED, events.get(0).getType());
-                case INTERRUPTED ->
-                        assertEquals(
-                                AgentRuntimeEvent.Type.TURN_CANCELLED, events.get(0).getType());
+                case PERMISSION_ASKING, TOOL_SUSPENDED, MIDDLEWARE_STOP_REQUESTED -> assertTrue(events.isEmpty());
+                case MODEL_STOP, STRUCTURED_OUTPUT -> assertEquals(
+                        AgentRuntimeEvent.Type.TURN_COMPLETED, events.get(0).getType());
+                case INTERRUPTED -> assertEquals(
+                        AgentRuntimeEvent.Type.TURN_CANCELLED, events.get(0).getType());
                 default -> {
                     assertEquals(
                             AgentRuntimeEvent.Type.TURN_FAILED,

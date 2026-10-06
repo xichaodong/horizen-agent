@@ -13,7 +13,7 @@ public interface ApprovalPresentationProvider {
     /**
      * 计算或取得本方法声明的结果，供当前ApprovalPresentationProvider处理步骤使用。
      *
-     * @param input 本次处理的输入。
+     * @param input   本次处理的输入。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
      * @return 本次操作返回的审批呈现结果。
      */

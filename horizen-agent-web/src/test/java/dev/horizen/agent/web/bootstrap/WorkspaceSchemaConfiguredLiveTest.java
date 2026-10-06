@@ -18,7 +18,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
-/** 默认只检查；增量 DDL 需要单独显式启用 apply-workspace 标志。 */
+/**
+ * 默认只检查；增量 DDL 需要单独显式启用 apply-workspace 标志。
+ */
 @EnabledIfSystemProperty(named = "horizen.workspace.schema.live", matches = "true")
 class WorkspaceSchemaConfiguredLiveTest {
     @Test
@@ -46,7 +48,7 @@ class WorkspaceSchemaConfiguredLiveTest {
         if (!Boolean.getBoolean("horizen.storage.apply-workspace")) return;
         if (!sessionColumn) {
             new ResourceDatabasePopulator(
-                            new ClassPathResource("schema/mysql-session-workspace-snapshot.sql"))
+                    new ClassPathResource("schema/mysql-session-workspace-snapshot.sql"))
                     .execute(source);
         }
         new ResourceDatabasePopulator(new ClassPathResource("schema/mysql-workspace-file.sql"))
@@ -63,18 +65,18 @@ class WorkspaceSchemaConfiguredLiveTest {
 
     private static boolean hasTable(JdbcTemplate jdbc, String table) {
         return jdbc.queryForObject(
-                        "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=?",
-                        Integer.class,
-                        table)
+                "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=?",
+                Integer.class,
+                table)
                 > 0;
     }
 
     private static boolean hasColumn(JdbcTemplate jdbc, String table, String column) {
         return jdbc.queryForObject(
-                        "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name=? AND column_name=?",
-                        Integer.class,
-                        table,
-                        column)
+                "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name=? AND column_name=?",
+                Integer.class,
+                table,
+                column)
                 > 0;
     }
 

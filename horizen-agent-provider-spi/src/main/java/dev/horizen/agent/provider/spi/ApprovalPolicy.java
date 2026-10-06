@@ -8,15 +8,23 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-/** 工具执行前是否需要人工确认的策略。 */
+/**
+ * 工具执行前是否需要人工确认的策略。
+ */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum ApprovalPolicy implements WireValue {
-    /** 当前策略不要求人工确认。 */
+    /**
+     * 当前策略不要求人工确认。
+     */
     NONE("none"),
-    /** 当前策略要求取得人工确认后执行。 */
+    /**
+     * 当前策略要求取得人工确认后执行。
+     */
     REQUIRED("required");
 
-    /** 对外协议使用的固定文本值，与 Java 枚举成员名称分开维护。 */
+    /**
+     * 对外协议使用的固定文本值，与 Java 枚举成员名称分开维护。
+     */
     @Getter(onMethod_ = {@Override, @JsonValue})
     @Accessors(fluent = true)
     private final String wireValue;

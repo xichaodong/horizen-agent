@@ -22,12 +22,12 @@ class TurnServicesLifecycleTest {
     void startsAfterSingletonsAndStopsBeforeBorrowedResourcesAreDestroyed() throws Exception {
         AtomicBoolean initialized = new AtomicBoolean();
         doAnswer(
-                        invocation -> {
-                            assertTrue(
-                                    initialized.get(),
-                                    "Background tasks must wait for singleton initialization");
-                            return null;
-                        })
+                invocation -> {
+                    assertTrue(
+                            initialized.get(),
+                            "Background tasks must wait for singleton initialization");
+                    return null;
+                })
                 .when(services)
                 .startRecovery();
         var context = context();

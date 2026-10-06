@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
-/** 在独立的本地 MySQL 临时库中验证升级，完成后仅删除该临时库。 */
+/**
+ * 在独立的本地 MySQL 临时库中验证升级，完成后仅删除该临时库。
+ */
 @EnabledIfSystemProperty(named = "horizen.mysql.interaction.live", matches = "true")
 class MysqlInteractionUpgradeLiveTest {
     @Test
@@ -35,10 +37,10 @@ class MysqlInteractionUpgradeLiveTest {
             throws Exception {
         Properties config = new Properties();
         try (var input =
-                Files.newBufferedReader(
-                        Path.of(
-                                System.getProperty(
-                                        "horizen.mysql.interaction.config", "../.env.yml")))) {
+                     Files.newBufferedReader(
+                             Path.of(
+                                     System.getProperty(
+                                             "horizen.mysql.interaction.config", "../.env.yml")))) {
             config.putAll(YamlConfigFiles.load(input));
         }
         URI uri = URI.create(config.getProperty("horizen.agent.storage.jdbc-url").substring(5));
@@ -58,8 +60,8 @@ class MysqlInteractionUpgradeLiveTest {
                     new DriverManagerDataSource(prefix + database + suffix, username, password);
             var jdbc = new JdbcTemplate(source);
             new ResourceDatabasePopulator(
-                            new ClassPathResource("schema/legacy-interaction.sql"),
-                            new ClassPathResource("schema/mysql.sql"))
+                    new ClassPathResource("schema/legacy-interaction.sql"),
+                    new ClassPathResource("schema/mysql.sql"))
                     .execute(source);
             Instant at = Instant.parse("2026-10-03T00:00:00Z");
             Timestamp created = Timestamp.from(at);
@@ -70,11 +72,11 @@ class MysqlInteractionUpgradeLiveTest {
                 boolean pending = status == ApprovalStatus.PENDING;
                 jdbc.update(
                         """
-            INSERT INTO ha_approval (owner_key,approval_id,session_id,turn_id,request_reply_id,
-                tool_call_id,tool_name,tool_content,tool_arguments_json,presentation_json,status,
-                requested_by,expires_at,decided_by,decided_at,created_at,updated_at,version)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-            """,
+                                INSERT INTO ha_approval (owner_key,approval_id,session_id,turn_id,request_reply_id,
+                                    tool_call_id,tool_name,tool_content,tool_arguments_json,presentation_json,status,
+                                    requested_by,expires_at,decided_by,decided_at,created_at,updated_at,version)
+                                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                                """,
                         "owner",
                         id,
                         "session",
@@ -99,10 +101,10 @@ class MysqlInteractionUpgradeLiveTest {
                 boolean pending = status == AskUserStatus.PENDING;
                 jdbc.update(
                         """
-INSERT INTO ha_ask_user (owner_key,ask_user_id,session_id,turn_id,reply_id,
-    tool_call_id,questions_json,answers_json,status,created_at,expires_at,resolved_at,version)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
-""",
+                                INSERT INTO ha_ask_user (owner_key,ask_user_id,session_id,turn_id,reply_id,
+                                    tool_call_id,questions_json,answers_json,status,created_at,expires_at,resolved_at,version)
+                                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+                                """,
                         "owner",
                         id,
                         "session",
@@ -118,7 +120,7 @@ VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
                         pending ? 4 : 8);
             }
             new ResourceDatabasePopulator(
-                            new ClassPathResource("schema/mysql-interaction-upgrade.sql"))
+                    new ClassPathResource("schema/mysql-interaction-upgrade.sql"))
                     .execute(source);
             var approvals = new JdbcApprovalStore(source);
             var asks = new JdbcAskUserStore(source);

@@ -35,10 +35,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/** 协议模拟器仅在隔离的临时测试目录执行可信测试脚本。 */
+/**
+ * 协议模拟器仅在隔离的临时测试目录执行可信测试脚本。
+ */
 class HttpE2bSnapshotRecoveryTest {
     private static final ObjectMapper JSON = new ObjectMapper();
-    @TempDir Path testRoot;
+    @TempDir
+    Path testRoot;
 
     @Test
     void freshPublicationReplacesReservedRootsAfterTaskArchiveRestore() throws Exception {

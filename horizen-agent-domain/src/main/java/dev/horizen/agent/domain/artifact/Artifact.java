@@ -10,101 +10,137 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-/** 云端可持久引用的 Agent 资源；内容本身由存储 Provider 管理。 */
+/**
+ * 云端可持久引用的 Agent 资源；内容本身由存储 Provider 管理。
+ */
 @Value
 public class Artifact {
 
-    /** 产物资源标识；访问内容时仍需校验所属隔离范围。 */
+    /**
+     * 产物资源标识；访问内容时仍需校验所属隔离范围。
+     */
     private String artifactId;
 
-    /** 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。 */
+    /**
+     * 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     */
     private String ownerKey;
 
-    /** 当前资源或请求类别，供生命周期、存储与呈现策略选择处理路径。 */
+    /**
+     * 当前资源或请求类别，供生命周期、存储与呈现策略选择处理路径。
+     */
     private ArtifactKind kind;
 
-    /** 当前工作状态或状态存储对象，供执行与恢复流程使用。 */
+    /**
+     * 当前工作状态或状态存储对象，供执行与恢复流程使用。
+     */
     private ArtifactState state;
 
-    /** 当前产物的可读标题，供宿主界面展示。 */
+    /**
+     * 当前产物的可读标题，供宿主界面展示。
+     */
     private String title;
 
-    /** 内容的 MIME 媒体类型，供传输、展示与解析策略选择使用。 */
+    /**
+     * 内容的 MIME 媒体类型，供传输、展示与解析策略选择使用。
+     */
     private String mediaType;
 
-    /** 内容存储引用；它定位实际字节内容，不等同于临时下载 URL。 */
+    /**
+     * 内容存储引用；它定位实际字节内容，不等同于临时下载 URL。
+     */
     private String contentRef;
 
-    /** 内容大小，单位为字节。 */
+    /**
+     * 内容大小，单位为字节。
+     */
     private Long sizeBytes;
 
-    /** 内容的 SHA-256 校验值，用于完整性校验。 */
+    /**
+     * 内容的 SHA-256 校验值，用于完整性校验。
+     */
     private String checksumSha256;
 
-    /** 来源产物的标识，用于串联修改前后的版本关系。 */
+    /**
+     * 来源产物的标识，用于串联修改前后的版本关系。
+     */
     private String parentArtifactId;
 
-    /** 当前事件、内容或执行的来源，供追踪生成关系与执行层级使用。 */
+    /**
+     * 当前事件、内容或执行的来源，供追踪生成关系与执行层级使用。
+     */
     private ArtifactSource source;
 
-    /** 来源资源的引用，供追踪产物或事件的生成来源。 */
+    /**
+     * 来源资源的引用，供追踪产物或事件的生成来源。
+     */
     private String sourceRef;
 
-    /** 当前记录或授权的失效时间，用于过期检查。 */
+    /**
+     * 当前记录或授权的失效时间，用于过期检查。
+     */
     private Instant expiresAt;
 
-    /** 当前记录的创建时间。 */
+    /**
+     * 当前记录的创建时间。
+     */
     private Instant createdAt;
 
-    /** 当前记录最近一次更新的时间。 */
+    /**
+     * 当前记录最近一次更新的时间。
+     */
     private Instant updatedAt;
 
-    /** 记录进入删除状态的时间，供生命周期和审计查询使用。 */
+    /**
+     * 记录进入删除状态的时间，供生命周期和审计查询使用。
+     */
     private Instant deletedAt;
 
-    /** 记录版本，用于乐观并发控制或区分协议版本。 */
+    /**
+     * 记录版本，用于乐观并发控制或区分协议版本。
+     */
     private long version;
 
     /**
      * 创建产物，初始化该组件所需的状态、配置或依赖。
      *
-     * @param artifactId 产物资源标识；访问内容时仍需校验所属隔离范围。
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param kind 当前资源或请求类别，供生命周期、存储与呈现策略选择处理路径。
-     * @param state 当前工作状态或状态存储对象，供执行与恢复流程使用。
-     * @param title 当前产物的可读标题，供宿主界面展示。
-     * @param mediaType 当前产物使用的媒体类型，供其处理与状态记录使用。
-     * @param contentRef 内容存储引用；它定位实际字节内容，不等同于临时下载 URL。
-     * @param sizeBytes 内容大小，单位为字节。
-     * @param checksumSha256 内容的 SHA-256 校验值，用于完整性校验。
+     * @param artifactId       产物资源标识；访问内容时仍需校验所属隔离范围。
+     * @param ownerKey         宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param kind             当前资源或请求类别，供生命周期、存储与呈现策略选择处理路径。
+     * @param state            当前工作状态或状态存储对象，供执行与恢复流程使用。
+     * @param title            当前产物的可读标题，供宿主界面展示。
+     * @param mediaType        当前产物使用的媒体类型，供其处理与状态记录使用。
+     * @param contentRef       内容存储引用；它定位实际字节内容，不等同于临时下载 URL。
+     * @param sizeBytes        内容大小，单位为字节。
+     * @param checksumSha256   内容的 SHA-256 校验值，用于完整性校验。
      * @param parentArtifactId 来源产物的标识，用于串联修改前后的版本关系。
-     * @param source 待解析或转换的来源对象。
-     * @param sourceRef 来源资源的引用，供追踪产物或事件的生成来源。
-     * @param expiresAt 当前记录或授权的失效时间，用于过期检查。
-     * @param createdAt 当前记录的创建时间。
-     * @param updatedAt 当前记录最近一次更新的时间。
-     * @param deletedAt 记录进入删除状态的时间，供生命周期和审计查询使用。
-     * @param version 记录版本，用于乐观并发控制或区分协议版本。
+     * @param source           待解析或转换的来源对象。
+     * @param sourceRef        来源资源的引用，供追踪产物或事件的生成来源。
+     * @param expiresAt        当前记录或授权的失效时间，用于过期检查。
+     * @param createdAt        当前记录的创建时间。
+     * @param updatedAt        当前记录最近一次更新的时间。
+     * @param deletedAt        记录进入删除状态的时间，供生命周期和审计查询使用。
+     * @param version          记录版本，用于乐观并发控制或区分协议版本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @ConstructorProperties({
-        "artifactId",
-        "ownerKey",
-        "kind",
-        "state",
-        "title",
-        "mediaType",
-        "contentRef",
-        "sizeBytes",
-        "checksumSha256",
-        "parentArtifactId",
-        "source",
-        "sourceRef",
-        "expiresAt",
-        "createdAt",
-        "updatedAt",
-        "deletedAt",
-        "version"
+            "artifactId",
+            "ownerKey",
+            "kind",
+            "state",
+            "title",
+            "mediaType",
+            "contentRef",
+            "sizeBytes",
+            "checksumSha256",
+            "parentArtifactId",
+            "source",
+            "sourceRef",
+            "expiresAt",
+            "createdAt",
+            "updatedAt",
+            "deletedAt",
+            "version"
     })
     public Artifact(
             String artifactId,
@@ -161,8 +197,8 @@ public class Artifact {
     /**
      * 取得并校验标识。
      *
-     * @param value 待校验、转换或保存的原始值。
-     * @param field 当前产物使用的字段，供其处理与状态记录使用。
+     * @param value   待校验、转换或保存的原始值。
+     * @param field   当前产物使用的字段，供其处理与状态记录使用。
      * @param pattern 当前产物持有的校验模式对象，供相应处理步骤使用。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。

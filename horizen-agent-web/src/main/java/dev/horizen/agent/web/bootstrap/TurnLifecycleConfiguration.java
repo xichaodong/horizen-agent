@@ -25,21 +25,23 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/** 在容器刷新前组装服务，后台任务在生命周期启动阶段开始执行。 */
+/**
+ * 在容器刷新前组装服务，后台任务在生命周期启动阶段开始执行。
+ */
 @Configuration(proxyBeanMethods = false)
 public class TurnLifecycleConfiguration {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent      当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
-     * @param leases 当前执行生命周期组装持有的租约集合对象，供相应处理步骤使用。
-     * @param storage 当前执行生命周期组装持有的存储对象，供相应处理步骤使用。
-     * @param events 当前执行或历史事件集合，供持久化、回放与观测使用。
-     * @param runtime 执行 Agent 模型与工具循环的运行时接口。
-     * @param requests 提供请求集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
-     * @param sink 当前执行生命周期组装持有的上报端对象，供相应处理步骤使用。
+     * @param leases     当前执行生命周期组装持有的租约集合对象，供相应处理步骤使用。
+     * @param storage    当前执行生命周期组装持有的存储对象，供相应处理步骤使用。
+     * @param events     当前执行或历史事件集合，供持久化、回放与观测使用。
+     * @param runtime    执行 Agent 模型与工具循环的运行时接口。
+     * @param requests   提供请求集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param mapper     本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param sink       当前执行生命周期组装持有的上报端对象，供相应处理步骤使用。
      * @return 本次操作返回的执行服务集合生命周期结果。
      */
     @Bean(destroyMethod = "close")

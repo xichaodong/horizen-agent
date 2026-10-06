@@ -10,12 +10,18 @@ import java.util.function.Supplier;
 
 import javax.sql.DataSource;
 
-/** 由 Spring 管理的事务边界；调用者在进入事务前准备远程操作所需内容。 */
+/**
+ * 由 Spring 管理的事务边界；调用者在进入事务前准备远程操作所需内容。
+ */
 public class JdbcUnitOfWork implements UnitOfWork {
-    /** 直接使用数据源构造适配器时采用的独立事务模板。 */
+    /**
+     * 直接使用数据源构造适配器时采用的独立事务模板。
+     */
     private final UnitOfWork standalone;
 
-    /** 创建JDBC工作单元关联工作，初始化该组件所需的状态、配置或依赖。 */
+    /**
+     * 创建JDBC工作单元关联工作，初始化该组件所需的状态、配置或依赖。
+     */
     public JdbcUnitOfWork() {
         standalone = null;
     }

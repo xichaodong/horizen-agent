@@ -7,22 +7,33 @@ import lombok.ToString;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/** 所有可变工作区文件均通过此云端内容提供器访问。 */
+/**
+ * 所有可变工作区文件均通过此云端内容提供器访问。
+ */
 @ConfigurationProperties("horizen.agent.workspace-storage")
 @Data
 public class WorkspaceStorageProperties {
     /** 对象存储访问标识，与 secretKey 配合完成服务端认证。 */
     /** 对象存储桶名称，限定内容对象的存储位置。 */
-    /** 已解析的服务接口地址，供实际网络请求使用。 */
+    /**
+     * 已解析的服务接口地址，供实际网络请求使用。
+     */
     private String endpoint = "", bucket = "", accessKey = "";
 
-    /** 对象存储访问密钥，不属于客户端展示数据。 */
-    @ToString.Exclude private String secretKey = "";
+    /**
+     * 对象存储访问密钥，不属于客户端展示数据。
+     */
+    @ToString.Exclude
+    private String secretKey = "";
 
-    /** 存储键前缀，用于区分本应用的数据与其他使用方。 */
+    /**
+     * 存储键前缀，用于区分本应用的数据与其他使用方。
+     */
     private String keyPrefix = "agentFiles/horizen-workspace-files";
 
-    /** 单个文件内容允许的字节数上限。 */
+    /**
+     * 单个文件内容允许的字节数上限。
+     */
     private long maxFileBytes = 10L * 1024 * 1024;
 
     /**

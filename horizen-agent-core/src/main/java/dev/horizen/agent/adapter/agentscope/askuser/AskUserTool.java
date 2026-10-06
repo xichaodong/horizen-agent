@@ -24,12 +24,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-/** 把 AgentScope 提问工具映射为可持久恢复的澄清请求。 */
+/**
+ * 把 AgentScope 提问工具映射为可持久恢复的澄清请求。
+ */
 public final class AskUserTool extends ToolBase {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 负责store对应持久化访问的仓储依赖；调用方通过端口隔离具体存储实现。 */
+    /**
+     * 负责store对应持久化访问的仓储依赖；调用方通过端口隔离具体存储实现。
+     */
     private final AskUserStore store;
 
     /**
@@ -144,14 +150,14 @@ public final class AskUserTool extends ToolBase {
             String id =
                     "ask_"
                             + UUID.nameUUIDFromBytes(
-                                            (ctx.getUserId()
-                                                            + "\0"
-                                                            + execution.getTurnId()
-                                                            + "\0"
-                                                            + call)
-                                                    .getBytes())
-                                    .toString()
-                                    .replace("-", "");
+                                    (ctx.getUserId()
+                                            + "\0"
+                                            + execution.getTurnId()
+                                            + "\0"
+                                            + call)
+                                            .getBytes())
+                            .toString()
+                            .replace("-", "");
             AskUserRequest request =
                     store.createOrFind(
                             new AskUserRequest(
@@ -234,7 +240,7 @@ public final class AskUserTool extends ToolBase {
      *
      * @param value 待校验、转换或保存的原始值。
      * @param field 当前提问用户工具使用的字段，供其处理与状态记录使用。
-     * @param max 当前提问用户工具使用的最大，供其处理与状态记录使用。
+     * @param max   当前提问用户工具使用的最大，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

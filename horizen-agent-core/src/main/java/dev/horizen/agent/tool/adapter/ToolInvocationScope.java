@@ -3,25 +3,33 @@ package dev.horizen.agent.tool.adapter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** 宿主为单次 Agent Turn 注入的可信身份和执行坐标。 */
+/**
+ * 宿主为单次 Agent Turn 注入的可信身份和执行坐标。
+ */
 @Data
 @NoArgsConstructor
 public class ToolInvocationScope {
-    /** 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。 */
+    /**
+     * 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     */
     private String ownerKey;
 
-    /** 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。 */
+    /**
+     * 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     */
     private String sessionId;
 
-    /** 单次用户输入触发的执行标识，用于关联状态、消息和事件。 */
+    /**
+     * 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     */
     private String turnId;
 
     /**
      * 创建工具调用作用域，初始化该组件所需的状态、配置或依赖。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      */
     public ToolInvocationScope(String ownerKey, String sessionId, String turnId) {
         this.ownerKey = required(ownerKey, "ownerKey");

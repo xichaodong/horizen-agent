@@ -13,11 +13,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 class WorkspaceArchiveValidatorTest {
-    @TempDir Path root;
+    @TempDir
+    Path root;
 
     @Test
     void rejectsTraversalDevicesAndSymlinksEscapingWorkspace() throws Exception {
-        for (String name : new String[] {"../../etc/config", "/etc/config", "C:/config"}) {
+        for (String name : new String[]{"../../etc/config", "/etc/config", "C:/config"}) {
             Path archive = archive(new TarArchiveEntry(name, true));
             assertThrows(
                     IOException.class,

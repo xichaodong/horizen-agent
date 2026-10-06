@@ -16,18 +16,28 @@ import java.net.http.HttpClient;
  */
 @Value
 public class RuntimeInfrastructure {
-    /** 外部工具目录与调用的网关适配器。 */
+    /**
+     * 外部工具目录与调用的网关适配器。
+     */
     GatewayBackend gateway;
 
-    /** 抓取与解析网页正文的 HTTP 客户端。 */
+    /**
+     * 抓取与解析网页正文的 HTTP 客户端。
+     */
     HttpClient webExtractClient;
 
-    /** 创建与管理远程沙箱环境的客户端。 */
+    /**
+     * 创建与管理远程沙箱环境的客户端。
+     */
     OkHttpClient sandboxClient;
 
-    /** 当前归属范围内的记忆读取或写入服务。 */
+    /**
+     * 当前归属范围内的记忆读取或写入服务。
+     */
     CloudMemoryService memory;
 
-    /** 主模型与压缩模型共用的可取消 HTTP 传输实现。 */
+    /**
+     * 主模型与压缩模型共用的可取消 HTTP 传输实现。
+     */
     HttpTransport modelTransport;
 }

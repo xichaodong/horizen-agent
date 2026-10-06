@@ -7,9 +7,13 @@ import io.agentscope.harness.agent.sandbox.snapshot.RemoteSnapshotClient;
 import java.io.InputStream;
 import java.util.Objects;
 
-/** AgentScope 适配器；存储实现由领域 Repository 接口隔离。 */
+/**
+ * AgentScope 适配器；存储实现由领域 Repository 接口隔离。
+ */
 public final class RepositoryRemoteSnapshotClient implements RemoteSnapshotClient {
-    /** 保存与恢复完整工作区归档的快照仓储。 */
+    /**
+     * 保存与恢复完整工作区归档的快照仓储。
+     */
     private final WorkspaceSnapshotRepository snapshots;
 
     /**
@@ -24,7 +28,7 @@ public final class RepositoryRemoteSnapshotClient implements RemoteSnapshotClien
     /**
      * 上传仓储远端快照客户端。
      *
-     * @param id 目标对象的标识。
+     * @param id   目标对象的标识。
      * @param data 当前操作处理的数据。
      */
     @Override

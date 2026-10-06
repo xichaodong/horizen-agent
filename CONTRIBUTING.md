@@ -41,18 +41,26 @@ module and hook comments explain lifecycle, cancellation and asynchronous state 
 Write explanatory source comments in Chinese, including tests, frontend and scripts.
 Keep technical identifiers, protocol names and third-party copyright/license notices in their original form.
 
-Install frontend dependencies with `npm --prefix horizen-agent-web ci`, then run
-`./scripts/format.sh apply` to format Java, XML, JavaScript/JSX, Less, HTML and JSON/YAML.
-Use `./scripts/format.sh check` to verify without changing files. Java and source files use
-four-space indentation; JSON/YAML use two. Dynamic MyBatis Mapper XML is excluded from the generic XML formatter to preserve its SQL text.
-Maven verification and CI reject formatting drift. IntelliJ should use the repository
-`.editorconfig`; the pinned formatters determine the canonical output.
+Formatting uses the native IntelliJ IDEA formatter, pinned to the version/build in
+[scripts/intellij-formatter.json](scripts/intellij-formatter.json). The shared project scheme is
+[Project.xml](.idea/codeStyles/Project.xml), enabled by [codeStyleConfig.xml](.idea/codeStyles/codeStyleConfig.xml).
+The repository [.editorconfig](.editorconfig) defines four-space source indentation and two-space JSON/YAML indentation.
+Open the project in IDEA and use **Code → Reformat Code**; select the **Project** scheme under
+**Settings → Editor → Code Style**. No Google Java Format plugin or Prettier integration is required.
+Associate `.env.yml.example` with the YAML file type in IDEA to format the template in the editor.
 
-Use explicit imports and simple names for annotations and class types. Fully-qualified
-names in source are reserved for genuine naming conflicts. Spotless shortens eligible
-type references and organizes imports when `./scripts/format.sh apply` runs.
-The import-style check also rejects unnecessary package prefixes on annotations and
-static type references, while allowing actual import/declaration conflicts.
+Use `./scripts/format.sh apply` to format public source files or `./scripts/format.sh check` to validate
+without writing changes. These commands detect the installed macOS application; on other systems set
+`HORIZEN_IDEA_HOME` to the installation directory. Linux x64 can install the pinned formatter with
+`python3 scripts/format-idea.py check --install`. The official archive SHA-256 is pinned and the installation
+is cached outside the repository. The formatter uses an isolated temporary IDE configuration, allowing the
+editor to remain open. It never loads private IDE plugins, formats real `.env.yml`, or visits local process documents.
+CI uses the same native engine and settings. Building with `./mvnw verify` does not download an IDE.
+Update the pinned version/checksum together when adopting a new formatter version.
+
+Use explicit imports and simple names for annotations and class types. Fully-qualified names in source
+are reserved for genuine naming conflicts. `scripts/check-java-style.py` enforces that rule; use IDEA's
+import actions when adding references. Do not enable a second formatter on save or before committing.
 
 - Keep domain models independent of runtime frameworks; follow the dependency boundaries in `AGENTS.md`.
 - Target Java 17. Use ordinary POJOs/Lombok rather than Java records, and preserve validation and explicit JSON creators.

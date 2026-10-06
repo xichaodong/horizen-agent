@@ -7,15 +7,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/** Agent Workspace 使用的存储视图：允许读取 AGENTS.md，拒绝 Agent 写入或删除。 */
+/**
+ * Agent Workspace 使用的存储视图：允许读取 AGENTS.md，拒绝 Agent 写入或删除。
+ */
 public final class ReadOnlyAgentsMdBaseStore implements BaseStore {
-    /** 根执行段使用的固定标识或协议文本。 */
+    /**
+     * 根执行段使用的固定标识或协议文本。
+     */
     private static final String ROOT_SEGMENT = "root";
 
-    /** Agent集合Markdown使用的固定标识或协议文本。 */
+    /**
+     * Agent集合Markdown使用的固定标识或协议文本。
+     */
     private static final String AGENTS_MD = "AGENTS.md";
 
-    /** 被包装的原始实现，由本组件补充隔离、观测或恢复行为。 */
+    /**
+     * 被包装的原始实现，由本组件补充隔离、观测或恢复行为。
+     */
     private final BaseStore delegate;
 
     /**
@@ -31,7 +39,7 @@ public final class ReadOnlyAgentsMdBaseStore implements BaseStore {
      * 读取读取只读Agent集合Markdown基础存储。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
+     * @param key       当前对象的查找或写入键。
      * @return 本次操作返回的存储条目结果。
      */
     @Override
@@ -43,8 +51,8 @@ public final class ReadOnlyAgentsMdBaseStore implements BaseStore {
      * 写入读取只读Agent集合Markdown基础存储。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
-     * @param value 待校验、转换或保存的原始值。
+     * @param key       当前对象的查找或写入键。
+     * @param value     待校验、转换或保存的原始值。
      */
     @Override
     public void put(List<String> namespace, String key, Map<String, Object> value) {
@@ -55,9 +63,9 @@ public final class ReadOnlyAgentsMdBaseStore implements BaseStore {
     /**
      * 写入条件版本。
      *
-     * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
-     * @param value 待校验、转换或保存的原始值。
+     * @param namespace       命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param key             当前对象的查找或写入键。
+     * @param value           待校验、转换或保存的原始值。
      * @param expectedVersion 调用方观察到的版本，更新时用于识别并发修改。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -74,8 +82,8 @@ public final class ReadOnlyAgentsMdBaseStore implements BaseStore {
      * 计算或取得本方法声明的结果，供当前ReadOnlyAgentsMdBaseStore处理步骤使用。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param limit 本次处理或返回数量上限。
-     * @param offset 本次读取的起始偏移。
+     * @param limit     本次处理或返回数量上限。
+     * @param offset    本次读取的起始偏移。
      * @return 本次处理得到的结果集合。
      */
     @Override
@@ -87,7 +95,7 @@ public final class ReadOnlyAgentsMdBaseStore implements BaseStore {
      * 删除读取只读Agent集合Markdown基础存储。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
+     * @param key       当前对象的查找或写入键。
      */
     @Override
     public void delete(List<String> namespace, String key) {
@@ -99,7 +107,7 @@ public final class ReadOnlyAgentsMdBaseStore implements BaseStore {
      * 取得并校验可写。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
+     * @param key       当前对象的查找或写入键。
      * @throws UnsupportedOperationException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private static void requireWritable(List<String> namespace, String key) {
@@ -112,7 +120,7 @@ public final class ReadOnlyAgentsMdBaseStore implements BaseStore {
      * 判断Agent集合Markdown。
      *
      * @param namespace 命名空间的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param key 当前对象的查找或写入键。
+     * @param key       当前对象的查找或写入键。
      * @return 本次检查是否通过或本次更新是否成功。
      */
     private static boolean isAgentsMd(List<String> namespace, String key) {

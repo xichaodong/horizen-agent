@@ -14,7 +14,7 @@ class SkillReleaseSnapshotTest {
         original[0] = 8;
         var exposed = skill.resources();
         exposed.get("ref.bin")[0] = 9;
-        assertArrayEquals(new byte[] {1, 2}, skill.resources().get("ref.bin"));
+        assertArrayEquals(new byte[]{1, 2}, skill.resources().get("ref.bin"));
         assertThrows(UnsupportedOperationException.class, () -> exposed.put("extra", new byte[0]));
     }
 }

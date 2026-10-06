@@ -10,7 +10,9 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
-/** 显式测试替身，在测试的两个应用宿主之间保留同一实例。 */
+/**
+ * 显式测试替身，在测试的两个应用宿主之间保留同一实例。
+ */
 @TestConfiguration(proxyBeanMethods = false)
 public class WorkspaceTestConfiguration {
     @Primary

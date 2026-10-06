@@ -41,86 +41,134 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-/** 每次调用使用的可变累加器；仅向输出端发送不可变快照。 */
+/**
+ * 每次调用使用的可变累加器；仅向输出端发送不可变快照。
+ */
 final class HorizenTraceRun {
-    /** 当前组件的配置与策略参数。 */
+    /**
+     * 当前组件的配置与策略参数。
+     */
     final HorizenTraceConfig config;
 
-    /** 本组件写入事件或观测数据的接收端，具体协议由声明类型确定。 */
+    /**
+     * 本组件写入事件或观测数据的接收端，具体协议由声明类型确定。
+     */
     private final HorizenTraceBatchSink sink;
 
-    /** 按已知敏感字段名清理观测负载的脱敏器，不识别任意自由文本中的秘密。 */
+    /**
+     * 按已知敏感字段名清理观测负载的脱敏器，不识别任意自由文本中的秘密。
+     */
     final TraceDataSanitizer sanitizer;
 
-    /** 模型与工具调用到 Span 的关联信息，用于归并完整执行链路。 */
+    /**
+     * 模型与工具调用到 Span 的关联信息，用于归并完整执行链路。
+     */
     private final ExecutionTraceContext correlation;
 
-    /** 一次评测或外部协议运行的标识，用于状态与证据查询。 */
+    /**
+     * 一次评测或外部协议运行的标识，用于状态与证据查询。
+     */
     private final String runId;
 
-    /** 关联本次 Agent 执行的 Trace 标识，用于归并模型与工具观测。 */
+    /**
+     * 关联本次 Agent 执行的 Trace 标识，用于归并模型与工具观测。
+     */
     private final String traceId;
 
-    /** 根Span的标识，用于关联相应记录或执行。 */
+    /**
+     * 根Span的标识，用于关联相应记录或执行。
+     */
     final String rootSpanId;
 
-    /** 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。 */
+    /**
+     * 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     */
     private final String sessionId;
 
-    /** 上游协议中的使用者标识；实际隔离含义由宿主传入的上下文约定。 */
+    /**
+     * 上游协议中的使用者标识；实际隔离含义由宿主传入的上下文约定。
+     */
     private final String userId;
 
-    /** 当前执行 Trace 的可读名称。 */
+    /**
+     * 当前执行 Trace 的可读名称。
+     */
     private final String traceName;
 
-    /** 开始时间，单位为毫秒。 */
+    /**
+     * 开始时间，单位为毫秒。
+     */
     private final long startedAtMs;
 
-    /** 按采集策略允许保留的执行输入内容。 */
+    /**
+     * 按采集策略允许保留的执行输入内容。
+     */
     private final Object traceInput;
 
-    /** 与当前 Trace 关联的宿主元数据。 */
+    /**
+     * 与当前 Trace 关联的宿主元数据。
+     */
     private final Object traceMetadata;
 
-    /** Span集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * Span集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final LinkedHashMap<String, SpanDraft> spans = new LinkedHashMap<>();
 
-    /** 工具父级Span的标识集合，用于批量关联相应记录。 */
+    /**
+     * 工具父级Span的标识集合，用于批量关联相应记录。
+     */
     final LinkedHashMap<String, String> toolParentSpanIds = new LinkedHashMap<>();
 
-    /** 当前执行或历史事件集合，供持久化、回放与观测使用。 */
+    /**
+     * 当前执行或历史事件集合，供持久化、回放与观测使用。
+     */
     private final ArrayList<HorizenTraceBatch.Event> events = new ArrayList<>();
 
-    /** 当前观测或评测事件在其所属序列中的位置。 */
+    /**
+     * 当前观测或评测事件在其所属序列中的位置。
+     */
     private final AtomicInteger eventIndex = new AtomicInteger();
 
-    /** 模型索引的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * 模型索引的原子状态，供并发更新与统计读取使用。
+     */
     final AtomicInteger modelIndex = new AtomicInteger();
 
-    /** 已结束的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * 已结束的原子状态，供并发更新与统计读取使用。
+     */
     private final AtomicBoolean ended = new AtomicBoolean();
 
-    /** 当前记录或执行的状态，具体取值由所属领域或协议约定。 */
+    /**
+     * 当前记录或执行的状态，具体取值由所属领域或协议约定。
+     */
     private volatile String status = "RUNNING";
 
-    /** 已结束时间，单位为毫秒。 */
+    /**
+     * 已结束时间，单位为毫秒。
+     */
     private volatile Long endedAtMs;
 
-    /** 按采集策略允许保留的执行最终输出。 */
+    /**
+     * 按采集策略允许保留的执行最终输出。
+     */
     private volatile Object traceOutput;
 
-    /** 本次执行最终记录的结束状态。 */
+    /**
+     * 本次执行最终记录的结束状态。
+     */
     private volatile String completionStatus = "COMPLETED";
 
     /**
      * 启动HorizenTrace运行。
      *
-     * @param config 当前组件的配置与策略参数。
-     * @param sink 当前HorizenTrace运行持有的上报端对象，供相应处理步骤使用。
-     * @param sanitizer 当前HorizenTrace运行持有的清理器对象，供相应处理步骤使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param config         当前组件的配置与策略参数。
+     * @param sink           当前HorizenTrace运行持有的上报端对象，供相应处理步骤使用。
+     * @param sanitizer      当前HorizenTrace运行持有的清理器对象，供相应处理步骤使用。
+     * @param agent          当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param runtimeContext 当前HorizenTrace运行持有的运行时上下文对象，供相应处理步骤使用。
-     * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param messages       消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @return 本次操作返回的HorizenTrace运行结果。
      */
     static HorizenTraceRun start(
@@ -137,7 +185,7 @@ final class HorizenTraceRun {
         boolean child =
                 inherited != null
                         && !Objects.equals(
-                                inherited.getRuntimeSessionId(), runtimeContext.getSessionId());
+                        inherited.getRuntimeSessionId(), runtimeContext.getSessionId());
         String runId =
                 child
                         ? inherited.getTurnId()
@@ -160,8 +208,8 @@ final class HorizenTraceRun {
                 child
                         ? agent.getName()
                         : textOr(
-                                supplied == null ? null : supplied.getName(),
-                                config.getAgentName());
+                        supplied == null ? null : supplied.getName(),
+                        config.getAgentName());
         Map<String, Object> metadata = new LinkedHashMap<>();
         metadata.put("source", config.getSource());
         metadata.put("sdkName", config.getSdkName());
@@ -217,16 +265,16 @@ final class HorizenTraceRun {
     /**
      * 创建HorizenTrace运行，初始化该组件所需的状态、配置或依赖。
      *
-     * @param config 当前组件的配置与策略参数。
-     * @param sink 当前HorizenTrace运行持有的上报端对象，供相应处理步骤使用。
-     * @param sanitizer 当前HorizenTrace运行持有的清理器对象，供相应处理步骤使用。
-     * @param runId 一次评测或外部协议运行的标识，用于状态与证据查询。
-     * @param traceId 关联本次 Agent 执行的 Trace 标识，用于归并模型与工具观测。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param userId 上游协议中的使用者标识；实际隔离含义由宿主传入的上下文约定。
-     * @param traceName 当前HorizenTrace运行使用的Trace名称，供其处理与状态记录使用。
-     * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param metadata 与当前对象关联的附加元数据，不替代领域状态或授权校验。
+     * @param config           当前组件的配置与策略参数。
+     * @param sink             当前HorizenTrace运行持有的上报端对象，供相应处理步骤使用。
+     * @param sanitizer        当前HorizenTrace运行持有的清理器对象，供相应处理步骤使用。
+     * @param runId            一次评测或外部协议运行的标识，用于状态与证据查询。
+     * @param traceId          关联本次 Agent 执行的 Trace 标识，用于归并模型与工具观测。
+     * @param sessionId        会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param userId           上游协议中的使用者标识；实际隔离含义由宿主传入的上下文约定。
+     * @param traceName        当前HorizenTrace运行使用的Trace名称，供其处理与状态记录使用。
+     * @param messages         消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param metadata         与当前对象关联的附加元数据，不替代领域状态或授权校验。
      * @param runtimeSessionId 运行时会话的标识，用于关联相应记录或执行。
      */
     private HorizenTraceRun(
@@ -279,7 +327,7 @@ final class HorizenTraceRun {
      * 共享状态的关键更新在互斥区内完成。
      *
      * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param next  将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     Flux<AgentEvent> traceModelCall(
@@ -308,11 +356,11 @@ final class HorizenTraceRun {
      * 计算或取得本方法声明的结果，供当前HorizenTraceRun处理步骤使用。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param model 当前HorizenTrace运行持有的模型对象，供相应处理步骤使用。
+     * @param model    当前HorizenTrace运行持有的模型对象，供相应处理步骤使用。
      * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param tools 工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param options 可供当前请求选择的选项或策略集合。
-     * @param next 返回结果的工作回调，由当前操作的执行或事务边界调用。
+     * @param tools    工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param options  可供当前请求选择的选项或策略集合。
+     * @param next     返回结果的工作回调，由当前操作的执行或事务边界调用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     Flux<ChatResponse> traceCompactionModelCall(
@@ -354,7 +402,7 @@ final class HorizenTraceRun {
      * 共享状态的关键更新在互斥区内完成。
      *
      * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param next  将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     Flux<AgentEvent> traceTools(ActingInput input, Function<ActingInput, Flux<AgentEvent>> next) {
@@ -401,8 +449,8 @@ final class HorizenTraceRun {
         if (event.getSource() != null && !event.getSource().isBlank()) return;
         if (event instanceof CustomEvent custom
                 && (ContextCompactionTelemetry.EVENT_NAME.equals(custom.getName())
-                        || ContextCompactionTelemetry.FAILURE_EVENT_NAME.equals(
-                                custom.getName()))) {
+                || ContextCompactionTelemetry.FAILURE_EVENT_NAME.equals(
+                custom.getName()))) {
             synchronized (this) {
                 addEvent(
                         rootSpanId,
@@ -423,9 +471,9 @@ final class HorizenTraceRun {
                                 Map.of(
                                         "replyId", textOr(confirm.getReplyId(), ""),
                                         "toolCalls",
-                                                confirm.getToolCalls().stream()
-                                                        .map(this::toolCallEventPayload)
-                                                        .toList())));
+                                        confirm.getToolCalls().stream()
+                                                .map(this::toolCallEventPayload)
+                                                .toList())));
             }
             publish();
         } else if (event instanceof UserConfirmResultEvent confirmed) {
@@ -439,20 +487,20 @@ final class HorizenTraceRun {
                                 Map.of(
                                         "replyId", textOr(confirmed.getReplyId(), ""),
                                         "decisions",
-                                                confirmed.getConfirmResults().stream()
-                                                        .map(
-                                                                result ->
-                                                                        Map.of(
-                                                                                "toolCallId",
-                                                                                        result.getToolCall()
-                                                                                                .getId(),
-                                                                                "toolName",
-                                                                                        result.getToolCall()
-                                                                                                .getName(),
-                                                                                "approved",
-                                                                                        result
-                                                                                                .isConfirmed()))
-                                                        .toList())));
+                                        confirmed.getConfirmResults().stream()
+                                                .map(
+                                                        result ->
+                                                                Map.of(
+                                                                        "toolCallId",
+                                                                        result.getToolCall()
+                                                                                .getId(),
+                                                                        "toolName",
+                                                                        result.getToolCall()
+                                                                                .getName(),
+                                                                        "approved",
+                                                                        result
+                                                                                .isConfirmed()))
+                                                .toList())));
             }
             publish();
         }
@@ -472,7 +520,9 @@ final class HorizenTraceRun {
         }
     }
 
-    /** 完成HorizenTrace运行。 */
+    /**
+     * 完成HorizenTrace运行。
+     */
     void complete() {
         finish(completionStatus, null);
     }
@@ -486,7 +536,9 @@ final class HorizenTraceRun {
         finish("ERROR", error);
     }
 
-    /** 取消HorizenTrace运行。 */
+    /**
+     * 取消HorizenTrace运行。
+     */
     void cancel() {
         finish("CANCELLED", null);
     }
@@ -497,7 +549,7 @@ final class HorizenTraceRun {
      * 共享状态的关键更新在互斥区内完成。
      *
      * @param finalStatus 当前HorizenTrace运行使用的正式状态，供其处理与状态记录使用。
-     * @param error 本次失败的异常，用于分类、传播或诊断。
+     * @param error       本次失败的异常，用于分类、传播或诊断。
      */
     private void finish(String finalStatus, Throwable error) {
         if (!ended.compareAndSet(false, true)) {
@@ -604,7 +656,9 @@ final class HorizenTraceRun {
         return Map.of("messageCount", result.size(), "messages", result);
     }
 
-    /** 提取最新用户文本作为追踪级输入；内容采集关闭或没有用户消息时返回空值。 */
+    /**
+     * 提取最新用户文本作为追踪级输入；内容采集关闭或没有用户消息时返回空值。
+     */
     private Object traceInput(List<Msg> messages) {
         if (!config.isCaptureContent() || messages == null) {
             return null;
@@ -710,11 +764,11 @@ final class HorizenTraceRun {
     /**
      * 增加事件。
      *
-     * @param spanId 当前观测操作的 Span 标识，供追踪父子操作关系。
+     * @param spanId    当前观测操作的 Span 标识，供追踪父子操作关系。
      * @param eventType 当前HorizenTrace运行使用的事件类型，供其处理与状态记录使用。
-     * @param name 需要定位或处理的名称。
-     * @param role 消息、资源引用或调用的角色，供上下文与生命周期规则区分用途。
-     * @param payload 当前HorizenTrace运行持有的负载对象，供相应处理步骤使用。
+     * @param name      需要定位或处理的名称。
+     * @param role      消息、资源引用或调用的角色，供上下文与生命周期规则区分用途。
+     * @param payload   当前HorizenTrace运行持有的负载对象，供相应处理步骤使用。
      */
     synchronized void addEvent(
             String spanId, String eventType, String name, String role, Object payload) {
@@ -787,8 +841,8 @@ final class HorizenTraceRun {
     /**
      * 写入HorizenTrace运行。
      *
-     * @param map 映射的索引映射，供按键查找或归并当前组件的数据。
-     * @param key 当前对象的查找或写入键。
+     * @param map   映射的索引映射，供按键查找或归并当前组件的数据。
+     * @param key   当前对象的查找或写入键。
      * @param value 待校验、转换或保存的原始值。
      */
     private static void put(Map<String, Object> map, String key, Object value) {
@@ -798,7 +852,7 @@ final class HorizenTraceRun {
     /**
      * 生成当前操作所需的textOr文本，供调用方继续处理。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value    待校验、转换或保存的原始值。
      * @param fallback 当前HorizenTrace运行使用的回退，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */

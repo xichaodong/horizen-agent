@@ -36,15 +36,23 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
-/** 使用关系数据库事务实现 Session 与 Turn 的事实存储。 */
+/**
+ * 使用关系数据库事务实现 Session 与 Turn 的事实存储。
+ */
 public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRepository {
-    /** 按归属检索和读取正式会话历史的仓储。 */
+    /**
+     * 按归属检索和读取正式会话历史的仓储。
+     */
     private final SessionHistoryRepository historyRecall;
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final SessionTurnMapper mapper;
 
-    /** 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。 */
+    /**
+     * 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     */
     private final UnitOfWork transactions;
 
     /**
@@ -59,7 +67,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 创建JDBC会话执行存储，初始化该组件所需的状态、配置或依赖。
      *
-     * @param dataSource 当前存储适配器使用的数据源；资源所有权由组装方约定。
+     * @param dataSource        当前存储适配器使用的数据源；资源所有权由组装方约定。
      * @param leaseQueryTimeout 租约查询允许持续的最长等待时间。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -76,7 +84,9 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
         this.transactions = new JdbcUnitOfWork(dataSource);
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcSessionTurnStore(
             SessionTurnMapper mapper,
             UnitOfWork transactions,
@@ -273,7 +283,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 更新会话处理后状态转换。
      *
-     * @param command 当前JDBC会话执行存储持有的命令对象，供相应处理步骤使用。
+     * @param command      当前JDBC会话执行存储持有的命令对象，供相应处理步骤使用。
      * @param nextSequence 下一页查询或下一次回放可以继续使用的游标。
      */
     private void updateSessionAfterTransition(TransitionTurnCommand command, Long nextSequence) {
@@ -323,11 +333,11 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 续期租约。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
-     * @param executorId 持有当前执行段的执行实例标识，用于租约与跨实例控制。
+     * @param ownerKey       宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param turnId         单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param executorId     持有当前执行段的执行实例标识，用于租约与跨实例控制。
      * @param leaseExpiresAt 执行实例租约到期时间，用于判断执行权是否仍有效。
-     * @param updatedAt 当前记录最近一次更新的时间。
+     * @param updatedAt      当前记录最近一次更新的时间。
      * @return 本次检查是否通过或本次更新是否成功。
      */
     @Override
@@ -347,9 +357,9 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
      * 续期租约集合。
      *
      * @param turnIdsByOwner 执行标识集合按条件数据归属的索引映射，供按键查找或归并当前组件的数据。
-     * @param executorId 持有当前执行段的执行实例标识，用于租约与跨实例控制。
+     * @param executorId     持有当前执行段的执行实例标识，用于租约与跨实例控制。
      * @param leaseExpiresAt 执行实例租约到期时间，用于判断执行权是否仍有效。
-     * @param updatedAt 当前记录最近一次更新的时间。
+     * @param updatedAt      当前记录最近一次更新的时间。
      * @return 本次操作返回的整数结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -384,7 +394,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 查找会话。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -400,7 +410,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
      * 查找执行。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId   单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
     @Override
@@ -414,7 +424,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 查找最近版本执行。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -430,8 +440,8 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
      * 查询列表中的会话集合。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param limit 本次处理或返回数量上限。
-     * @param offset 本次读取的起始偏移。
+     * @param limit    本次处理或返回数量上限。
+     * @param offset   本次读取的起始偏移。
      * @return 本次处理得到的结果集合。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -453,9 +463,9 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 检查renameSession对应的条件，供调用方选择后续处理分支。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param title 当前JDBC会话执行存储的可读标题，供宿主界面展示。
+     * @param title     当前JDBC会话执行存储的可读标题，供宿主界面展示。
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -463,20 +473,20 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     public boolean renameSession(
             String ownerKey, String sessionId, String title, Instant updatedAt) {
         return mapper.updateRenameSession(
-                        title,
-                        JdbcExecutionMappings.timestamp(updatedAt),
-                        ownerKey,
-                        sessionId,
-                        SessionStatus.ACTIVE.name())
+                title,
+                JdbcExecutionMappings.timestamp(updatedAt),
+                ownerKey,
+                sessionId,
+                SessionStatus.ACTIVE.name())
                 == 1;
     }
 
     /**
      * 设置会话置顶。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param pinned 会话是否置顶，影响会话目录展示顺序。
+     * @param pinned    会话是否置顶，影响会话目录展示顺序。
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -484,18 +494,18 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     public boolean setSessionPinned(
             String ownerKey, String sessionId, boolean pinned, Instant updatedAt) {
         return mapper.updateSetSessionPinned(
-                        pinned,
-                        JdbcExecutionMappings.timestamp(updatedAt),
-                        ownerKey,
-                        sessionId,
-                        SessionStatus.ACTIVE.name())
+                pinned,
+                JdbcExecutionMappings.timestamp(updatedAt),
+                ownerKey,
+                sessionId,
+                SessionStatus.ACTIVE.name())
                 == 1;
     }
 
     /**
      * 检查archiveSession对应的条件，供调用方选择后续处理分支。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次检查是否通过或本次更新是否成功。
@@ -503,18 +513,18 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     @Override
     public boolean archiveSession(String ownerKey, String sessionId, Instant updatedAt) {
         return mapper.updateArchiveSession(
-                        SessionStatus.ARCHIVED.name(),
-                        JdbcExecutionMappings.timestamp(updatedAt),
-                        ownerKey,
-                        sessionId,
-                        SessionStatus.ACTIVE.name())
+                SessionStatus.ARCHIVED.name(),
+                JdbcExecutionMappings.timestamp(updatedAt),
+                ownerKey,
+                sessionId,
+                SessionStatus.ACTIVE.name())
                 == 1;
     }
 
     /**
      * 查询列表中的正式消息集合。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次处理得到的结果集合。
      */
@@ -542,7 +552,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 查找过期租约集合。
      *
-     * @param now 用于本次更新或过期判断的当前时间。
+     * @param now   用于本次更新或过期判断的当前时间。
      * @param limit 本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -566,7 +576,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 查找超过时限执行集合。
      *
-     * @param now 用于本次更新或过期判断的当前时间。
+     * @param now   用于本次更新或过期判断的当前时间。
      * @param limit 本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -592,11 +602,11 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 确保会话。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param actorId 实际操作方的审计标识，与数据隔离使用的 ownerKey 分开保存。
+     * @param ownerKey     宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId    会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param actorId      实际操作方的审计标识，与数据隔离使用的 ownerKey 分开保存。
      * @param firstMessage 当前JDBC会话执行存储使用的首个消息，供其处理与状态记录使用。
-     * @param now 用于本次更新或过期判断的当前时间。
+     * @param now          用于本次更新或过期判断的当前时间。
      */
     private void ensureSession(
             String ownerKey, String sessionId, String actorId, String firstMessage, Instant now) {
@@ -618,7 +628,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 计算或取得本方法声明的结果，供当前JdbcSessionTurnStore处理步骤使用。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -633,7 +643,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
      * 计算或取得本方法声明的结果，供当前JdbcSessionTurnStore处理步骤使用。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId   单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
     private Optional<AgentTurn> lockTurn(String ownerKey, String turnId) {
@@ -646,7 +656,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 查找执行按条件请求。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param requestId 调用方提供的请求标识，用于区分重复提交和关联幂等处理。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
@@ -662,7 +672,7 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 计算或取得本方法声明的结果，供当前JdbcSessionTurnStore处理步骤使用。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次操作返回的长整型结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -678,14 +688,14 @@ public class JdbcSessionTurnStore implements SessionTurnStore, SessionHistoryRep
     /**
      * 完成当前操作的insertMessage步骤，按实现更新相应状态或依赖。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @param messageId 会话消息的标识，用于历史查询与过程事件关联。
-     * @param role 消息、资源引用或调用的角色，供上下文与生命周期规则区分用途。
-     * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
-     * @param sequence 当前记录在对应序列中的位置，用于排序或继续读取。
-     * @param now 用于本次更新或过期判断的当前时间。
+     * @param role      消息、资源引用或调用的角色，供上下文与生命周期规则区分用途。
+     * @param content   当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+     * @param sequence  当前记录在对应序列中的位置，用于排序或继续读取。
+     * @param now       用于本次更新或过期判断的当前时间。
      */
     private void insertMessage(
             String ownerKey,

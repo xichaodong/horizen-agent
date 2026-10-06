@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/** 运行时输入映射边界：RuntimeInputMapper。 */
+/**
+ * 运行时输入映射边界：RuntimeInputMapper。
+ */
 final class RuntimeInputMapper {
     /**
      * 构造输入消息。

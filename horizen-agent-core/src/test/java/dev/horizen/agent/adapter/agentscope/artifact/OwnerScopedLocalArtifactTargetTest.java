@@ -15,7 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 class OwnerScopedLocalArtifactTargetTest {
-    @TempDir Path directory;
+    @TempDir
+    Path directory;
 
     @Test
     void separatesOwnersEvenWhenSessionAndFileNamesMatch() throws Exception {

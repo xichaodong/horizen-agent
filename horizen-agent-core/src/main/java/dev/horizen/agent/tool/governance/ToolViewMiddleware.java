@@ -31,18 +31,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-/** 为每次模型推理捕获经过工具分组过滤后的准确工具集合。 */
+/**
+ * 为每次模型推理捕获经过工具分组过滤后的准确工具集合。
+ */
 public final class ToolViewMiddleware implements MiddlewareBase {
-    /** 当前组件的诊断日志器。 */
+    /**
+     * 当前组件的诊断日志器。
+     */
     private static final Logger log = LoggerFactory.getLogger(ToolViewMiddleware.class);
 
-    /** 按工具名维护执行元数据与可用状态的注册表。 */
+    /**
+     * 按工具名维护执行元数据与可用状态的注册表。
+     */
     private final ToolDescriptorRegistry registry;
 
-    /** 适配器Resolvers的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+    /**
+     * 适配器Resolvers的有序集合，保留当前组件处理或协议输出所需的顺序。
+     */
     private final List<ToolCatalogResolver> adapterResolvers;
 
-    /** 创建工具视图中间件，初始化该组件所需的状态、配置或依赖。 */
+    /**
+     * 创建工具视图中间件，初始化该组件所需的状态、配置或依赖。
+     */
     public ToolViewMiddleware() {
         this(null, List.of());
     }
@@ -59,7 +69,7 @@ public final class ToolViewMiddleware implements MiddlewareBase {
     /**
      * 创建工具视图中间件，初始化该组件所需的状态、配置或依赖。
      *
-     * @param registry 当前工具视图中间件持有的注册表对象，供相应处理步骤使用。
+     * @param registry         当前工具视图中间件持有的注册表对象，供相应处理步骤使用。
      * @param adapterResolvers 适配器Resolvers的有序集合，保留当前组件处理或协议输出所需的顺序。
      */
     public ToolViewMiddleware(
@@ -71,10 +81,10 @@ public final class ToolViewMiddleware implements MiddlewareBase {
     /**
      * 响应Agent。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -128,10 +138,10 @@ public final class ToolViewMiddleware implements MiddlewareBase {
     /**
      * 响应模型推理。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -152,7 +162,7 @@ public final class ToolViewMiddleware implements MiddlewareBase {
                                         registry == null
                                                 || !registry.isProviderTool(schema.getName())
                                                 || (business != null
-                                                        && business.allows(schema.getName())))
+                                                && business.allows(schema.getName())))
                         .toList();
         for (ToolSchema schema : visible) names.add(schema.getName());
         ToolInvocationScope scope = context.get(ToolInvocationScope.class);
@@ -178,10 +188,10 @@ public final class ToolViewMiddleware implements MiddlewareBase {
     /**
      * 响应Acting。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override

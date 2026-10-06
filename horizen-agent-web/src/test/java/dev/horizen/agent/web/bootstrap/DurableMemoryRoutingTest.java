@@ -17,7 +17,8 @@ import org.junit.jupiter.api.io.TempDir;
 import java.nio.file.Path;
 
 class DurableMemoryRoutingTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void sharesMemoryAcrossSessionsButIsolatesOwners() {

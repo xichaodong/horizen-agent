@@ -1,9 +1,10 @@
-import { post } from '../api/client.js';
-import { createId } from '../utils/chat.js';
+import {post} from '../api/client.js';
+import {createId} from '../utils/chat.js';
+
 /** 提交审批和澄清决定后重新观察原执行；已提交决定不会因观察连接失败而回退。 */
-export function useInteractionActions({ session, execution }) {
-    const { activeSessionId, activeSession, updateSession, appendMessage } = session;
-    const { streams, turnIdsRef, streamSequencesRef, followSessionResponse } = execution;
+export function useInteractionActions({session, execution}) {
+    const {activeSessionId, activeSession, updateSession, appendMessage} = session;
+    const {streams, turnIdsRef, streamSequencesRef, followSessionResponse} = execution;
     const resolve = async (message, url, body, resolvedStatus) => {
         const sessionId = activeSessionId;
         const controller = streams.begin(sessionId);
@@ -12,12 +13,12 @@ export function useInteractionActions({ session, execution }) {
             updateSession(sessionId, (value) => ({
                 ...value,
                 messages: value.messages.map((item) =>
-                    item.id === message.id ? { ...item, status } : item
+                    item.id === message.id ? {...item, status} : item
                 ),
             }));
         updateCard('submitting');
         try {
-            const response = await post(url, body, { signal: controller.signal });
+            const response = await post(url, body, {signal: controller.signal});
             if (!response.ok) throw new Error('交互提交失败');
             const result = await response.json();
             committed = true;
@@ -39,7 +40,7 @@ export function useInteractionActions({ session, execution }) {
                     afterTimelineSequence: activeSession?.timelineSequence || 0,
                     afterEventSequence: 0,
                 },
-                { signal: controller.signal, stream: true }
+                {signal: controller.signal, stream: true}
             );
             await followSessionResponse(
                 sessionId,
@@ -82,8 +83,8 @@ export function useInteractionActions({ session, execution }) {
         resolve(
             message,
             '/api/ask-user/answer',
-            { askUserId: message.askUserId, answers, skip },
+            {askUserId: message.askUserId, answers, skip},
             'resolved'
         );
-    return { decideApprovals, submitAskUser };
+    return {decideApprovals, submitAskUser};
 }

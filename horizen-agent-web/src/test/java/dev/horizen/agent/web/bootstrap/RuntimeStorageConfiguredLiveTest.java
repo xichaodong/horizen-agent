@@ -71,30 +71,34 @@ class RuntimeStorageConfiguredLiveTest {
                         new JdbcTemplate(dataSource)
                                 .query(
                                         "SELECT request_json, response_json, version FROM ha_interaction WHERE 1 = 0",
-                                        ignored -> {}));
+                                        ignored -> {
+                                        }));
         assertDoesNotThrow(
                 () ->
                         new JdbcTemplate(dataSource)
                                 .query(
                                         "SELECT project_id, agent_key, workspace_release_id, workspace_release_hash"
                                                 + " FROM ha_session WHERE 1 = 0",
-                                        ignored -> {}));
+                                        ignored -> {
+                                        }));
         assertDoesNotThrow(
                 () ->
                         new JdbcTemplate(dataSource)
                                 .query(
                                         "SELECT content_ref, version FROM ha_workspace_file WHERE 1 = 0",
-                                        ignored -> {}));
+                                        ignored -> {
+                                        }));
         assertDoesNotThrow(
                 () ->
                         new JdbcTemplate(dataSource)
                                 .query(
                                         "SELECT snapshot_id FROM ha_session WHERE 1 = 0",
-                                        ignored -> {}));
+                                        ignored -> {
+                                        }));
         try (RuntimeStorage storage =
-                RuntimeStorage.open(
-                        properties,
-                        InMemoryWorkspaceContentRepository.shared("runtime-storage-tests"))) {
+                     RuntimeStorage.open(
+                             properties,
+                             InMemoryWorkspaceContentRepository.shared("runtime-storage-tests"))) {
             RuntimeStorage.DatabasePoolStatus pool = storage.databasePoolStatus();
             assertEquals(properties.getJdbcMaximumPoolSize(), pool.getMaximumPoolSize());
             assertTrue(pool.getTotalConnections() >= 1);
@@ -230,15 +234,15 @@ class RuntimeStorageConfiguredLiveTest {
         Path schema =
                 Path.of("..", "horizen-agent-storage-jdbc", "src", "main", "resources", "schema");
         new ResourceDatabasePopulator(
-                        new FileSystemResource(schema.resolve("mysql-artifact-ask-user.sql")),
-                        new FileSystemResource(schema.resolve("mysql-presentation.sql")),
-                        new FileSystemResource(schema.resolve("mysql-session-catalog.sql")),
-                        new FileSystemResource(schema.resolve("mysql-turn-timeline.sql")),
-                        new FileSystemResource(
-                                schema.resolve("mysql-session-workspace-release.sql")),
-                        new FileSystemResource(schema.resolve("mysql-workspace-document.sql")),
-                        new FileSystemResource(
-                                schema.resolve("mysql-session-workspace-snapshot.sql")))
+                new FileSystemResource(schema.resolve("mysql-artifact-ask-user.sql")),
+                new FileSystemResource(schema.resolve("mysql-presentation.sql")),
+                new FileSystemResource(schema.resolve("mysql-session-catalog.sql")),
+                new FileSystemResource(schema.resolve("mysql-turn-timeline.sql")),
+                new FileSystemResource(
+                        schema.resolve("mysql-session-workspace-release.sql")),
+                new FileSystemResource(schema.resolve("mysql-workspace-document.sql")),
+                new FileSystemResource(
+                        schema.resolve("mysql-session-workspace-snapshot.sql")))
                 .execute(
                         new DriverManagerDataSource(
                                 required(config, "horizen.agent.storage.jdbc-url"),

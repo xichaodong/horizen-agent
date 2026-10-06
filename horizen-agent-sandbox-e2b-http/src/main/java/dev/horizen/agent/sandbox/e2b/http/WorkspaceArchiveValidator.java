@@ -11,16 +11,21 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-/** 解压前校验完整 tar，保留归档内部安全链接的可用性。 */
+/**
+ * 解压前校验完整 tar，保留归档内部安全链接的可用性。
+ */
 final class WorkspaceArchiveValidator {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private WorkspaceArchiveValidator() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private WorkspaceArchiveValidator() {
+    }
 
     /**
      * 验证工作区归档的条目数量、总容量与路径，拒绝越界路径和不允许的归档内容。
      *
-     * @param archive 当前工作区归档校验器持有的归档对象，供相应处理步骤使用。
-     * @param maxBytes 本次处理或传输允许的最大字节数。
+     * @param archive    当前工作区归档校验器持有的归档对象，供相应处理步骤使用。
+     * @param maxBytes   本次处理或传输允许的最大字节数。
      * @param maxEntries 归档或目录中允许处理的条目数量上限。
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -41,9 +46,9 @@ final class WorkspaceArchiveValidator {
                 byte type = entry.getLinkFlag();
                 if (entry.isSparse()
                         || !(type == TarConstants.LF_NORMAL
-                                || type == TarConstants.LF_OLDNORM
-                                || type == TarConstants.LF_DIR
-                                || type == TarConstants.LF_SYMLINK)) {
+                        || type == TarConstants.LF_OLDNORM
+                        || type == TarConstants.LF_DIR
+                        || type == TarConstants.LF_SYMLINK)) {
                     throw new IOException("unsupported workspace archive entry");
                 }
                 bytes += entry.getSize();

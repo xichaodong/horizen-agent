@@ -13,23 +13,31 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 
-/** 每次调用重建派生能力状态，保留对话和待处理操作。 */
+/**
+ * 每次调用重建派生能力状态，保留对话和待处理操作。
+ */
 public final class PublicationStateMiddleware implements MiddlewareBase {
-    /** 沙箱执行的工作目录，发布文件投影与写入规则以此为基准。 */
+    /**
+     * 沙箱执行的工作目录，发布文件投影与写入规则以此为基准。
+     */
     private final String sandboxRoot;
 
-    /** 默认分组集合的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+    /**
+     * 默认分组集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     */
     private final List<String> defaultGroups;
 
-    /** 子级工具集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 子级工具集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, Set<String>> childTools;
 
     /**
      * 创建发布工作状态中间件，初始化该组件所需的状态、配置或依赖。
      *
-     * @param sandboxRoot 当前发布工作状态中间件使用的沙箱根，供其处理与状态记录使用。
+     * @param sandboxRoot   当前发布工作状态中间件使用的沙箱根，供其处理与状态记录使用。
      * @param defaultGroups 默认分组集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param childTools 子级工具集合的索引映射，供按键查找或归并当前组件的数据。
+     * @param childTools    子级工具集合的索引映射，供按键查找或归并当前组件的数据。
      */
     public PublicationStateMiddleware(
             String sandboxRoot, List<String> defaultGroups, Map<String, Set<String>> childTools) {
@@ -51,9 +59,9 @@ public final class PublicationStateMiddleware implements MiddlewareBase {
     /**
      * 响应系统Prompt。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param prompt 传给模型的提示文本，供当前模型请求使用。
+     * @param prompt  传给模型的提示文本，供当前模型请求使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -67,8 +75,8 @@ public final class PublicationStateMiddleware implements MiddlewareBase {
             List<String> groups =
                     agent instanceof ReActAgent react
                             ? defaultGroups.stream()
-                                    .filter(name -> react.getToolkit().getToolGroup(name) != null)
-                                    .toList()
+                            .filter(name -> react.getToolkit().getToolGroup(name) != null)
+                            .toList()
                             : defaultGroups;
             var state = RuntimeContext.resolveAgentState(context, agent);
             if (state != null) {
@@ -84,10 +92,10 @@ public final class PublicationStateMiddleware implements MiddlewareBase {
     /**
      * 响应Acting。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -113,7 +121,7 @@ public final class PublicationStateMiddleware implements MiddlewareBase {
             if (mutations.contains(call.getName())) {
                 for (var entry : call.getInput().entrySet()) {
                     if (Set.of("path", "from_path", "to_path", "source", "destination")
-                                    .contains(entry.getKey())
+                            .contains(entry.getKey())
                             && entry.getValue() instanceof String path
                             && protectedPath(path))
                         return Flux.error(
@@ -143,10 +151,10 @@ public final class PublicationStateMiddleware implements MiddlewareBase {
     /**
      * 响应模型推理。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -159,12 +167,12 @@ public final class PublicationStateMiddleware implements MiddlewareBase {
         return allowed == null
                 ? next.apply(input)
                 : next.apply(
-                        new ReasoningInput(
-                                input.messages(),
-                                input.tools().stream()
-                                        .filter(tool -> allowed.contains(tool.getName()))
-                                        .toList(),
-                                input.options()));
+                new ReasoningInput(
+                        input.messages(),
+                        input.tools().stream()
+                                .filter(tool -> allowed.contains(tool.getName()))
+                                .toList(),
+                        input.options()));
     }
 
     /**
@@ -185,9 +193,13 @@ public final class PublicationStateMiddleware implements MiddlewareBase {
         return WorkspaceFilePolicy.serverOwned(normalized);
     }
 
-    /** 发布工作状态中间件内部的Seen，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 发布工作状态中间件内部的Seen，封装该步骤需要的状态或输入输出。
+     */
     private static final class Seen {
-        /** Agent集合的去重集合，供成员查找或范围检查使用。 */
+        /**
+         * Agent集合的去重集合，供成员查找或范围检查使用。
+         */
         final Set<Agent> agents =
                 Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap<>()));
     }

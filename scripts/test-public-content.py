@@ -49,6 +49,22 @@ class PublicContentTest(unittest.TestCase):
         subprocess.run(["git", "-C", str(self.root), "add", "-f", ".env.yml"], check=True)
         self.assertTrue(scanner.check(self.root, staged=True)[1])
 
+    def test_only_shared_idea_code_styles_are_allowed(self):
+        for name in scanner.PUBLIC_IDEA_FILES:
+            self.write(name, '<component name="ProjectCodeStyleConfiguration" />')
+            self.stage(name)
+        self.assertFalse(scanner.check(self.root, staged=True)[1])
+        self.write('.idea/workspace.xml', '<project />')
+        self.stage('.idea/workspace.xml')
+        self.assertTrue(any(label == 'private/generated directory'
+                            for _, _, label in scanner.check(self.root, staged=True)[1]))
+
+    def test_public_idea_settings_still_reject_private_values(self):
+        self.write('.idea/codeStyles/Project.xml', '<option value="/' + 'home/private-user/project/" />')
+        self.stage('.idea/codeStyles/Project.xml')
+        self.assertTrue(any(label == 'private local path'
+                            for _, _, label in scanner.check(self.root, staged=True)[1]))
+
     def test_missing_document_target_fails_and_valid_index_target_passes(self):
         self.write("README.md", "[Guide](guides/guide.md)\n")
         self.assertTrue(scanner.check(self.root)[1])

@@ -9,4 +9,5 @@ package dev.horizen.agent.tool.adapter;
  * 接受身份、租户或授权字段。
  */
 @Deprecated
-public interface ToolAdapter extends ToolProvider {}
+public interface ToolAdapter extends ToolProvider {
+}

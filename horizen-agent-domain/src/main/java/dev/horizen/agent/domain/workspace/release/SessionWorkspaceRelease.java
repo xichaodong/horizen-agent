@@ -6,23 +6,31 @@ import lombok.Value;
 
 import java.util.Objects;
 
-/** 属于 Session 的不可变发布身份，不属于沙箱或单个 Skill。 */
+/**
+ * 属于 Session 的不可变发布身份，不属于沙箱或单个 Skill。
+ */
 @Value
 public class SessionWorkspaceRelease {
-    /** 当前资源目录或目录定位键，用于查找可用发布与工具。 */
+    /**
+     * 当前资源目录或目录定位键，用于查找可用发布与工具。
+     */
     AgentCatalogKey catalog;
 
-    /** 发布记录标识，用于取得会话绑定的具体发布快照。 */
+    /**
+     * 发布记录标识，用于取得会话绑定的具体发布快照。
+     */
     long releaseId;
 
-    /** 发布内容哈希，用于完整性校验和锁定会话的发布内容。 */
+    /**
+     * 发布内容哈希，用于完整性校验和锁定会话的发布内容。
+     */
     String releaseHash;
 
     /**
      * 创建会话工作区发布，初始化该组件所需的状态、配置或依赖。
      *
-     * @param catalog 当前资源目录或目录定位键，用于查找可用发布与工具。
-     * @param releaseId 发布记录标识，用于取得会话绑定的具体发布快照。
+     * @param catalog     当前资源目录或目录定位键，用于查找可用发布与工具。
+     * @param releaseId   发布记录标识，用于取得会话绑定的具体发布快照。
      * @param releaseHash 发布内容哈希，用于完整性校验和锁定会话的发布内容。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

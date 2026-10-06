@@ -11,65 +11,105 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-/** 追踪采集与可选 HTTP 导出器共用的配置。 */
+/**
+ * 追踪采集与可选 HTTP 导出器共用的配置。
+ */
 @Data
 public class HorizenTraceConfig {
-    /** 远端服务的基础地址，用于拼接接口路径。 */
+    /**
+     * 远端服务的基础地址，用于拼接接口路径。
+     */
     private URI baseUrl;
 
-    /** 工作区或发布所属 Project 的标识，参与资源归属校验。 */
+    /**
+     * 工作区或发布所属 Project 的标识，参与资源归属校验。
+     */
     private long projectId;
 
-    /** 观测服务端请求使用的访问凭据，不属于模型输入。 */
-    @ToString.Exclude private String authToken;
+    /**
+     * 观测服务端请求使用的访问凭据，不属于模型输入。
+     */
+    @ToString.Exclude
+    private String authToken;
 
-    /** 当前事件、内容或执行的来源，供追踪生成关系与执行层级使用。 */
+    /**
+     * 当前事件、内容或执行的来源，供追踪生成关系与执行层级使用。
+     */
     private String source;
 
-    /** 上报数据所声明的 SDK 名称，供远端识别接入来源。 */
+    /**
+     * 上报数据所声明的 SDK 名称，供远端识别接入来源。
+     */
     private String sdkName;
 
-    /** SDK的版本，供兼容或并发检查使用。 */
+    /**
+     * SDK的版本，供兼容或并发检查使用。
+     */
     private String sdkVersion;
 
-    /** 观测数据中的 Agent 展示名称。 */
+    /**
+     * 观测数据中的 Agent 展示名称。
+     */
     private String agentName;
 
-    /** 观测数据中的执行方展示名称。 */
+    /**
+     * 观测数据中的执行方展示名称。
+     */
     private String executorName;
 
-    /** 运行环境的标识，供远端按环境组织观测数据。 */
+    /**
+     * 运行环境的标识，供远端按环境组织观测数据。
+     */
     private String environment;
 
-    /** Agent目标的标识，用于关联相应记录或执行。 */
+    /**
+     * Agent目标的标识，用于关联相应记录或执行。
+     */
     private Long agentTargetId;
 
-    /** 是否采集消息与工具正文；关闭时仅保留必要的运行元数据。 */
+    /**
+     * 是否采集消息与工具正文；关闭时仅保留必要的运行元数据。
+     */
     private boolean captureContent;
 
-    /** 单次远端请求允许的最长等待时间。 */
+    /**
+     * 单次远端请求允许的最长等待时间。
+     */
     private Duration requestTimeout;
 
-    /** 积累或上报一批数据前的刷新间隔。 */
+    /**
+     * 积累或上报一批数据前的刷新间隔。
+     */
     private Duration flushInterval;
 
-    /** 待处理队列可容纳的项目数量上限。 */
+    /**
+     * 待处理队列可容纳的项目数量上限。
+     */
     private int queueCapacity;
 
-    /** 关闭时等待在途任务收敛的最长时间。 */
+    /**
+     * 关闭时等待在途任务收敛的最长时间。
+     */
     private Duration shutdownTimeout;
 
-    /** 首次请求之后允许执行的额外重试次数上限。 */
+    /**
+     * 首次请求之后允许执行的额外重试次数上限。
+     */
     private int maxRetries = 2;
 
-    /** 重试初始延迟的时间配置，供等待、调度或失效判断使用。 */
+    /**
+     * 重试初始延迟的时间配置，供等待、调度或失效判断使用。
+     */
     private Duration retryInitialDelay = Duration.ofMillis(100);
 
-    /** 重试最大延迟的时间配置，供等待、调度或失效判断使用。 */
+    /**
+     * 重试最大延迟的时间配置，供等待、调度或失效判断使用。
+     */
     private Duration retryMaxDelay = Duration.ofSeconds(1);
 
     /**
      * 校验重试策略。
+     *
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public void validateRetryPolicy() {
@@ -88,39 +128,39 @@ public class HorizenTraceConfig {
     /**
      * 创建HorizenTrace配置，初始化该组件所需的状态、配置或依赖。
      *
-     * @param baseUrl 远端服务的基础地址，用于拼接接口路径。
-     * @param projectId 工作区或发布所属 Project 的标识，参与资源归属校验。
-     * @param authToken 当前HorizenTrace配置使用的auth令牌，供其处理与状态记录使用。
-     * @param source 待解析或转换的来源对象。
-     * @param sdkName 当前HorizenTrace配置使用的SDK名称，供其处理与状态记录使用。
-     * @param sdkVersion SDK的版本，供兼容或并发检查使用。
-     * @param agentName 当前HorizenTrace配置使用的Agent名称，供其处理与状态记录使用。
-     * @param executorName 当前HorizenTrace配置使用的执行方名称，供其处理与状态记录使用。
-     * @param environment 当前HorizenTrace配置使用的环境，供其处理与状态记录使用。
-     * @param agentTargetId Agent目标的标识，用于关联相应记录或执行。
-     * @param captureContent 是否采集消息与工具正文；关闭时仅保留必要的运行元数据。
-     * @param requestTimeout 单次远端请求允许的最长等待时间。
-     * @param flushInterval 积累或上报一批数据前的刷新间隔。
-     * @param queueCapacity 待处理队列可容纳的项目数量上限。
+     * @param baseUrl         远端服务的基础地址，用于拼接接口路径。
+     * @param projectId       工作区或发布所属 Project 的标识，参与资源归属校验。
+     * @param authToken       当前HorizenTrace配置使用的auth令牌，供其处理与状态记录使用。
+     * @param source          待解析或转换的来源对象。
+     * @param sdkName         当前HorizenTrace配置使用的SDK名称，供其处理与状态记录使用。
+     * @param sdkVersion      SDK的版本，供兼容或并发检查使用。
+     * @param agentName       当前HorizenTrace配置使用的Agent名称，供其处理与状态记录使用。
+     * @param executorName    当前HorizenTrace配置使用的执行方名称，供其处理与状态记录使用。
+     * @param environment     当前HorizenTrace配置使用的环境，供其处理与状态记录使用。
+     * @param agentTargetId   Agent目标的标识，用于关联相应记录或执行。
+     * @param captureContent  是否采集消息与工具正文；关闭时仅保留必要的运行元数据。
+     * @param requestTimeout  单次远端请求允许的最长等待时间。
+     * @param flushInterval   积累或上报一批数据前的刷新间隔。
+     * @param queueCapacity   待处理队列可容纳的项目数量上限。
      * @param shutdownTimeout 关闭时等待在途任务收敛的最长时间。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @ConstructorProperties({
-        "baseUrl",
-        "projectId",
-        "authToken",
-        "source",
-        "sdkName",
-        "sdkVersion",
-        "agentName",
-        "executorName",
-        "environment",
-        "agentTargetId",
-        "captureContent",
-        "requestTimeout",
-        "flushInterval",
-        "queueCapacity",
-        "shutdownTimeout"
+            "baseUrl",
+            "projectId",
+            "authToken",
+            "source",
+            "sdkName",
+            "sdkVersion",
+            "agentName",
+            "executorName",
+            "environment",
+            "agentTargetId",
+            "captureContent",
+            "requestTimeout",
+            "flushInterval",
+            "queueCapacity",
+            "shutdownTimeout"
     })
     public HorizenTraceConfig(
             URI baseUrl,
@@ -140,7 +180,7 @@ public class HorizenTraceConfig {
             Duration shutdownTimeout) {
         Objects.requireNonNull(baseUrl, "baseUrl");
         if (!("http".equalsIgnoreCase(baseUrl.getScheme())
-                        || "https".equalsIgnoreCase(baseUrl.getScheme()))
+                || "https".equalsIgnoreCase(baseUrl.getScheme()))
                 || baseUrl.getHost() == null
                 || baseUrl.getUserInfo() != null
                 || baseUrl.getFragment() != null) {
@@ -192,7 +232,7 @@ public class HorizenTraceConfig {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param baseUrl 远端服务的基础地址，用于拼接接口路径。
+     * @param baseUrl   远端服务的基础地址，用于拼接接口路径。
      * @param projectId 工作区或发布所属 Project 的标识，参与资源归属校验。
      * @return 本次操作返回的HorizenTrace配置结果。
      */
@@ -215,7 +255,9 @@ public class HorizenTraceConfig {
                 Duration.ofSeconds(3));
     }
 
-    /** 从进程环境变量加载 Horizen 追踪配置；未启用追踪时返回空 Optional。 */
+    /**
+     * 从进程环境变量加载 Horizen 追踪配置；未启用追踪时返回空 Optional。
+     */
     public static Optional<HorizenTraceConfig> fromEnvironment() {
         return fromEnvironment(System.getenv());
     }
@@ -294,7 +336,7 @@ public class HorizenTraceConfig {
     /**
      * 生成当前操作所需的textOr文本，供调用方继续处理。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value    待校验、转换或保存的原始值。
      * @param fallback 当前HorizenTrace配置使用的回退，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */
@@ -316,7 +358,7 @@ public class HorizenTraceConfig {
      * 生成当前操作所需的firstText文本，供调用方继续处理。
      *
      * @param environment 当前HorizenTrace配置使用的环境，供其处理与状态记录使用。
-     * @param names 当前HorizenTrace配置持有的名称集合对象，供相应处理步骤使用。
+     * @param names       当前HorizenTrace配置持有的名称集合对象，供相应处理步骤使用。
      * @return 本次处理生成或读取的文本。
      */
     private static String firstText(Map<String, String> environment, String... names) {
@@ -330,7 +372,7 @@ public class HorizenTraceConfig {
     /**
      * 检查booleanValue对应的条件，供调用方选择后续处理分支。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value    待校验、转换或保存的原始值。
      * @param fallback 回退的状态标记，用于选择当前组件的处理路径。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -346,7 +388,7 @@ public class HorizenTraceConfig {
     /**
      * 计算或取得本方法声明的结果，供当前HorizenTraceConfig处理步骤使用。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value    待校验、转换或保存的原始值。
      * @param fallback 当前HorizenTrace配置使用的回退，供其处理与状态记录使用。
      * @return 本次操作返回的长整型结果。
      */

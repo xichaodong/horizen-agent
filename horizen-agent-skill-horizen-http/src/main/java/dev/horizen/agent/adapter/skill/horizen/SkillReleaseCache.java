@@ -33,32 +33,46 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/** 以 releaseHash 为键的不可变磁盘缓存，用于下载优化和进程重启恢复。 */
+/**
+ * 以 releaseHash 为键的不可变磁盘缓存，用于下载优化和进程重启恢复。
+ */
 public final class SkillReleaseCache {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 清单文件使用的固定标识或协议文本。 */
+    /**
+     * 清单文件使用的固定标识或协议文本。
+     */
     private static final String MANIFEST_FILE = "release.json";
 
-    /** 本组件使用的根路径或根对象，限定后续读取与定位范围。 */
+    /**
+     * 本组件使用的根路径或根对象，限定后续读取与定位范围。
+     */
     private final Path root;
 
-    /** 最大文件的数量，供运行统计或容量控制使用。 */
+    /**
+     * 最大文件的数量，供运行统计或容量控制使用。
+     */
     private final int maxFileCount;
 
-    /** 最大Unpacked的字节数，用于容量或传输限制。 */
+    /**
+     * 最大Unpacked的字节数，用于容量或传输限制。
+     */
     private final long maxUnpackedBytes;
 
-    /** 归档解压允许的最大膨胀比例，用于限制异常压缩内容。 */
+    /**
+     * 归档解压允许的最大膨胀比例，用于限制异常压缩内容。
+     */
     private final int maxCompressionRatio;
 
     /**
      * 创建Skill发布缓存，初始化该组件所需的状态、配置或依赖。
      *
-     * @param root 当前操作允许使用的根路径。
-     * @param maxFileCount 最大文件的数量，供运行统计或容量控制使用。
-     * @param maxUnpackedBytes 最大Unpacked的字节数，用于容量或传输限制。
+     * @param root                当前操作允许使用的根路径。
+     * @param maxFileCount        最大文件的数量，供运行统计或容量控制使用。
+     * @param maxUnpackedBytes    最大Unpacked的字节数，用于容量或传输限制。
      * @param maxCompressionRatio 当前Skill发布缓存使用的最大压缩Ratio，供其处理与状态记录使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -77,7 +91,7 @@ public final class SkillReleaseCache {
      * 下载并校验 Skill 发布制品，准备可供渐进读取的本地目录。
      *
      * @param manifest 当前Skill发布缓存持有的清单对象，供相应处理步骤使用。
-     * @param client 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     * @param client   当前适配器使用的远端客户端，供实际网络或服务请求使用。
      * @return 本次操作返回的Skill发布快照结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -159,9 +173,9 @@ public final class SkillReleaseCache {
                                     + item.getRuntimeName());
                 }
                 if (skills.put(
-                                item.getRuntimeName(),
-                                SkillReleaseSnapshot.skill(
-                                        new String(markdown, StandardCharsets.UTF_8), files))
+                        item.getRuntimeName(),
+                        SkillReleaseSnapshot.skill(
+                                new String(markdown, StandardCharsets.UTF_8), files))
                         != null) {
                     throw new IllegalStateException(
                             "Duplicate runtimeName in release: " + item.getRuntimeName());
@@ -198,10 +212,10 @@ public final class SkillReleaseCache {
     /**
      * 在归档条目与容量限制内解包制品，不接受越过根目录的路径。
      *
-     * @param archive 当前Skill发布缓存持有的归档对象，供相应处理步骤使用。
-     * @param item 当前Skill发布缓存持有的条目对象，供相应处理步骤使用。
+     * @param archive     当前Skill发布缓存持有的归档对象，供相应处理步骤使用。
+     * @param item        当前Skill发布缓存持有的条目对象，供相应处理步骤使用。
      * @param destination 当前Skill发布缓存持有的destination对象，供相应处理步骤使用。
-     * @param counters 当前Skill发布缓存持有的统计对象，供相应处理步骤使用。
+     * @param counters    当前Skill发布缓存持有的统计对象，供相应处理步骤使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void extract(
@@ -231,8 +245,8 @@ public final class SkillReleaseCache {
     /**
      * 读取归档条目并核对它们的边界信息。
      *
-     * @param archive 当前Skill发布缓存持有的归档对象，供相应处理步骤使用。
-     * @param item 当前Skill发布缓存持有的条目对象，供相应处理步骤使用。
+     * @param archive  当前Skill发布缓存持有的归档对象，供相应处理步骤使用。
+     * @param item     当前Skill发布缓存持有的条目对象，供相应处理步骤使用。
      * @param counters 当前Skill发布缓存持有的统计对象，供相应处理步骤使用。
      * @return 本次处理得到的结果集合。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -241,7 +255,7 @@ public final class SkillReleaseCache {
             byte[] archive, SkillReleaseManifest.Item item, Counters counters) throws IOException {
         ArrayList<ArchiveEntry> entries = new ArrayList<>();
         try (ZipInputStream input =
-                new ZipInputStream(new ByteArrayInputStream(archive), StandardCharsets.UTF_8)) {
+                     new ZipInputStream(new ByteArrayInputStream(archive), StandardCharsets.UTF_8)) {
             ZipEntry entry;
             while ((entry = input.getNextEntry()) != null) {
                 if (entry.isDirectory()) continue;
@@ -386,28 +400,41 @@ public final class SkillReleaseCache {
         }
     }
 
-    /** Skill发布缓存内部的归档条目，封装该步骤需要的状态或输入输出。 */
+    /**
+     * Skill发布缓存内部的归档条目，封装该步骤需要的状态或输入输出。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     private static class ArchiveEntry {
-        /** 当前归档条目的名称，用于目录、调用或展示中的识别。 */
+        /**
+         * 当前归档条目的名称，用于目录、调用或展示中的识别。
+         */
         private String name;
 
-        /** 当前记录或资源的正文内容；与资源标识和存储引用分开保存。 */
+        /**
+         * 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+         */
         private byte[] content;
     }
 
-    /** Skill发布缓存内部的统计，封装该步骤需要的状态或输入输出。 */
+    /**
+     * Skill发布缓存内部的统计，封装该步骤需要的状态或输入输出。
+     */
     private final class Counters {
-        /** 当前工作区目录中的文件内容访问端口。 */
+        /**
+         * 当前工作区目录中的文件内容访问端口。
+         */
         private int files;
 
-        /** 当前内容字节或字节计数，用于传输、校验与容量控制。 */
+        /**
+         * 当前内容字节或字节计数，用于传输、校验与容量控制。
+         */
         private long bytes;
 
         /**
          * 完成当前操作的file步骤，按实现更新相应状态或依赖。
+         *
          * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
          */
         private void file() {

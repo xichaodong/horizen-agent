@@ -31,28 +31,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** 需要本地 Redis，验证宿主级 ask_user 暂停和恢复契约。 */
+/**
+ * 需要本地 Redis，验证宿主级 ask_user 暂停和恢复契约。
+ */
 @EnabledIfSystemProperty(named = "horizen.redis.live", matches = "true")
 @Import(WorkspaceTestConfiguration.class)
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = {
-            "horizen.agent.model-mode=SCRIPTED",
-            "horizen.agent.storage.mode=DISTRIBUTED",
-            "horizen.agent.storage.jdbc-username=sa",
-            "horizen.agent.storage.jdbc-password=",
-            "horizen.agent.storage.redis-url=redis://127.0.0.1:6379",
-            "horizen.agent.storage.redis-key-prefix=horizen-ask-flow-test:",
-            "horizen.agent.storage.instance-id=ask-flow-instance",
-            "horizen.agent.gateway.mode=remote",
-            "horizen.agent.gateway.url=",
-            "horizen.agent.gateway.token=",
-            "horizen.trace.enabled=false",
-            "horizen.agent.skill-release.enabled=false",
-            "horizen.agent.workspace-release.enabled=false",
-            "horizen.agent.sandbox.e2b.enabled=false",
-            "horizen.agent.sandbox.snapshot.bos.enabled=false",
-            "horizen.agent.artifact.bos.enabled=false"
+                "horizen.agent.model-mode=SCRIPTED",
+                "horizen.agent.storage.mode=DISTRIBUTED",
+                "horizen.agent.storage.jdbc-username=sa",
+                "horizen.agent.storage.jdbc-password=",
+                "horizen.agent.storage.redis-url=redis://127.0.0.1:6379",
+                "horizen.agent.storage.redis-key-prefix=horizen-ask-flow-test:",
+                "horizen.agent.storage.instance-id=ask-flow-instance",
+                "horizen.agent.gateway.mode=remote",
+                "horizen.agent.gateway.url=",
+                "horizen.agent.gateway.token=",
+                "horizen.trace.enabled=false",
+                "horizen.agent.skill-release.enabled=false",
+                "horizen.agent.workspace-release.enabled=false",
+                "horizen.agent.sandbox.e2b.enabled=false",
+                "horizen.agent.sandbox.snapshot.bos.enabled=false",
+                "horizen.agent.artifact.bos.enabled=false"
         })
 class AskUserDistributedFlowLiveTest {
     private static final ObjectMapper JSON = new ObjectMapper();
@@ -66,7 +68,8 @@ class AskUserDistributedFlowLiveTest {
     private static final ExecutionIdentity IDENTITY =
             new ExecutionIdentity("ask-owner", "ask-actor");
 
-    @Autowired private AgentService service;
+    @Autowired
+    private AgentService service;
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
@@ -98,7 +101,8 @@ class AskUserDistributedFlowLiveTest {
                 "waiting_ask_user", service.sessionExecution(IDENTITY, SESSION_ID).getStatus());
 
         Map<String, Object> details =
-                JSON.readValue(required.getDetails(), new TypeReference<>() {});
+                JSON.readValue(required.getDetails(), new TypeReference<>() {
+                });
         String askUserId = String.valueOf(details.get("askUserId"));
         SessionApi.SessionExecutionResponse resumed =
                 service.answerAskUser(
@@ -152,7 +156,8 @@ class AskUserDistributedFlowLiveTest {
                         .findFirst()
                         .orElseThrow(() -> new AssertionError(events.toString()));
         List<Map<String, Object>> tasks =
-                JSON.readValue(todo.getDetails(), new TypeReference<>() {});
+                JSON.readValue(todo.getDetails(), new TypeReference<>() {
+                });
         assertEquals(2, tasks.size());
         assertEquals("completed", tasks.get(0).get("status"));
         assertEquals("in_progress", tasks.get(1).get("status"));

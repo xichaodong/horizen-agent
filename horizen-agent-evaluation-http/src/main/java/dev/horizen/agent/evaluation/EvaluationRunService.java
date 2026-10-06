@@ -34,32 +34,46 @@ import java.util.logging.Logger;
  * 单次执行评测用例；内存只保存执行中的状态，结果由服务器管理。
  */
 public final class EvaluationRunService implements AutoCloseable {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 评测使用的执行宿主入口，负责提交输入与处理交互。 */
+    /**
+     * 评测使用的执行宿主入口，负责提交输入与处理交互。
+     */
     private final EvaluationHost host;
 
-    /** 按工具名维护执行元数据与可用状态的注册表。 */
+    /**
+     * 按工具名维护执行元数据与可用状态的注册表。
+     */
     private final EvaluationSessionRegistry registry;
 
-    /** 评测或后台工作使用的执行资源，供异步运行与关闭管理。 */
+    /**
+     * 评测或后台工作使用的执行资源，供异步运行与关闭管理。
+     */
     private final ThreadPoolExecutor workers;
 
-    /** 限制尚未结算的评测数量；线程收尾期间的交接不会扩大准入容量。 */
+    /**
+     * 限制尚未结算的评测数量；线程收尾期间的交接不会扩大准入容量。
+     */
     private final Semaphore slots;
 
-    /** 关闭状态，由 start 和 close 共用的服务监视器保护。 */
+    /**
+     * 关闭状态，由 start 和 close 共用的服务监视器保护。
+     */
     private boolean closed;
 
-    /** 活跃的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 活跃的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, Run> active = new ConcurrentHashMap<>();
 
     /**
      * 创建评测运行服务，初始化该组件所需的状态、配置或依赖。
      *
-     * @param host 当前评测运行服务持有的宿主对象，供相应处理步骤使用。
-     * @param registry 当前评测运行服务持有的注册表对象，供相应处理步骤使用。
+     * @param host        当前评测运行服务持有的宿主对象，供相应处理步骤使用。
+     * @param registry    当前评测运行服务持有的注册表对象，供相应处理步骤使用。
      * @param concurrency 当前评测运行服务使用的并发，供其处理与状态记录使用。
      */
     public EvaluationRunService(
@@ -105,7 +119,7 @@ public final class EvaluationRunService implements AutoCloseable {
      * 启动评测运行服务。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -146,7 +160,7 @@ public final class EvaluationRunService implements AutoCloseable {
      * 共享状态的关键更新在互斥区内完成。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param id 目标对象的标识。
+     * @param id       目标对象的标识。
      * @return 本次操作返回的状态结果。
      * @throws NoSuchElementException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -163,7 +177,7 @@ public final class EvaluationRunService implements AutoCloseable {
      * 共享状态的关键更新在互斥区内完成。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param id 目标对象的标识。
+     * @param id       目标对象的标识。
      * @return 本次操作返回的状态结果。
      * @throws NoSuchElementException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -186,8 +200,8 @@ public final class EvaluationRunService implements AutoCloseable {
      * 执行评测运行服务。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param key 当前对象的查找或写入键。
-     * @param run 当前评测运行服务持有的运行对象，供相应处理步骤使用。
+     * @param key      当前对象的查找或写入键。
+     * @param run      当前评测运行服务持有的运行对象，供相应处理步骤使用。
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -300,10 +314,10 @@ public final class EvaluationRunService implements AutoCloseable {
                     && run.pending != null
                     && error instanceof IllegalStateException
                     && List.of(
-                                    "ASK_USER_SCRIPT_MISMATCH",
-                                    "APPROVAL_SCRIPT_TOOL_MISMATCH",
-                                    "INTERACTION_SCRIPT_TYPE_MISMATCH")
-                            .contains(error.getMessage())) {
+                            "ASK_USER_SCRIPT_MISMATCH",
+                            "APPROVAL_SCRIPT_TOOL_MISMATCH",
+                            "INTERACTION_SCRIPT_TYPE_MISMATCH")
+                    .contains(error.getMessage())) {
                 interactionRequired(run, evidence);
                 try {
                     host.cancel(identity, result.getSessionId());
@@ -330,8 +344,8 @@ public final class EvaluationRunService implements AutoCloseable {
                         run.fixture.getFailure() != null
                                 ? run.fixture.getFailure()
                                 : "COMPLETED".equals(result.getStatus())
-                                        ? null
-                                        : result.getStatus());
+                                ? null
+                                : result.getStatus());
                 // 仅保留安全的错误分类，任意模型或 Provider 异常消息可能包含秘密。
                 result.setErrorMessage(
                         error instanceof IllegalStateException
@@ -367,7 +381,7 @@ public final class EvaluationRunService implements AutoCloseable {
      * 完成当前操作的interactionRequired步骤，按实现更新相应状态或依赖。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param run 当前评测运行服务持有的运行对象，供相应处理步骤使用。
+     * @param run      当前评测运行服务持有的运行对象，供相应处理步骤使用。
      * @param evidence 当前评测运行服务持有的证据对象，供相应处理步骤使用。
      */
     private static void interactionRequired(Run run, EvaluationEvidence evidence) {
@@ -404,9 +418,9 @@ public final class EvaluationRunService implements AutoCloseable {
      * 完成当前操作的agentFailed步骤，按实现更新相应状态或依赖。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param run 当前评测运行服务持有的运行对象，供相应处理步骤使用。
+     * @param run      当前评测运行服务持有的运行对象，供相应处理步骤使用。
      * @param evidence 当前评测运行服务持有的证据对象，供相应处理步骤使用。
-     * @param failure 当前失败信息。
+     * @param failure  当前失败信息。
      */
     private static void agentFailed(
             Run run, EvaluationEvidence evidence, AgentRuntimeEvent failure) {
@@ -450,9 +464,9 @@ public final class EvaluationRunService implements AutoCloseable {
      * 完成当前操作的skippedOptional步骤，按实现更新相应状态或依赖。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param run 当前评测运行服务持有的运行对象，供相应处理步骤使用。
+     * @param run      当前评测运行服务持有的运行对象，供相应处理步骤使用。
      * @param evidence 当前评测运行服务持有的证据对象，供相应处理步骤使用。
-     * @param index 当前评测运行服务使用的索引，供其处理与状态记录使用。
+     * @param index    当前评测运行服务使用的索引，供其处理与状态记录使用。
      */
     private static void skippedOptional(Run run, EvaluationEvidence evidence, int index) {
         synchronized (run) {
@@ -473,10 +487,10 @@ public final class EvaluationRunService implements AutoCloseable {
     /**
      * 检查评测运行服务。
      *
-     * @param run 当前评测运行服务持有的运行对象，供相应处理步骤使用。
+     * @param run      当前评测运行服务持有的运行对象，供相应处理步骤使用。
      * @param deadline 当前评测运行服务使用的截止，供其处理与状态记录使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws InterruptedException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws InterruptedException  当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void check(Run run, long deadline) throws InterruptedException {
         if (run.cancelled.get() || Thread.currentThread().isInterrupted())
@@ -515,7 +529,7 @@ public final class EvaluationRunService implements AutoCloseable {
      * 生成当前操作所需的key文本，供调用方继续处理。
      *
      * @param owner 当前评测运行服务使用的数据归属，供其处理与状态记录使用。
-     * @param id 目标对象的标识。
+     * @param id    目标对象的标识。
      * @return 本次处理生成或读取的文本。
      */
     private String key(String owner, String id) {
@@ -532,7 +546,9 @@ public final class EvaluationRunService implements AutoCloseable {
         return JSON.convertValue(value, EvaluationProtocol.Status.class);
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
     public void close() {
         synchronized (this) {
@@ -562,54 +578,84 @@ public final class EvaluationRunService implements AutoCloseable {
         }
     }
 
-    /** 已准入的工作项；关闭时可结算尚未被线程接收的任务，避免完成句柄永久等待。 */
+    /**
+     * 已准入的工作项；关闭时可结算尚未被线程接收的任务，避免完成句柄永久等待。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private final class QueuedRun implements Runnable {
-        /** 所有者与执行标识组成的活跃索引键。 */
+        /**
+         * 所有者与执行标识组成的活跃索引键。
+         */
         private final String key;
 
-        /** 此工作项独占的输入、状态和完成句柄。 */
+        /**
+         * 此工作项独占的输入、状态和完成句柄。
+         */
         private final Run run;
 
-        /** 在线程接收工作项后执行评测，实际结束后释放准入名额。 */
+        /**
+         * 在线程接收工作项后执行评测，实际结束后释放准入名额。
+         */
         @Override
         public void run() {
             execute(key, run, run.identity);
         }
     }
 
-    /** 评测运行服务内部的运行，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 评测运行服务内部的运行，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class Run {
-        /** 可信宿主解析的执行身份，供访问范围与审计使用。 */
+        /**
+         * 可信宿主解析的执行身份，供访问范围与审计使用。
+         */
         private final ExecutionIdentity identity;
 
-        /** 本组件使用的 {@code EvaluationProtocol.Start} 状态或依赖，用于 request 的处理。 */
+        /**
+         * 本组件使用的 {@code EvaluationProtocol.Start} 状态或依赖，用于 request 的处理。
+         */
         private final EvaluationProtocol.Start request;
 
-        /** 当前执行或查询的结果，供后续状态转换或协议输出使用。 */
+        /**
+         * 当前执行或查询的结果，供后续状态转换或协议输出使用。
+         */
         private final EvaluationProtocol.Status result;
 
-        /** 本次评测运行的固定调用样本与故障脚本。 */
+        /**
+         * 本次评测运行的固定调用样本与故障脚本。
+         */
         private final EvaluationFixture fixture;
 
-        /** 当前评测用例已经规范化的输入内容。 */
+        /**
+         * 当前评测用例已经规范化的输入内容。
+         */
         private final EvaluationCase caseInput;
 
-        /** completion的异步完成句柄，用于等待结果或传播失败。 */
+        /**
+         * completion的异步完成句柄，用于等待结果或传播失败。
+         */
         private final CompletableFuture<EvaluationProtocol.Status> completion =
                 new CompletableFuture<>();
 
-        /** 当前执行是否已确认取消，与仅提交取消请求分开表示。 */
+        /**
+         * 当前执行是否已确认取消，与仅提交取消请求分开表示。
+         */
         private final AtomicBoolean cancelled = new AtomicBoolean();
 
-        /** 当前后台运行使用的工作线程。 */
+        /**
+         * 当前后台运行使用的工作线程。
+         */
         private volatile Thread thread;
 
-        /** 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。 */
+        /**
+         * 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。
+         */
         private AgentRuntimeEvent pending;
 
-        /** 当前评测尚未执行到的步骤集合或数量。 */
+        /**
+         * 当前评测尚未执行到的步骤集合或数量。
+         */
         private int unexecutedSteps;
     }
 }

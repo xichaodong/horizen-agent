@@ -6,12 +6,18 @@ import io.agentscope.harness.agent.filesystem.model.*;
 
 import java.util.*;
 
-/** 对已发布工作区提供只读视图，防止执行时修改发布内容。 */
+/**
+ * 对已发布工作区提供只读视图，防止执行时修改发布内容。
+ */
 public final class ReadOnlyWorkspaceFilesystem implements AbstractFilesystem {
-    /** 被包装的原始实现，由本组件补充隔离、观测或恢复行为。 */
+    /**
+     * 被包装的原始实现，由本组件补充隔离、观测或恢复行为。
+     */
     private final AbstractFilesystem delegate;
 
-    /** 错误使用的固定标识或协议文本。 */
+    /**
+     * 错误使用的固定标识或协议文本。
+     */
     private static final String ERROR = "Published workspace content is read-only";
 
     /**

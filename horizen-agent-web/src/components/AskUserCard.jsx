@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     CheckCircleFilled,
     CloseCircleFilled,
@@ -36,7 +36,7 @@ import {
 } from '../utils/chat.js';
 import MessageContent from '../MessageContent.jsx';
 
-const AskUserCard = ({ message, onSubmit }) => {
+const AskUserCard = ({message, onSubmit}) => {
     const [answers, setAnswers] = useState({});
     const [submitting, setSubmitting] = useState(false);
     const questions = message.questions || [];
@@ -47,8 +47,8 @@ const AskUserCard = ({ message, onSubmit }) => {
                 question.type === 'single'
                     ? [optionId]
                     : selected.includes(optionId)
-                      ? selected.filter((id) => id !== optionId)
-                      : [...selected, optionId];
+                        ? selected.filter((id) => id !== optionId)
+                        : [...selected, optionId];
             return {
                 ...current,
                 [question.questionId]: {
@@ -128,8 +128,8 @@ const AskUserCard = ({ message, onSubmit }) => {
                         {submitting
                             ? '提交中…'
                             : message.status === 'waiting'
-                              ? '提交答案'
-                              : '已提交'}
+                                ? '提交答案'
+                                : '已提交'}
                     </button>
                 </div>
             </div>

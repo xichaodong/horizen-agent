@@ -17,9 +17,13 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-/** 为每个并发委派创建独立上下文，不改变内置权限。 */
+/**
+ * 为每个并发委派创建独立上下文，不改变内置权限。
+ */
 final class HorizenDelegationTool extends ToolBase {
-    /** 被包装的原始实现，由本组件补充隔离、观测或恢复行为。 */
+    /**
+     * 被包装的原始实现，由本组件补充隔离、观测或恢复行为。
+     */
     private final ToolBase delegate;
 
     /**
@@ -64,7 +68,7 @@ final class HorizenDelegationTool extends ToolBase {
     /**
      * 检查权限集合。
      *
-     * @param input 本次处理的输入。
+     * @param input   本次处理的输入。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
@@ -77,7 +81,7 @@ final class HorizenDelegationTool extends ToolBase {
     /**
      * 检查matchRule对应的条件，供调用方选择后续处理分支。
      *
-     * @param rule 当前Horizen委派工具使用的规则，供其处理与状态记录使用。
+     * @param rule  当前Horizen委派工具使用的规则，供其处理与状态记录使用。
      * @param input 本次处理的输入。
      * @return 本次检查是否通过或本次更新是否成功。
      */

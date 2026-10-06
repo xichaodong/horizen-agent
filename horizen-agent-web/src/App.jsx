@@ -1,15 +1,15 @@
-import { request as apiRequest } from './api/client.js';
-import { useSessionCatalog } from './hooks/useSessionCatalog.js';
-import { useChatActions } from './hooks/useChatActions.js';
-import { useArtifactActions } from './hooks/useArtifactActions.js';
-import { useInteractionActions } from './hooks/useInteractionActions.js';
-import { useCopyAction } from './hooks/useCopyAction.js';
-import { useTurnStream } from './hooks/useTurnStream.js';
-import { createTurnEventProcessor, createActivityUpdater } from './stream/turnEvents.js';
-import { useAgentQueries } from './hooks/useAgentQueries.js';
-import { useConversationHistory } from './hooks/useConversationHistory.js';
-import { useTurnObservation } from './hooks/useTurnObservation.js';
-import { useTypewriter } from './hooks/useTypewriter.js';
+import {request as apiRequest} from './api/client.js';
+import {useSessionCatalog} from './hooks/useSessionCatalog.js';
+import {useChatActions} from './hooks/useChatActions.js';
+import {useArtifactActions} from './hooks/useArtifactActions.js';
+import {useInteractionActions} from './hooks/useInteractionActions.js';
+import {useCopyAction} from './hooks/useCopyAction.js';
+import {useTurnStream} from './hooks/useTurnStream.js';
+import {createTurnEventProcessor, createActivityUpdater} from './stream/turnEvents.js';
+import {useAgentQueries} from './hooks/useAgentQueries.js';
+import {useConversationHistory} from './hooks/useConversationHistory.js';
+import {useTurnObservation} from './hooks/useTurnObservation.js';
+import {useTypewriter} from './hooks/useTypewriter.js';
 import {
     PREFIX,
     SESSION_PAGE_SIZE,
@@ -32,9 +32,9 @@ import ActivityItem from './components/ActivityItem.jsx';
 import AskUserCard from './components/AskUserCard.jsx';
 import TodoCard from './components/TodoCard.jsx';
 import SubagentExecutionCard from './components/SubagentExecutionCard.jsx';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { finishTool, appendToolOutput, finishSubagent } from './toolHistory.js';
-import { followTurnStream, executionFailureEvent } from './turnRecovery.js';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {finishTool, appendToolOutput, finishSubagent} from './toolHistory.js';
+import {followTurnStream, executionFailureEvent} from './turnRecovery.js';
 import {
     CheckCircleFilled,
     CloseCircleFilled,
@@ -106,7 +106,7 @@ const App = () => {
         saveRename,
         handleTogglePin,
         setObserving,
-    } = useSessionCatalog({ status, inputRef, setInputValue });
+    } = useSessionCatalog({status, inputRef, setInputValue});
 
     const activeSession = useMemo(
         () => sessions.find((session) => session.id === activeSessionId) || sessions[0],
@@ -134,7 +134,7 @@ const App = () => {
     useEffect(() => {
         apiRequest('/api/status')
             .then((response) => response.json())
-            .then((data) => setStatus({ ...data, loading: false }))
+            .then((data) => setStatus({...data, loading: false}))
             .catch(() =>
                 setStatus({
                     loading: false,
@@ -150,7 +150,7 @@ const App = () => {
         }
     }, [messages, running]);
 
-    const { queueTextDelta, clearQueuedText, flushQueuedText } = useTypewriter(
+    const {queueTextDelta, clearQueuedText, flushQueuedText} = useTypewriter(
         setSessions,
         sessionsRef,
         updateSession
@@ -171,21 +171,21 @@ const App = () => {
                 updatedAt: Date.now(),
                 messages: exists
                     ? session.messages.map((message) =>
-                          message.id === card.id ? { ...message, ...card } : message
-                      )
+                        message.id === card.id ? {...message, ...card} : message
+                    )
                     : [...session.messages, card],
             };
         });
     };
 
     const upsertActivity = createActivityUpdater(updateSession);
-    const { loadSubtasks, loadApprovals, cancelSubtask } = useAgentQueries({
+    const {loadSubtasks, loadApprovals, cancelSubtask} = useAgentQueries({
         updateSession,
         sessionsRef,
         upsertActivity,
         appendMessage,
     });
-    const { applyTurnEvent, showConnectionNotice } = createTurnEventProcessor({
+    const {applyTurnEvent, showConnectionNotice} = createTurnEventProcessor({
         upsertActivity,
         updateSession,
         streamSequencesRef,
@@ -211,7 +211,7 @@ const App = () => {
     const recoveryJson = async (url, sessionId, signal) => {
         const response = await apiRequest(url, {
             method: 'POST',
-            body: JSON.stringify({ sessionId }),
+            body: JSON.stringify({sessionId}),
             signal,
         });
         if (!response.ok) throw new Error('执行状态恢复失败');
@@ -238,7 +238,7 @@ const App = () => {
             subscribe: (turnId) =>
                 apiRequest('/api/session/subscribe', {
                     method: 'POST',
-                    headers: { Accept: 'text/event-stream' },
+                    headers: {Accept: 'text/event-stream'},
                     body: JSON.stringify({
                         sessionId,
                         expectedTurnId: turnId,
@@ -248,9 +248,9 @@ const App = () => {
                 }),
         });
 
-    const artifacts = useArtifactActions({ activeSessionId, appendMessage, running });
-    const { attachments, setAttachments, uploading, handleUpload, openArtifact } = artifacts;
-    const { copiedId, handleCopy } = useCopyAction();
+    const artifacts = useArtifactActions({activeSessionId, appendMessage, running});
+    const {attachments, setAttachments, uploading, handleUpload, openArtifact} = artifacts;
+    const {copiedId, handleCopy} = useCopyAction();
     const execution = {
         recoveryJson,
         applyTurnEvent,
@@ -269,13 +269,13 @@ const App = () => {
         appendMessage,
         upsertActivity,
     };
-    const { handleStop, sendMessage, handleKeyDown, retryLastMessage } = useChatActions({
-        composer: { inputValue, setInputValue, inputRef },
+    const {handleStop, sendMessage, handleKeyDown, retryLastMessage} = useChatActions({
+        composer: {inputValue, setInputValue, inputRef},
         session: sessionActions,
         execution,
         artifacts,
     });
-    const { decideApprovals, submitAskUser } = useInteractionActions({
+    const {decideApprovals, submitAskUser} = useInteractionActions({
         session: sessionActions,
         execution,
     });
@@ -336,7 +336,7 @@ const App = () => {
                     {status.modelName || 'AgentScope HarnessAgent'}
                     {status.gateway?.mode === 'mock' ? ' · Mock 演示数据' : ''}
                 </div>
-                <input ref={fileInputRef} type="file" hidden onChange={handleUpload} />
+                <input ref={fileInputRef} type="file" hidden onChange={handleUpload}/>
                 <button
                     type="button"
                     className={`${PREFIX}__upload-button`}
@@ -344,7 +344,7 @@ const App = () => {
                     onClick={() => fileInputRef.current?.click()}
                     title="上传文件"
                 >
-                    {uploading ? <LoadingOutlined /> : <PaperClipOutlined />}
+                    {uploading ? <LoadingOutlined/> : <PaperClipOutlined/>}
                     <span>上传</span>
                 </button>
                 {running ? (
@@ -355,7 +355,7 @@ const App = () => {
                         aria-label="停止执行"
                         title="停止执行"
                     >
-                        <img src={stopIcon} alt="" />
+                        <img src={stopIcon} alt=""/>
                     </button>
                 ) : (
                     <button
@@ -366,7 +366,7 @@ const App = () => {
                         aria-label="发送"
                         title="发送"
                     >
-                        <img src={inputValue.trim() ? sendActiveIcon : sendInactiveIcon} alt="" />
+                        <img src={inputValue.trim() ? sendActiveIcon : sendInactiveIcon} alt=""/>
                     </button>
                 )}
             </div>
@@ -385,7 +385,7 @@ const App = () => {
             <aside className={`${PREFIX}__sidebar`}>
                 <div className={`${PREFIX}__brand-row`}>
                     <div className={`${PREFIX}__brand`}>
-                        <img className={`${PREFIX}__brand-mark`} src={assistantIcon} alt="" />
+                        <img className={`${PREFIX}__brand-mark`} src={assistantIcon} alt=""/>
                         <strong>Horizen Agent</strong>
                     </div>
                     <div className={`${PREFIX}__brand-actions`}>
@@ -395,7 +395,7 @@ const App = () => {
                             onClick={() => setSidebarCollapsed((value) => !value)}
                             aria-label={sidebarCollapsed ? '展开会话栏' : '收起会话栏'}
                         >
-                            <img src={collapseIcon} alt="" />
+                            <img src={collapseIcon} alt=""/>
                         </button>
                         {sidebarCollapsed ? (
                             <button
@@ -404,7 +404,7 @@ const App = () => {
                                 onClick={handleNewSession}
                                 aria-label="新对话"
                             >
-                                <img src={newSessionIcon} alt="" />
+                                <img src={newSessionIcon} alt=""/>
                             </button>
                         ) : null}
                     </div>
@@ -415,7 +415,7 @@ const App = () => {
                         className={`${PREFIX}__new-session`}
                         onClick={handleNewSession}
                     >
-                        <img src={newSessionIcon} alt="" />
+                        <img src={newSessionIcon} alt=""/>
                         <span>新对话</span>
                     </button>
                 ) : null}
@@ -459,7 +459,7 @@ const App = () => {
                                                         <span
                                                             className={`${PREFIX}__session-spinner`}
                                                         >
-                                                            <LoadingOutlined />
+                                                            <LoadingOutlined/>
                                                         </span>
                                                     ) : null}
                                                 </button>
@@ -487,7 +487,7 @@ const App = () => {
                                                     aria-haspopup="menu"
                                                     aria-expanded={openSessionMenuId === session.id}
                                                 >
-                                                    <img src={moreIcon} alt="" />
+                                                    <img src={moreIcon} alt=""/>
                                                 </button>
                                             </>
                                         )}
@@ -500,10 +500,10 @@ const App = () => {
                             {!status.ready
                                 ? '连接后显示会话历史'
                                 : historyStatus === 'loading'
-                                  ? '加载中...'
-                                  : historyStatus === 'failed'
-                                    ? '历史会话暂时加载失败'
-                                    : '还没有历史会话'}
+                                    ? '加载中...'
+                                    : historyStatus === 'failed'
+                                        ? '历史会话暂时加载失败'
+                                        : '还没有历史会话'}
                         </div>
                     )}
                     {sessionHasMore ? (
@@ -531,7 +531,7 @@ const App = () => {
                         role="menuitem"
                         onClick={() => handleTogglePin(menuSession)}
                     >
-                        {menuSession.pinned ? <PushpinFilled /> : <PushpinOutlined />}
+                        {menuSession.pinned ? <PushpinFilled/> : <PushpinOutlined/>}
                         <span>{menuSession.pinned ? '取消置顶' : '置顶会话'}</span>
                     </button>
                     <button
@@ -539,7 +539,7 @@ const App = () => {
                         role="menuitem"
                         onClick={() => handleRenameStart(menuSession)}
                     >
-                        <EditOutlined />
+                        <EditOutlined/>
                         <span>重命名</span>
                     </button>
                     <button
@@ -548,7 +548,7 @@ const App = () => {
                         className="is-danger"
                         onClick={() => handleDeleteSession(menuSession.id)}
                     >
-                        <DeleteOutlined />
+                        <DeleteOutlined/>
                         <span>删除</span>
                     </button>
                 </div>
@@ -567,7 +567,7 @@ const App = () => {
                         className={`${PREFIX}__connection ${status.ready ? 'is-ready' : ''}`}
                         role="status"
                     >
-                        <i aria-hidden="true" />
+                        <i aria-hidden="true"/>
                         {status.loading ? '连接中' : status.ready ? '已连接' : '未连接'}
                     </span>
                 </header>
@@ -643,9 +643,9 @@ const App = () => {
                                         key={message.id}
                                     />
                                 ) : message.role === 'todo' ? (
-                                    <TodoCard message={message} key={message.id} />
+                                    <TodoCard message={message} key={message.id}/>
                                 ) : message.role === 'subagent_execution' ? (
-                                    <SubagentExecutionCard message={message} key={message.id} />
+                                    <SubagentExecutionCard message={message} key={message.id}/>
                                 ) : message.role === 'subtask' ? (
                                     <article className={`${PREFIX}__todo-block`} key={message.id}>
                                         <div className={`${PREFIX}__todo-head`}>
@@ -694,12 +694,12 @@ const App = () => {
                                         <div className={`${PREFIX}__message-body`}>
                                             {message.role === 'assistant' ? (
                                                 <div className={`${PREFIX}__answer-label`}>
-                                                    <ExperimentOutlined />
+                                                    <ExperimentOutlined/>
                                                     <span>Agent 回复</span>
                                                 </div>
                                             ) : null}
                                             <div className={`${PREFIX}__bubble`}>
-                                                <MessageContent content={message.content} />
+                                                <MessageContent content={message.content}/>
                                             </div>
                                             {message.role === 'user' &&
                                             message.attachments?.length ? (
@@ -721,7 +721,7 @@ const App = () => {
                                                     onClick={() => handleCopy(message)}
                                                     aria-label="复制"
                                                 >
-                                                    <CopyOutlined />{' '}
+                                                    <CopyOutlined/>{' '}
                                                     {copiedId === message.id ? '已复制' : ''}
                                                 </button>
                                             ) : message.isStreaming ? null : (
@@ -731,14 +731,14 @@ const App = () => {
                                                         onClick={() => handleCopy(message)}
                                                         title="复制"
                                                     >
-                                                        <CopyOutlined />
+                                                        <CopyOutlined/>
                                                     </button>
                                                     <button
                                                         type="button"
                                                         onClick={retryLastMessage}
                                                         title="重新生成"
                                                     >
-                                                        <ReloadOutlined />
+                                                        <ReloadOutlined/>
                                                     </button>
                                                     {message.latencyMs ? (
                                                         <span className={`${PREFIX}__latency`}>

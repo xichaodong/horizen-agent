@@ -12,28 +12,44 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Locale;
 
-/** 构建运行状态视图，不参与执行流程。 */
+/**
+ * 构建运行状态视图，不参与执行流程。
+ */
 @RequiredArgsConstructor
 public final class AgentStatusService {
-    /** 当前配置的 Agent 实例，承担模型与工具循环执行。 */
+    /**
+     * 当前配置的 Agent 实例，承担模型与工具循环执行。
+     */
     private final AgentProperties agent;
 
-    /** 外部工具目录与调用的网关适配器。 */
+    /**
+     * 外部工具目录与调用的网关适配器。
+     */
     private final GatewayProperties gateway;
 
-    /** 观测采集与异步上报配置。 */
+    /**
+     * 观测采集与异步上报配置。
+     */
     private final HorizenProperties tracing;
 
-    /** 沙箱启用与隔离参数配置。 */
+    /**
+     * 沙箱启用与隔离参数配置。
+     */
     private final E2bSandboxProperties sandbox;
 
-    /** 当前宿主组装的异步 Trace 上报器。 */
+    /**
+     * 当前宿主组装的异步 Trace 上报器。
+     */
     private final HorizenHttpBatchExporter exporter;
 
-    /** 是否启用发布集合处理。 */
+    /**
+     * 是否启用发布集合处理。
+     */
     private final boolean publicationsEnabled;
 
-    /** 完整工作区发布服务，提供会话绑定版本的准备与状态。 */
+    /**
+     * 完整工作区发布服务，提供会话绑定版本的准备与状态。
+     */
     private final AgentReleaseService publications;
 
     /**

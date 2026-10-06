@@ -7,15 +7,21 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 外部工具输出的结构化呈现内容，与工具成功状态分开表达。 */
+/**
+ * 外部工具输出的结构化呈现内容，与工具成功状态分开表达。
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PresentationContract {
-    /** Schema的版本，供兼容或并发检查使用。 */
+    /**
+     * Schema的版本，供兼容或并发检查使用。
+     */
     private int schemaVersion = 1;
 
-    /** 块集合的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+    /**
+     * 块集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     */
     private List<PresentationBlockContract> blocks = new ArrayList<>();
 
     /**

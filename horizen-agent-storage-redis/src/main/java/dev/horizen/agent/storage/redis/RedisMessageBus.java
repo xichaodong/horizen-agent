@@ -24,117 +24,135 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** 使用 Redis List 和 Pub/Sub 实现 AgentScope MessageBus，兼容 Redis 4.0。 */
+/**
+ * 使用 Redis List 和 Pub/Sub 实现 AgentScope MessageBus，兼容 Redis 4.0。
+ */
 public final class RedisMessageBus implements MessageBus {
 
-    /** 日志追加SCRIPT使用的固定标识或协议文本。 */
+    /**
+     * 日志追加SCRIPT使用的固定标识或协议文本。
+     */
     private static final String LOG_APPEND_SCRIPT =
             """
-local body = cjson.decode(ARGV[1])
-local write_id = body['_write_id']
-local list_len = redis.call('LLEN', KEYS[1])
-local sequence_value = redis.call('GET', KEYS[2])
-if list_len > 0 and not sequence_value then
-    return redis.error_reply('LOG_SEQUENCE_MISSING')
-end
-if write_id and redis.call('HEXISTS', KEYS[4], write_id) == 1 then
-    return redis.call('HGET', KEYS[4], write_id)
-end
-if write_id and list_len > 0 then
-    local last = cjson.decode(redis.call('LINDEX', KEYS[1], -1))
-    if last['writeId'] == write_id then
-        return last['entryId']
-    end
-end
-local max_total_events = tonumber(ARGV[6])
-local current_sequence = tonumber(sequence_value or '0')
-if max_total_events and max_total_events > 0 and current_sequence >= max_total_events then
-    return redis.error_reply('LOG_TOTAL_EVENTS_LIMIT')
-end
-local sequence = redis.call('INCR', KEYS[2])
-body['_write_id'] = nil
-local value = cjson.encode({entryId = tostring(sequence), payload = body, writeId = write_id})
-local max_total_bytes = tonumber(ARGV[5])
-local value_bytes = string.len(value)
-if max_total_bytes and max_total_bytes > 0 then
-    local current_bytes_value = redis.call('GET', KEYS[5])
-    if list_len > 0 and not current_bytes_value then
-        redis.call('DECR', KEYS[2])
-        return redis.error_reply('LOG_BYTES_COUNTER_MISSING')
-    end
-    local current_bytes = tonumber(current_bytes_value or '0')
-    if current_bytes + value_bytes > max_total_bytes then
-        redis.call('DECR', KEYS[2])
-        return redis.error_reply('LOG_TOTAL_BYTES_LIMIT')
-    end
-    redis.call('INCRBY', KEYS[5], value_bytes)
-end
-redis.call('RPUSH', KEYS[1], value)
-local max_len = tonumber(ARGV[2])
-if max_len and max_len > 0 then
-    redis.call('LTRIM', KEYS[1], -max_len, -1)
-end
-local first = redis.call('LINDEX', KEYS[1], 0)
-if first then
-    redis.call('SET', KEYS[3], cjson.decode(first).entryId)
-end
-if write_id then
-    redis.call('HSET', KEYS[4], write_id, tostring(sequence))
-end
-redis.call('EXPIRE', KEYS[1], ARGV[3])
-redis.call('EXPIRE', KEYS[2], ARGV[3])
-redis.call('EXPIRE', KEYS[3], ARGV[3])
-redis.call('EXPIRE', KEYS[4], ARGV[3])
-if max_total_bytes and max_total_bytes > 0 then
-    redis.call('EXPIRE', KEYS[5], ARGV[3])
-end
-return tostring(sequence)
-""";
+                    local body = cjson.decode(ARGV[1])
+                    local write_id = body['_write_id']
+                    local list_len = redis.call('LLEN', KEYS[1])
+                    local sequence_value = redis.call('GET', KEYS[2])
+                    if list_len > 0 and not sequence_value then
+                        return redis.error_reply('LOG_SEQUENCE_MISSING')
+                    end
+                    if write_id and redis.call('HEXISTS', KEYS[4], write_id) == 1 then
+                        return redis.call('HGET', KEYS[4], write_id)
+                    end
+                    if write_id and list_len > 0 then
+                        local last = cjson.decode(redis.call('LINDEX', KEYS[1], -1))
+                        if last['writeId'] == write_id then
+                            return last['entryId']
+                        end
+                    end
+                    local max_total_events = tonumber(ARGV[6])
+                    local current_sequence = tonumber(sequence_value or '0')
+                    if max_total_events and max_total_events > 0 and current_sequence >= max_total_events then
+                        return redis.error_reply('LOG_TOTAL_EVENTS_LIMIT')
+                    end
+                    local sequence = redis.call('INCR', KEYS[2])
+                    body['_write_id'] = nil
+                    local value = cjson.encode({entryId = tostring(sequence), payload = body, writeId = write_id})
+                    local max_total_bytes = tonumber(ARGV[5])
+                    local value_bytes = string.len(value)
+                    if max_total_bytes and max_total_bytes > 0 then
+                        local current_bytes_value = redis.call('GET', KEYS[5])
+                        if list_len > 0 and not current_bytes_value then
+                            redis.call('DECR', KEYS[2])
+                            return redis.error_reply('LOG_BYTES_COUNTER_MISSING')
+                        end
+                        local current_bytes = tonumber(current_bytes_value or '0')
+                        if current_bytes + value_bytes > max_total_bytes then
+                            redis.call('DECR', KEYS[2])
+                            return redis.error_reply('LOG_TOTAL_BYTES_LIMIT')
+                        end
+                        redis.call('INCRBY', KEYS[5], value_bytes)
+                    end
+                    redis.call('RPUSH', KEYS[1], value)
+                    local max_len = tonumber(ARGV[2])
+                    if max_len and max_len > 0 then
+                        redis.call('LTRIM', KEYS[1], -max_len, -1)
+                    end
+                    local first = redis.call('LINDEX', KEYS[1], 0)
+                    if first then
+                        redis.call('SET', KEYS[3], cjson.decode(first).entryId)
+                    end
+                    if write_id then
+                        redis.call('HSET', KEYS[4], write_id, tostring(sequence))
+                    end
+                    redis.call('EXPIRE', KEYS[1], ARGV[3])
+                    redis.call('EXPIRE', KEYS[2], ARGV[3])
+                    redis.call('EXPIRE', KEYS[3], ARGV[3])
+                    redis.call('EXPIRE', KEYS[4], ARGV[3])
+                    if max_total_bytes and max_total_bytes > 0 then
+                        redis.call('EXPIRE', KEYS[5], ARGV[3])
+                    end
+                    return tostring(sequence)
+                    """;
 
-    /** 队列排空SCRIPT使用的固定标识或协议文本。 */
+    /**
+     * 队列排空SCRIPT使用的固定标识或协议文本。
+     */
     private static final String QUEUE_DRAIN_SCRIPT =
             """
-      local result = {}
-      local count = tonumber(ARGV[1])
-      for index = 1, count do
-          local value = redis.call('LPOP', KEYS[1])
-          if not value then
-              break
-          end
-          table.insert(result, value)
-      end
-      return result
-      """;
+                    local result = {}
+                    local count = tonumber(ARGV[1])
+                    for index = 1, count do
+                        local value = redis.call('LPOP', KEYS[1])
+                        if not value then
+                            break
+                        end
+                        table.insert(result, value)
+                    end
+                    return result
+                    """;
 
-    /** 当前组件用于普通状态读写的 Redis 命令客户端。 */
+    /**
+     * 当前组件用于普通状态读写的 Redis 命令客户端。
+     */
     private final UnifiedJedis commands;
 
-    /** 当前组件用于实时订阅的专用连接或连接池。 */
+    /**
+     * 当前组件用于实时订阅的专用连接或连接池。
+     */
     private final JedisPool subscriptions;
 
-    /** 存储键前缀，用于区分本应用的数据与其他使用方。 */
+    /**
+     * 存储键前缀，用于区分本应用的数据与其他使用方。
+     */
     private final String keyPrefix;
 
-    /** 保留时间，单位为秒。 */
+    /**
+     * 保留时间，单位为秒。
+     */
     private final long ttlSeconds;
 
-    /** 订阅接收缓冲允许保留的事件数量上限。 */
+    /**
+     * 订阅接收缓冲允许保留的事件数量上限。
+     */
     private final int subscriptionBufferCapacity;
 
     /**
      * 创建Redis消息消息总线，初始化该组件所需的状态、配置或依赖。
      *
-     * @param commands 当前Redis消息消息总线持有的命令集合对象，供相应处理步骤使用。
+     * @param commands      当前Redis消息消息总线持有的命令集合对象，供相应处理步骤使用。
      * @param subscriptions 当前Redis消息消息总线持有的订阅集合对象，供相应处理步骤使用。
-     * @param keyPrefix 存储键前缀，用于区分本应用的数据与其他使用方。
-     * @param replayTtl 回放保留时间的时间配置，供等待、调度或失效判断使用。
+     * @param keyPrefix     存储键前缀，用于区分本应用的数据与其他使用方。
+     * @param replayTtl     回放保留时间的时间配置，供等待、调度或失效判断使用。
      */
     public RedisMessageBus(
             UnifiedJedis commands, JedisPool subscriptions, String keyPrefix, Duration replayTtl) {
         this(commands, subscriptions, keyPrefix, replayTtl, 256);
     }
 
-    /** 每个慢订阅者最多保留此数量的消息，超过后关闭连接。 */
+    /**
+     * 每个慢订阅者最多保留此数量的消息，超过后关闭连接。
+     */
     public RedisMessageBus(
             UnifiedJedis commands,
             JedisPool subscriptions,
@@ -156,7 +174,7 @@ return tostring(sequence)
     /**
      * 计算或取得本方法声明的结果，供当前RedisMessageBus处理步骤使用。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param payload 负载的索引映射，供按键查找或归并当前组件的数据。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
@@ -178,7 +196,7 @@ return tostring(sequence)
     /**
      * 计算或取得本方法声明的结果，供当前RedisMessageBus处理步骤使用。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key      当前对象的查找或写入键。
      * @param maxCount 最大的数量，供运行统计或容量控制使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -238,9 +256,9 @@ return tostring(sequence)
     /**
      * 计算或取得本方法声明的结果，供当前RedisMessageBus处理步骤使用。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param payload 负载的索引映射，供按键查找或归并当前组件的数据。
-     * @param maxLen 当前Redis消息消息总线使用的最大Len，供其处理与状态记录使用。
+     * @param maxLen  当前Redis消息消息总线使用的最大Len，供其处理与状态记录使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -264,15 +282,15 @@ return tostring(sequence)
     /**
      * 计算或取得本方法声明的结果，供当前RedisMessageBus处理步骤使用。
      *
-     * @param key 当前对象的查找或写入键。
-     * @param payload 负载的索引映射，供按键查找或归并当前组件的数据。
-     * @param maxLen 当前Redis消息消息总线使用的最大Len，供其处理与状态记录使用。
-     * @param maxEventBytes 最大事件的字节数，用于容量或传输限制。
-     * @param maxTotalBytes 最大总计的字节数，用于容量或传输限制。
+     * @param key            当前对象的查找或写入键。
+     * @param payload        负载的索引映射，供按键查找或归并当前组件的数据。
+     * @param maxLen         当前Redis消息消息总线使用的最大Len，供其处理与状态记录使用。
+     * @param maxEventBytes  最大事件的字节数，用于容量或传输限制。
+     * @param maxTotalBytes  最大总计的字节数，用于容量或传输限制。
      * @param maxTotalEvents 当前Redis消息消息总线使用的最大总计事件集合，供其处理与状态记录使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public Mono<String> logAppendBounded(
             String key,
@@ -318,8 +336,8 @@ return tostring(sequence)
     /**
      * 计算或取得本方法声明的结果，供当前RedisMessageBus处理步骤使用。
      *
-     * @param key 当前对象的查找或写入键。
-     * @param since 当前Redis消息消息总线使用的since，供其处理与状态记录使用。
+     * @param key      当前对象的查找或写入键。
+     * @param since    当前Redis消息消息总线使用的since，供其处理与状态记录使用。
      * @param maxCount 最大的数量，供运行统计或容量控制使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -362,7 +380,9 @@ return tostring(sequence)
                 });
     }
 
-    /** 报告物理 Redis List 是否仍存在，用于恢复诊断。 */
+    /**
+     * 报告物理 Redis List 是否仍存在，用于恢复诊断。
+     */
     public Mono<Boolean> logExists(String key) {
         return Mono.fromCallable(() -> commands.exists(logKey(key)));
     }
@@ -388,7 +408,7 @@ return tostring(sequence)
     /**
      * 发布Redis消息消息总线。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param payload 负载的索引映射，供按键查找或归并当前组件的数据。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
@@ -416,7 +436,7 @@ return tostring(sequence)
      * 订阅Redis消息消息总线。
      *
      * @param channel 当前Redis消息消息总线使用的通道，供其处理与状态记录使用。
-     * @param sink 上报端的索引映射，供按键查找或归并当前组件的数据。
+     * @param sink    上报端的索引映射，供按键查找或归并当前组件的数据。
      */
     private void subscribe(String channel, FluxSink<Map<String, Object>> sink) {
         AtomicReference<JedisPubSub> listenerRef = new AtomicReference<>();
@@ -586,7 +606,7 @@ return tostring(sequence)
      * 取得并校验正值。
      *
      * @param value 待校验、转换或保存的原始值。
-     * @param name 需要定位或处理的名称。
+     * @param name  需要定位或处理的名称。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private static void requirePositive(int value, String name) {

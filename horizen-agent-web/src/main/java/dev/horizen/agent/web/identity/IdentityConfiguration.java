@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** 为本地测试宿主提供默认身份解析器。 */
+/**
+ * 为本地测试宿主提供默认身份解析器。
+ */
 @Configuration
 public class IdentityConfiguration {
 

@@ -144,16 +144,16 @@ class ToolGovernanceTest {
                         return Mono.just(
                                 "owner-a".equals(context.getOwnerKey())
                                         ? List.of(
-                                                new ToolDefinition(
-                                                        "domain_lookup",
-                                                        "",
-                                                        Map.of(
-                                                                "type",
-                                                                "object",
-                                                                "properties",
-                                                                Map.of()),
-                                                        "low",
-                                                        false))
+                                        new ToolDefinition(
+                                                "domain_lookup",
+                                                "",
+                                                Map.of(
+                                                        "type",
+                                                        "object",
+                                                        "properties",
+                                                        Map.of()),
+                                                "low",
+                                                false))
                                         : List.of());
                     }
 

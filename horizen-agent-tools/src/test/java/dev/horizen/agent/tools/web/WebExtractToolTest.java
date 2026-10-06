@@ -21,10 +21,10 @@ class WebExtractToolTest {
         WebExtractTool.Extracted extracted =
                 WebExtractTool.extractHtml(
                         """
-            <html><head><title>Useful page</title><script>steal()</script></head>
-            <body><nav>navigation</nav><article><h1>Headline</h1><p>Useful content.</p></article>
-            <footer>footer</footer></body></html>
-            """
+                                <html><head><title>Useful page</title><script>steal()</script></head>
+                                <body><nav>navigation</nav><article><h1>Headline</h1><p>Useful content.</p></article>
+                                <footer>footer</footer></body></html>
+                                """
                                 .getBytes(StandardCharsets.UTF_8),
                         URI.create("https://example.com/page"),
                         "text/html");
@@ -40,7 +40,7 @@ class WebExtractToolTest {
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage());
             try (PDPageContentStream content =
-                    new PDPageContentStream(document, document.getPage(0))) {
+                         new PDPageContentStream(document, document.getPage(0))) {
                 content.beginText();
                 content.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
                 content.newLineAtOffset(50, 700);

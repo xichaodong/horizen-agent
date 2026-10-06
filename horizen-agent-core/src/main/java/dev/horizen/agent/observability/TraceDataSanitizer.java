@@ -8,9 +8,13 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
-/** 把任意值转换为 JSON 兼容结构，并遮蔽常见的敏感字段。 */
+/**
+ * 把任意值转换为 JSON 兼容结构，并遮蔽常见的敏感字段。
+ */
 public final class TraceDataSanitizer {
-    /** 密钥键的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 密钥键的固定取值，用于相应策略和边界判断。
+     */
     private static final Set<String> SECRET_KEYS =
             Set.of(
                     "apikey",
@@ -24,7 +28,9 @@ public final class TraceDataSanitizer {
                     "cookie",
                     "setcookie");
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final ObjectMapper mapper;
 
     /**

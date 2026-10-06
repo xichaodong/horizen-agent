@@ -17,7 +17,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 class JsonlTraceSinkTest {
-    @TempDir Path directory;
+    @TempDir
+    Path directory;
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Test

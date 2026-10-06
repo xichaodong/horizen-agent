@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 class GatewayToolAdapterTest {
-    @TempDir Path directory;
+    @TempDir
+    Path directory;
 
     @Test
     void convertsExistingGatewayCatalogToConcreteDefinitionsAndInvokesByName() throws Exception {
@@ -29,14 +30,14 @@ class GatewayToolAdapterTest {
         Files.writeString(
                 fixture,
                 """
-{"tools":[{"name":"domain_lookup","description":"Find a domain object",
-"inputSchema":{"type":"object","properties":{"spuId":{"type":"string"}},"required":["spuId"]},
-"readOnly":true,"timeoutSeconds":12,"idempotent":true,
-"concurrencySafe":false,"supportsCancellation":true,"approvalPolicy":"required",
-"group":{"id":"domain-read","description":"Domain read tools",
-    "activeByDefault":false,"activateOnSkill":"domain-skill"},
-"response":{"title":"Demo"}}]}
-""");
+                        {"tools":[{"name":"domain_lookup","description":"Find a domain object",
+                        "inputSchema":{"type":"object","properties":{"spuId":{"type":"string"}},"required":["spuId"]},
+                        "readOnly":true,"timeoutSeconds":12,"idempotent":true,
+                        "concurrencySafe":false,"supportsCancellation":true,"approvalPolicy":"required",
+                        "group":{"id":"domain-read","description":"Domain read tools",
+                            "activeByDefault":false,"activateOnSkill":"domain-skill"},
+                        "response":{"title":"Demo"}}]}
+                        """);
         GatewayToolAdapter adapter = new GatewayToolAdapter(new FixtureGateway(fixture));
         RuntimeContext runtime =
                 RuntimeContext.builder().userId("owner-1").sessionId("session-1").build();
@@ -70,9 +71,9 @@ class GatewayToolAdapterTest {
         Files.writeString(
                 fixture,
                 """
-        {"tools":[{"name":"coupon_create","riskLevel":"high",
-        "inputSchema":{"type":"object","properties":{}},"response":{}}]}
-        """);
+                        {"tools":[{"name":"coupon_create","riskLevel":"high",
+                        "inputSchema":{"type":"object","properties":{}},"response":{}}]}
+                        """);
         GatewayToolAdapter adapter = new GatewayToolAdapter(new FixtureGateway(fixture));
 
         ToolDefinition definition =

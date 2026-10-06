@@ -21,33 +21,47 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/** 从经过校验的应用输入与持久化引用创建运行时 Turn 请求。 */
+/**
+ * 从经过校验的应用输入与持久化引用创建运行时 Turn 请求。
+ */
 @RequiredArgsConstructor
 public final class AgentTurnRequestFactory implements TurnRequestFactory {
-    /** 产物管理依赖或产物集合，用于引用、读取与交付资源。 */
+    /**
+     * 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     */
     private final ArtifactSupport artifacts;
 
-    /** 图片输入与视觉传输的数量、容量配置。 */
+    /**
+     * 图片输入与视觉传输的数量、容量配置。
+     */
     private final MultimodalProperties multimodal;
 
-    /** 外部工具目录与调用的网关适配器。 */
+    /**
+     * 外部工具目录与调用的网关适配器。
+     */
     private final GatewayProperties gateway;
 
-    /** 是否启用观测处理。 */
+    /**
+     * 是否启用观测处理。
+     */
     private final boolean tracingEnabled;
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final AgentApiMapper mapper;
 
-    /** 定位评测使用的隔离会话与调用脚本的管理器。 */
+    /**
+     * 定位评测使用的隔离会话与调用脚本的管理器。
+     */
     private final EvaluationSessionRegistry evaluationSessions;
 
     /**
      * 创建Agent执行请求工厂。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param identity          可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param request           当前操作的请求参数。
+     * @param turnId            单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @param approvalDecisions 当前恢复请求提交的审批决定集合。
      * @return 本次操作返回的Agent执行请求结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -112,7 +126,7 @@ public final class AgentTurnRequestFactory implements TurnRequestFactory {
      * 生成当前操作所需的message文本，供调用方继续处理。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 本次处理生成或读取的文本。
      */
     private String message(String ownerKey, ChatCommand request) {
@@ -137,8 +151,8 @@ public final class AgentTurnRequestFactory implements TurnRequestFactory {
     /**
      * 计算或取得本方法声明的结果，供当前AgentTurnRequestFactory处理步骤使用。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param ownerKey    宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId   会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param excludedIds 排除的标识集合，用于批量关联相应记录。
      * @return 本次处理得到的结果集合。
      */

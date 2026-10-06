@@ -17,7 +17,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 class SandboxSearchFilesToolTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void invalidRegexAndMissingDirectoryRemainErrorsButNoMatchSucceeds() throws Exception {

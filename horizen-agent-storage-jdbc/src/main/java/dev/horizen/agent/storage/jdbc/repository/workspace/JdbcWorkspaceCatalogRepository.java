@@ -18,12 +18,18 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
-/** 在同一事务中提交聚合版本、文件引用和审计，不执行对象 I/O。 */
+/**
+ * 在同一事务中提交聚合版本、文件引用和审计，不执行对象 I/O。
+ */
 public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepository {
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final WorkspaceCatalogMapper mapper;
 
-    /** 当前短数据库工作单元的提交与回滚控制器。 */
+    /**
+     * 当前短数据库工作单元的提交与回滚控制器。
+     */
     private final UnitOfWork transaction;
 
     /**
@@ -46,7 +52,9 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
         return "project:" + project;
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcWorkspaceCatalogRepository(WorkspaceCatalogMapper mapper, UnitOfWork transaction) {
         this.mapper = Objects.requireNonNull(mapper);
         this.transaction = Objects.requireNonNull(transaction);
@@ -56,7 +64,7 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
      * 构造并返回当前操作所需的结果对象。
      *
      * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @return 本次操作返回的草稿结果。
      */
     @Transactional(
@@ -82,7 +90,7 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
      * 计算或取得本方法声明的结果，供当前JdbcWorkspaceCatalogRepository处理步骤使用。
      *
      * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @return 本次处理得到的结果集合。
      */
     private List<File> files(long project, String agent) {
@@ -102,7 +110,7 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
      * 完成当前操作的lock步骤，按实现更新相应状态或依赖。
      *
      * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      */
     private void lock(long project, String agent) {
         mapper.insertWorkspaceIfAbsent(project, agent);
@@ -112,10 +120,10 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
     /**
      * 保存JDBC工作区目录仓储。
      *
-     * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param project  当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
+     * @param agent    当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param expected 当前JDBC工作区目录仓储使用的预期，供其处理与状态记录使用。
-     * @param files 文件集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param files    文件集合的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @param operator 当前JDBC工作区目录仓储使用的操作符，供其处理与状态记录使用。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -142,7 +150,7 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
                                 if (prior != null
                                         && prior.getChecksum().equals(file.getChecksum())
                                         && Objects.equals(
-                                                prior.getMediaType(), file.getMediaType()))
+                                        prior.getMediaType(), file.getMediaType()))
                                     continue;
                                 String kind = WorkspaceFilePolicy.kind(file.getPath());
                                 long priorVersion =
@@ -195,8 +203,8 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
      * 计算或取得本方法声明的结果，供当前JdbcWorkspaceCatalogRepository处理步骤使用。
      *
      * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param path 需要读取、写入或校验的路径。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param path    需要读取、写入或校验的路径。
      * @return 本次操作返回的长整型结果。
      */
     private long fileVersion(long project, String agent, String path) {
@@ -206,15 +214,15 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
     /**
      * 完成当前操作的audit步骤，按实现更新相应状态或依赖。
      *
-     * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param before 当前JDBC工作区目录仓储持有的处理前对象，供相应处理步骤使用。
-     * @param after 当前JDBC工作区目录仓储持有的处理后对象，供相应处理步骤使用。
-     * @param operation 当前JDBC工作区目录仓储使用的操作，供其处理与状态记录使用。
-     * @param type 当前操作使用的目标类型或类别。
-     * @param operator 当前JDBC工作区目录仓储使用的操作符，供其处理与状态记录使用。
+     * @param project       当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
+     * @param agent         当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param before        当前JDBC工作区目录仓储持有的处理前对象，供相应处理步骤使用。
+     * @param after         当前JDBC工作区目录仓储持有的处理后对象，供相应处理步骤使用。
+     * @param operation     当前JDBC工作区目录仓储使用的操作，供其处理与状态记录使用。
+     * @param type          当前操作使用的目标类型或类别。
+     * @param operator      当前JDBC工作区目录仓储使用的操作符，供其处理与状态记录使用。
      * @param beforeVersion 处理前的版本，供兼容或并发检查使用。
-     * @param afterVersion 处理后的版本，供兼容或并发检查使用。
+     * @param afterVersion  处理后的版本，供兼容或并发检查使用。
      */
     private void audit(
             long project,
@@ -253,12 +261,12 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
     /**
      * 发布JDBC工作区目录仓储。
      *
-     * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param project  当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
+     * @param agent    当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param expected 当前JDBC工作区目录仓储使用的预期，供其处理与状态记录使用。
      * @param manifest 当前JDBC工作区目录仓储使用的清单，供其处理与状态记录使用。
-     * @param hash 内容或索引的摘要值，供去重、校验或缓存寻址使用。
-     * @param notes 当前JDBC工作区目录仓储使用的说明集合，供其处理与状态记录使用。
+     * @param hash     内容或索引的摘要值，供去重、校验或缓存寻址使用。
+     * @param notes    当前JDBC工作区目录仓储使用的说明集合，供其处理与状态记录使用。
      * @param operator 当前JDBC工作区目录仓储使用的操作符，供其处理与状态记录使用。
      * @return 本次操作返回的发布结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -311,8 +319,8 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
      * 计算或取得本方法声明的结果，供当前JdbcWorkspaceCatalogRepository处理步骤使用。
      *
      * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param number 当前JDBC工作区目录仓储使用的number，供其处理与状态记录使用。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param number  当前JDBC工作区目录仓储使用的number，供其处理与状态记录使用。
      * @return 本次操作返回的发布结果。
      */
     private Release currentByNumber(long project, String agent, long number) {
@@ -326,7 +334,7 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
      * 计算或取得本方法声明的结果，供当前JdbcWorkspaceCatalogRepository处理步骤使用。
      *
      * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
     @Override
@@ -340,8 +348,8 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
      * 释放JDBC工作区目录仓储。
      *
      * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param id 目标对象的标识。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param id      目标对象的标识。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
     @Override
@@ -355,7 +363,7 @@ public class JdbcWorkspaceCatalogRepository implements WorkspaceCatalogRepositor
      * 计算或取得本方法声明的结果，供当前JdbcWorkspaceCatalogRepository处理步骤使用。
      *
      * @param project 当前JDBC工作区目录仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @return 本次处理得到的结果集合。
      */
     @Override

@@ -32,12 +32,12 @@ class InstanceLeaseRenewerTest {
                         });
         LeaseRenewalPolicy properties = properties(50, 2, 0, Duration.ofMillis(10));
         try (InstanceLeaseRenewer renewer =
-                new InstanceLeaseRenewer(
-                        store,
-                        "instance",
-                        Duration.ofSeconds(5),
-                        Duration.ofMillis(200),
-                        properties)) {
+                     new InstanceLeaseRenewer(
+                             store,
+                             "instance",
+                             Duration.ofSeconds(5),
+                             Duration.ofMillis(200),
+                             properties)) {
             renewer.start();
             Thread.sleep(50L);
             renewer.track("owner", "turn-started-during-wait");
@@ -66,12 +66,12 @@ class InstanceLeaseRenewerTest {
                         });
         LeaseRenewalPolicy properties = properties(2, 2, 0, Duration.ofMillis(10));
         try (InstanceLeaseRenewer renewer =
-                new InstanceLeaseRenewer(
-                        store,
-                        "instance",
-                        Duration.ofSeconds(5),
-                        Duration.ofMillis(20),
-                        properties)) {
+                     new InstanceLeaseRenewer(
+                             store,
+                             "instance",
+                             Duration.ofSeconds(5),
+                             Duration.ofMillis(20),
+                             properties)) {
             for (int index = 1; index <= 5; index++) {
                 renewer.track("owner", "turn-" + index);
             }
@@ -107,12 +107,12 @@ class InstanceLeaseRenewerTest {
                         });
         LeaseRenewalPolicy properties = properties(2, 2, 1, Duration.ofMillis(10));
         try (InstanceLeaseRenewer renewer =
-                new InstanceLeaseRenewer(
-                        store,
-                        "instance",
-                        Duration.ofSeconds(5),
-                        Duration.ofSeconds(1),
-                        properties)) {
+                     new InstanceLeaseRenewer(
+                             store,
+                             "instance",
+                             Duration.ofSeconds(5),
+                             Duration.ofSeconds(1),
+                             properties)) {
             for (int index = 1; index <= 4; index++) {
                 renewer.track("owner", "turn-" + index);
             }
@@ -133,12 +133,12 @@ class InstanceLeaseRenewerTest {
         when(store.findTurn(anyString(), anyString())).thenReturn(Optional.empty());
         LeaseRenewalPolicy properties = properties(50, 2, 0, Duration.ofMillis(10));
         try (InstanceLeaseRenewer renewer =
-                new InstanceLeaseRenewer(
-                        store,
-                        "instance",
-                        Duration.ofSeconds(5),
-                        Duration.ofSeconds(1),
-                        properties)) {
+                     new InstanceLeaseRenewer(
+                             store,
+                             "instance",
+                             Duration.ofSeconds(5),
+                             Duration.ofSeconds(1),
+                             properties)) {
             renewer.track("owner", "turn-ended");
 
             renewer.runOnce().block(Duration.ofSeconds(1));
@@ -162,12 +162,12 @@ class InstanceLeaseRenewerTest {
         when(store.findTurn(anyString(), anyString())).thenReturn(Optional.empty());
         LeaseRenewalPolicy properties = properties(50, 2, 1, Duration.ofMillis(10));
         try (InstanceLeaseRenewer renewer =
-                new InstanceLeaseRenewer(
-                        store,
-                        "instance",
-                        Duration.ofSeconds(5),
-                        Duration.ofSeconds(1),
-                        properties)) {
+                     new InstanceLeaseRenewer(
+                             store,
+                             "instance",
+                             Duration.ofSeconds(5),
+                             Duration.ofSeconds(1),
+                             properties)) {
             renewer.track("owner", "turn-ended-during-retry");
 
             renewer.runOnce().block(Duration.ofSeconds(1));

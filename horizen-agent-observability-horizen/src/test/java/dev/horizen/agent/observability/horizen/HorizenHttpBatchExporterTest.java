@@ -141,10 +141,10 @@ class HorizenHttpBatchExporterTest {
                 });
         server.start();
         try (var exporter =
-                new HorizenHttpBatchExporter(
-                        config(
-                                URI.create("http://127.0.0.1:" + server.getAddress().getPort()),
-                                null))) {
+                     new HorizenHttpBatchExporter(
+                             config(
+                                     URI.create("http://127.0.0.1:" + server.getAddress().getPort()),
+                                     null))) {
             exporter.submit(batch());
             assertTrue(exporter.flush(Duration.ofSeconds(3)));
             assertEquals(3, requests.size());
@@ -171,10 +171,10 @@ class HorizenHttpBatchExporterTest {
                 });
         server.start();
         try (var exporter =
-                new HorizenHttpBatchExporter(
-                        config(
-                                URI.create("http://127.0.0.1:" + server.getAddress().getPort()),
-                                null))) {
+                     new HorizenHttpBatchExporter(
+                             config(
+                                     URI.create("http://127.0.0.1:" + server.getAddress().getPort()),
+                                     null))) {
             exporter.submit(batch());
             assertTrue(exporter.flush(Duration.ofSeconds(3)));
             assertEquals(1, calls.get());

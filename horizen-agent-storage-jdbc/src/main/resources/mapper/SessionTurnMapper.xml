@@ -4,108 +4,108 @@
 <mapper namespace="dev.horizen.agent.storage.jdbc.mapper.SessionTurnMapper">
     <insert id="insertTurn">
         INSERT INTO
-            ha_turn (
-                owner_key,
-                turn_id,
-                session_id,
-                request_id,
-                actor_id,
-                status,
-                executor_id,
-                started_at,
-                finished_at,
-                deadline_at,
-                lease_expires_at,
-                failure_code,
-                created_at,
-                updated_at,
-                version
-            )
+        ha_turn (
+        owner_key,
+        turn_id,
+        session_id,
+        request_id,
+        actor_id,
+        status,
+        executor_id,
+        started_at,
+        finished_at,
+        deadline_at,
+        lease_expires_at,
+        failure_code,
+        created_at,
+        updated_at,
+        version
+        )
         VALUES
-            (
-                #{ownerKey},
-                #{turnId},
-                #{sessionId},
-                #{requestId},
-                #{actorId},
-                #{status},
-                #{executorId},
-                #{startedAt},
-                NULL,
-                #{deadlineAt},
-                #{leaseExpiresAt},
-                NULL,
-                #{createdAt},
-                #{updatedAt},
-                0
-            )
+        (
+        #{ownerKey},
+        #{turnId},
+        #{sessionId},
+        #{requestId},
+        #{actorId},
+        #{status},
+        #{executorId},
+        #{startedAt},
+        NULL,
+        #{deadlineAt},
+        #{leaseExpiresAt},
+        NULL,
+        #{createdAt},
+        #{updatedAt},
+        0
+        )
     </insert>
 
     <update id="claimSessionForTurn">
         UPDATE ha_session
         SET
-            active_turn_id = #{activeTurnId},
-            next_message_sequence = #{nextMessageSequence},
-            last_message_at = #{lastMessageAt},
-            updated_at = #{updatedAt},
-            version = version + 1
+        active_turn_id = #{activeTurnId},
+        next_message_sequence = #{nextMessageSequence},
+        last_message_at = #{lastMessageAt},
+        updated_at = #{updatedAt},
+        version = version + 1
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND active_turn_id IS NULL
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND active_turn_id IS NULL
     </update>
 
     <update id="transitionTurn">
         UPDATE ha_turn
         SET
-            status = #{status},
-            executor_id = #{executorId},
-            lease_expires_at = #{leaseExpiresAt},
-            finished_at = #{finishedAt},
-            failure_code = #{failureCode},
-            updated_at = #{updatedAt},
-            version = version + 1
+        status = #{status},
+        executor_id = #{executorId},
+        lease_expires_at = #{leaseExpiresAt},
+        finished_at = #{finishedAt},
+        failure_code = #{failureCode},
+        updated_at = #{updatedAt},
+        version = version + 1
         WHERE
-            owner_key = #{ownerKey}
-            AND turn_id = #{turnId}
-            AND version = #{version}
+        owner_key = #{ownerKey}
+        AND turn_id = #{turnId}
+        AND version = #{version}
     </update>
 
     <update id="releaseSessionTurn">
         UPDATE ha_session
         SET
-            active_turn_id = NULL,
-            updated_at = #{updatedAt},
-            version = version + 1
+        active_turn_id = NULL,
+        updated_at = #{updatedAt},
+        version = version + 1
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND active_turn_id = #{activeTurnId}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND active_turn_id = #{activeTurnId}
     </update>
 
     <update id="releaseSessionTurnWithMessage">
         UPDATE ha_session
         SET
-            active_turn_id = NULL,
-            next_message_sequence = #{nextMessageSequence},
-            last_message_at = #{lastMessageAt},
-            updated_at = #{updatedAt},
-            version = version + 1
+        active_turn_id = NULL,
+        next_message_sequence = #{nextMessageSequence},
+        last_message_at = #{lastMessageAt},
+        updated_at = #{updatedAt},
+        version = version + 1
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND active_turn_id = #{activeTurnId}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND active_turn_id = #{activeTurnId}
     </update>
 
     <update id="touchActiveSession">
         UPDATE ha_session
         SET
-            updated_at = #{updatedAt},
-            version = version + 1
+        updated_at = #{updatedAt},
+        version = version + 1
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND active_turn_id = #{activeTurnId}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND active_turn_id = #{activeTurnId}
     </update>
 
     <select
@@ -113,12 +113,12 @@
         resultType="dev.horizen.agent.storage.jdbc.model.SessionRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_session
+        ha_session
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
     </select>
 
     <select
@@ -126,12 +126,12 @@
         resultType="dev.horizen.agent.storage.jdbc.model.TurnRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_turn
+        ha_turn
         WHERE
-            owner_key = #{ownerKey}
-            AND turn_id = #{turnId}
+        owner_key = #{ownerKey}
+        AND turn_id = #{turnId}
     </select>
 
     <select
@@ -139,16 +139,16 @@
         resultType="dev.horizen.agent.storage.jdbc.model.TurnRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_turn
+        ha_turn
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
         ORDER BY
-            created_at DESC
+        created_at DESC
         LIMIT
-            1
+        1
     </select>
 
     <select
@@ -156,58 +156,58 @@
         resultType="dev.horizen.agent.storage.jdbc.model.SessionRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_session
+        ha_session
         WHERE
-            owner_key = #{ownerKey}
-            AND status = #{status}
+        owner_key = #{ownerKey}
+        AND status = #{status}
         ORDER BY
-            pinned DESC,
-            last_message_at DESC,
-            session_id DESC
+        pinned DESC,
+        last_message_at DESC,
+        session_id DESC
         LIMIT
-            #{limit}
+        #{limit}
         OFFSET
-            #{offset}
+        #{offset}
     </select>
 
     <update id="updateRenameSession">
         UPDATE ha_session
         SET
-            title = #{title},
-            updated_at = #{updatedAt},
-            version = version + 1
+        title = #{title},
+        updated_at = #{updatedAt},
+        version = version + 1
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND status = #{status}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND status = #{status}
     </update>
 
     <update id="updateSetSessionPinned">
         UPDATE ha_session
         SET
-            pinned = #{pinned},
-            updated_at = #{updatedAt},
-            version = version + 1
+        pinned = #{pinned},
+        updated_at = #{updatedAt},
+        version = version + 1
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND status = #{status}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND status = #{status}
     </update>
 
     <update id="updateArchiveSession">
         UPDATE ha_session
         SET
-            status = #{status},
-            pinned = FALSE,
-            updated_at = #{updatedAt},
-            version = version + 1
+        status = #{status},
+        pinned = FALSE,
+        updated_at = #{updatedAt},
+        version = version + 1
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND status = #{expectedStatus}
-            AND active_turn_id IS NULL
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND status = #{expectedStatus}
+        AND active_turn_id IS NULL
     </update>
 
     <select
@@ -215,15 +215,15 @@
         resultType="dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_conversation_history
+        ha_conversation_history
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND record_type = 'MESSAGE'
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND record_type = 'MESSAGE'
         ORDER BY
-            message_sequence
+        message_sequence
     </select>
 
     <select
@@ -231,17 +231,17 @@
         resultType="dev.horizen.agent.storage.jdbc.model.TurnRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_turn
+        ha_turn
         WHERE
-            status IN (#{runningStatus}, #{cancellingStatus})
-            AND lease_expires_at IS NOT NULL
-            AND lease_expires_at &lt;= #{leaseExpiresAt}
+        status IN (#{runningStatus}, #{cancellingStatus})
+        AND lease_expires_at IS NOT NULL
+        AND lease_expires_at &lt;= #{leaseExpiresAt}
         ORDER BY
-            lease_expires_at
+        lease_expires_at
         LIMIT
-            #{limit}
+        #{limit}
     </select>
 
     <select
@@ -249,49 +249,49 @@
         resultType="dev.horizen.agent.storage.jdbc.model.TurnRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_turn
+        ha_turn
         WHERE
-            status IN (#{runningStatus}, #{waitingApprovalStatus}, #{waitingAskUserStatus}, #{cancellingStatus})
-            AND deadline_at &lt;= #{deadlineAt}
+        status IN (#{runningStatus}, #{waitingApprovalStatus}, #{waitingAskUserStatus}, #{cancellingStatus})
+        AND deadline_at &lt;= #{deadlineAt}
         ORDER BY
-            deadline_at
+        deadline_at
         LIMIT
-            #{limit}
+        #{limit}
     </select>
 
     <insert id="insertSession">
         INSERT INTO
-            ha_session (
-                owner_key,
-                session_id,
-                status,
-                active_turn_id,
-                created_by,
-                title,
-                pinned,
-                last_message_at,
-                next_message_sequence,
-                created_at,
-                updated_at,
-                version
-            )
+        ha_session (
+        owner_key,
+        session_id,
+        status,
+        active_turn_id,
+        created_by,
+        title,
+        pinned,
+        last_message_at,
+        next_message_sequence,
+        created_at,
+        updated_at,
+        version
+        )
         VALUES
-            (
-                #{ownerKey},
-                #{sessionId},
-                #{status},
-                NULL,
-                #{createdBy},
-                #{title},
-                FALSE,
-                #{lastMessageAt},
-                1,
-                #{createdAt},
-                #{updatedAt},
-                0
-            )
+        (
+        #{ownerKey},
+        #{sessionId},
+        #{status},
+        NULL,
+        #{createdBy},
+        #{title},
+        FALSE,
+        #{lastMessageAt},
+        1,
+        #{createdAt},
+        #{updatedAt},
+        0
+        )
     </insert>
 
     <select
@@ -299,12 +299,12 @@
         resultType="dev.horizen.agent.storage.jdbc.model.SessionRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_session
+        ha_session
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId} FOR
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId} FOR
         UPDATE
     </select>
 
@@ -313,12 +313,12 @@
         resultType="dev.horizen.agent.storage.jdbc.model.TurnRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_turn
+        ha_turn
         WHERE
-            owner_key = #{ownerKey}
-            AND turn_id = #{turnId} FOR
+        owner_key = #{ownerKey}
+        AND turn_id = #{turnId} FOR
         UPDATE
     </select>
 
@@ -327,13 +327,13 @@
         resultType="dev.horizen.agent.storage.jdbc.model.TurnRow"
     >
         SELECT
-            *
+        *
         FROM
-            ha_turn
+        ha_turn
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND request_id = #{requestId}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND request_id = #{requestId}
     </select>
 
     <select
@@ -341,39 +341,39 @@
         resultType="java.lang.Long"
     >
         SELECT
-            next_message_sequence
+        next_message_sequence
         FROM
-            ha_session
+        ha_session
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
     </select>
 
     <insert id="insertMessage">
         INSERT INTO
-            ha_conversation_history (
-                owner_key,
-                session_id,
-                turn_id,
-                record_type,
-                record_id,
-                message_sequence,
-                payload_json,
-                created_at,
-                updated_at
-            )
+        ha_conversation_history (
+        owner_key,
+        session_id,
+        turn_id,
+        record_type,
+        record_id,
+        message_sequence,
+        payload_json,
+        created_at,
+        updated_at
+        )
         VALUES
-            (
-                #{ownerKey},
-                #{sessionId},
-                #{turnId},
-                'MESSAGE',
-                #{recordId},
-                #{messageSequence},
-                #{payloadJson},
-                #{createdAt},
-                #{updatedAt}
-            )
+        (
+        #{ownerKey},
+        #{sessionId},
+        #{turnId},
+        'MESSAGE',
+        #{recordId},
+        #{messageSequence},
+        #{payloadJson},
+        #{createdAt},
+        #{updatedAt}
+        )
     </insert>
     <update
         id="renewLeases"
@@ -381,14 +381,14 @@
     >
         UPDATE ha_turn
         SET
-            lease_expires_at = #{expires},
-            updated_at = #{now},
-            version = version + 1
+        lease_expires_at = #{expires},
+        updated_at = #{now},
+        version = version + 1
         WHERE executor_id = #{executor}
-            AND status IN ('RUNNING', 'CANCELLING')
-            AND lease_expires_at &gt; #{now}
-            AND deadline_at &gt; #{now}
-            AND
+        AND status IN ('RUNNING', 'CANCELLING')
+        AND lease_expires_at &gt; #{now}
+        AND deadline_at &gt; #{now}
+        AND
         <foreach
             collection="owners"
             item="ids"

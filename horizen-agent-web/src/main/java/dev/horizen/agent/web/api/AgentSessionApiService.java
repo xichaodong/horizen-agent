@@ -33,36 +33,50 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-/** Session 查询和目录 API 适配器；活跃 Turn 命令仍由执行协调器处理。 */
+/**
+ * Session 查询和目录 API 适配器；活跃 Turn 命令仍由执行协调器处理。
+ */
 public final class AgentSessionApiService {
-    /** 执行 Agent 模型与工具循环的运行时接口。 */
+    /**
+     * 执行 Agent 模型与工具循环的运行时接口。
+     */
     private final AgentRuntime runtime;
 
-    /** 会话对象或会话索引，按相应的归属键定位数据。 */
+    /**
+     * 会话对象或会话索引，按相应的归属键定位数据。
+     */
     private final SessionTurnStore sessions;
 
-    /** 会话目录、标题与生命周期的应用用例。 */
+    /**
+     * 会话目录、标题与生命周期的应用用例。
+     */
     private final SessionApplicationService sessionUseCases;
 
-    /** 组合正式消息、过程事件与呈现块的历史查询用例。 */
+    /**
+     * 组合正式消息、过程事件与呈现块的历史查询用例。
+     */
     private final ConversationHistoryQueryService historyQueries;
 
-    /** 共享执行增量与回放的事件通道。 */
+    /**
+     * 共享执行增量与回放的事件通道。
+     */
     private final RedisTurnEventBridge distributedEvents;
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final AgentApiMapper mapper;
 
     /**
      * 创建Agent会话API服务，初始化该组件所需的状态、配置或依赖。
      *
-     * @param runtime 执行 Agent 模型与工具循环的运行时接口。
-     * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
-     * @param presentations 需要持久化或展示的结构化呈现块集合。
-     * @param timeline 提供时间线能力的依赖，具体实现由当前组件的组装方传入。
-     * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     * @param runtime           执行 Agent 模型与工具循环的运行时接口。
+     * @param sessions          会话对象或会话索引，按相应的归属键定位数据。
+     * @param presentations     需要持久化或展示的结构化呈现块集合。
+     * @param timeline          提供时间线能力的依赖，具体实现由当前组件的组装方传入。
+     * @param artifacts         产物管理依赖或产物集合，用于引用、读取与交付资源。
      * @param distributedEvents 当前Agent会话API服务持有的分布式事件集合对象，供相应处理步骤使用。
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param mapper            本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
      */
     public AgentSessionApiService(
             AgentRuntime runtime,
@@ -79,10 +93,10 @@ public final class AgentSessionApiService {
                 sessions == null
                         ? null
                         : new ConversationHistoryQueryService(
-                                sessions,
-                                presentations,
-                                timeline,
-                                artifacts == null ? null : artifacts.getArtifacts());
+                        sessions,
+                        presentations,
+                        timeline,
+                        artifacts == null ? null : artifacts.getArtifacts());
         this.distributedEvents = distributedEvents;
         this.mapper = mapper;
     }
@@ -90,15 +104,15 @@ public final class AgentSessionApiService {
     /**
      * 创建Agent会话API服务，初始化该组件所需的状态、配置或依赖。
      *
-     * @param runtime 执行 Agent 模型与工具循环的运行时接口。
-     * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
-     * @param presentations 需要持久化或展示的结构化呈现块集合。
-     * @param timeline 提供时间线能力的依赖，具体实现由当前组件的组装方传入。
-     * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     * @param runtime           执行 Agent 模型与工具循环的运行时接口。
+     * @param sessions          会话对象或会话索引，按相应的归属键定位数据。
+     * @param presentations     需要持久化或展示的结构化呈现块集合。
+     * @param timeline          提供时间线能力的依赖，具体实现由当前组件的组装方传入。
+     * @param artifacts         产物管理依赖或产物集合，用于引用、读取与交付资源。
      * @param distributedEvents 当前Agent会话API服务持有的分布式事件集合对象，供相应处理步骤使用。
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
-     * @param sessionUseCases 提供会话使用用例集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param historyQueries 提供历史Queries能力的依赖，具体实现由当前组件的组装方传入。
+     * @param mapper            本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param sessionUseCases   提供会话使用用例集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param historyQueries    提供历史Queries能力的依赖，具体实现由当前组件的组装方传入。
      */
     public AgentSessionApiService(
             AgentRuntime runtime,
@@ -121,7 +135,7 @@ public final class AgentSessionApiService {
     /**
      * 计算或取得本方法声明的结果，供当前AgentSessionApiService处理步骤使用。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param identity     可信宿主解析的执行身份，供访问范围与审计使用。
      * @param rawSessionId 原始会话的标识，用于关联相应记录或执行。
      * @return 本次操作返回的会话执行响应结果。
      */
@@ -138,18 +152,18 @@ public final class AgentSessionApiService {
         return state == null
                 ? new SessionApi.SessionExecutionResponse(sessionId, null, "idle", null, null, null)
                 : new SessionApi.SessionExecutionResponse(
-                        sessionId,
-                        state.getTurnId(),
-                        state.getStatus().name().toLowerCase(Locale.ROOT),
-                        state.getStartedAt(),
-                        state.getFinishedAt(),
-                        state.getFailureCode());
+                sessionId,
+                state.getTurnId(),
+                state.getStatus().name().toLowerCase(Locale.ROOT),
+                state.getStartedAt(),
+                state.getFinishedAt(),
+                state.getFailureCode());
     }
 
     /**
      * 计算或取得本方法声明的结果，供当前AgentSessionApiService处理步骤使用。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param identity     可信宿主解析的执行身份，供访问范围与审计使用。
      * @param rawSessionId 原始会话的标识，用于关联相应记录或执行。
      * @return 本次处理得到的结果集合。
      */
@@ -163,9 +177,9 @@ public final class AgentSessionApiService {
     /**
      * 取消子任务。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param identity     可信宿主解析的执行身份，供访问范围与审计使用。
      * @param rawSessionId 原始会话的标识，用于关联相应记录或执行。
-     * @param rawTaskId 原始任务的标识，用于关联相应记录或执行。
+     * @param rawTaskId    原始任务的标识，用于关联相应记录或执行。
      * @return 本次检查是否通过或本次更新是否成功。
      */
     boolean cancelSubtask(ExecutionIdentity identity, String rawSessionId, String rawTaskId) {
@@ -178,7 +192,7 @@ public final class AgentSessionApiService {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param identity     可信宿主解析的执行身份，供访问范围与审计使用。
      * @param rawSessionId 原始会话的标识，用于关联相应记录或执行。
      * @return 本次操作返回的会话消息集合响应结果。
      */
@@ -210,7 +224,7 @@ public final class AgentSessionApiService {
                                                 message.getCreatedAt(),
                                                 message.getRole() == MessageRole.USER
                                                         ? inputArtifacts.getOrDefault(
-                                                                message.getTurnId(), List.of())
+                                                        message.getTurnId(), List.of())
                                                         : List.of()))
                         .toList();
         List<SessionApi.PresentationResponse> presentations =
@@ -229,21 +243,21 @@ public final class AgentSessionApiService {
         AgentTurn latest = history.getLatestTurn();
         if (latest != null
                 && (latest.getStatus() == TurnStatus.FAILED
-                        || latest.getStatus() == TurnStatus.TIMED_OUT
-                        || latest.getStatus() == TurnStatus.CANCELLED)
+                || latest.getStatus() == TurnStatus.TIMED_OUT
+                || latest.getStatus() == TurnStatus.CANCELLED)
                 && timeline.stream()
-                        .noneMatch(
-                                item ->
-                                        latest.getTurnId().equals(item.getTurnId())
-                                                && Set.of("error", "cancelled")
-                                                        .contains(item.getEvent().getType())
-                                                && item.getEvent().getSource() == null)) {
+                .noneMatch(
+                        item ->
+                                latest.getTurnId().equals(item.getTurnId())
+                                        && Set.of("error", "cancelled")
+                                        .contains(item.getEvent().getType())
+                                        && item.getEvent().getSource() == null)) {
             var type =
                     latest.getStatus() == TurnStatus.CANCELLED
                             ? AgentRuntimeEvent.Type.TURN_CANCELLED
                             : latest.getStatus() == TurnStatus.TIMED_OUT
-                                    ? AgentRuntimeEvent.Type.TURN_TIMED_OUT
-                                    : AgentRuntimeEvent.Type.TURN_FAILED;
+                            ? AgentRuntimeEvent.Type.TURN_TIMED_OUT
+                            : AgentRuntimeEvent.Type.TURN_FAILED;
             var fallback =
                     new AgentRuntimeEvent(
                             type,
@@ -276,7 +290,7 @@ public final class AgentSessionApiService {
      * 查询列表中的Agent会话API服务。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 本次操作返回的会话列表响应结果。
      */
     SessionApi.SessionListResponse list(
@@ -302,7 +316,7 @@ public final class AgentSessionApiService {
      * 计算或取得本方法声明的结果，供当前AgentSessionApiService处理步骤使用。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 本次操作返回的会话摘要响应结果。
      */
     SessionApi.SessionSummaryResponse rename(
@@ -325,7 +339,7 @@ public final class AgentSessionApiService {
      * 计算或取得本方法声明的结果，供当前AgentSessionApiService处理步骤使用。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 本次操作返回的会话摘要响应结果。
      */
     SessionApi.SessionSummaryResponse pin(
@@ -348,7 +362,7 @@ public final class AgentSessionApiService {
      * 删除Agent会话API服务。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      */
     void delete(ExecutionIdentity identity, SessionApi.SessionDeleteRequest request) {
         requireDistributed();
@@ -365,7 +379,7 @@ public final class AgentSessionApiService {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param latest 当前Agent会话API服务持有的最近版本对象，供相应处理步骤使用。
+     * @param latest   当前Agent会话API服务持有的最近版本对象，供相应处理步骤使用。
      * @param timeline 时间线的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @return 本次操作返回的当前执行恢复响应结果。
      * @throws ApiException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -384,8 +398,8 @@ public final class AgentSessionApiService {
         if (!snapshot.isPresent()
                 && latest.getStartedAt() != null
                 && Duration.between(latest.getStartedAt(), Instant.now())
-                                .compareTo(Duration.ofSeconds(1))
-                        > 0) {
+                .compareTo(Duration.ofSeconds(1))
+                > 0) {
             throw new ApiException(HttpStatus.CONFLICT, "当前 Turn 的实时增量已不可恢复，请等待终态或重新执行");
         }
         return new SessionApi.CurrentTurnRecoveryResponse(
@@ -399,7 +413,7 @@ public final class AgentSessionApiService {
     /**
      * 生成当前操作所需的displayContent文本，供调用方继续处理。
      *
-     * @param message 用户输入、响应说明或诊断消息，含义由所属协议对象限定。
+     * @param message     用户输入、响应说明或诊断消息，含义由所属协议对象限定。
      * @param attachments 本次消息附带的输入资源，内容解析由运行时适配器完成。
      * @return 本次处理生成或读取的文本。
      */
@@ -415,6 +429,7 @@ public final class AgentSessionApiService {
 
     /**
      * 取得并校验就绪。
+     *
      * @throws ApiException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void requireReady() {
@@ -425,6 +440,7 @@ public final class AgentSessionApiService {
 
     /**
      * 取得并校验分布式。
+     *
      * @throws ApiException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void requireDistributed() {

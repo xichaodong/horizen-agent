@@ -45,32 +45,50 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-/** 从公开 HTML/PDF URL 提取可读文本，不使用模型生成摘要。 */
+/**
+ * 从公开 HTML/PDF URL 提取可读文本，不使用模型生成摘要。
+ */
 public final class WebExtractTool extends ToolBase {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 默认上限的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 默认上限的固定取值，用于相应策略和边界判断。
+     */
     private static final int DEFAULT_LIMIT = 15_000;
 
-    /** 最小上限的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最小上限的固定取值，用于相应策略和边界判断。
+     */
     private static final int MIN_LIMIT = 2_000;
 
-    /** 最大上限的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大上限的固定取值，用于相应策略和边界判断。
+     */
     private static final int MAX_LIMIT = 500_000;
 
-    /** 最大响应字节的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大响应字节的固定取值，用于相应策略和边界判断。
+     */
     private static final int MAX_RESPONSE_BYTES = 8 * 1024 * 1024;
 
-    /** 校验SENSITIVE查询的模式，限定允许接受的输入形式。 */
+    /**
+     * 校验SENSITIVE查询的模式，限定允许接受的输入形式。
+     */
     private static final Pattern SENSITIVE_QUERY =
             Pattern.compile(
                     "(?i)(?:^|[?&])(token|api[_-]?key|access[_-]?token|authorization|signature|secret)=");
 
-    /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+    /**
+     * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     */
     private final HttpClient client;
 
-    /** 产物管理依赖或产物集合，用于引用、读取与交付资源。 */
+    /**
+     * 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     */
     private final ArtifactLifecycleService artifacts;
 
     /**
@@ -90,7 +108,7 @@ public final class WebExtractTool extends ToolBase {
     /**
      * 创建Web提取工具，初始化该组件所需的状态、配置或依赖。
      *
-     * @param client 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     * @param client    当前适配器使用的远端客户端，供实际网络或服务请求使用。
      * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
      */
     public WebExtractTool(HttpClient client, ArtifactLifecycleService artifacts) {
@@ -107,27 +125,27 @@ public final class WebExtractTool extends ToolBase {
                                         "properties",
                                         Map.of(
                                                 "urls",
-                                                        Map.of(
-                                                                "type",
-                                                                "array",
-                                                                "items",
-                                                                Map.of("type", "string"),
-                                                                "minItems",
-                                                                1,
-                                                                "maxItems",
-                                                                5,
-                                                                "description",
-                                                                "待提取的公开 URL"),
+                                                Map.of(
+                                                        "type",
+                                                        "array",
+                                                        "items",
+                                                        Map.of("type", "string"),
+                                                        "minItems",
+                                                        1,
+                                                        "maxItems",
+                                                        5,
+                                                        "description",
+                                                        "待提取的公开 URL"),
                                                 "char_limit",
-                                                        Map.of(
-                                                                "type",
-                                                                "integer",
-                                                                "minimum",
-                                                                MIN_LIMIT,
-                                                                "maximum",
-                                                                MAX_LIMIT,
-                                                                "description",
-                                                                "每页返回字符上限，默认 15000")),
+                                                Map.of(
+                                                        "type",
+                                                        "integer",
+                                                        "minimum",
+                                                        MIN_LIMIT,
+                                                        "maximum",
+                                                        MAX_LIMIT,
+                                                        "description",
+                                                        "每页返回字符上限，默认 15000")),
                                         "required",
                                         List.of("urls"),
                                         "additionalProperties",
@@ -178,9 +196,9 @@ public final class WebExtractTool extends ToolBase {
     /**
      * 提取One。
      *
-     * @param value 待校验、转换或保存的原始值。
-     * @param limit 本次处理或返回数量上限。
-     * @param param 当前Web提取工具持有的参数对象，供相应处理步骤使用。
+     * @param value  待校验、转换或保存的原始值。
+     * @param limit  本次处理或返回数量上限。
+     * @param param  当前Web提取工具持有的参数对象，供相应处理步骤使用。
      * @param result 本次处理已有的结果。
      */
     private void extractOne(String value, int limit, ToolCallParam param, ObjectNode result) {
@@ -234,9 +252,9 @@ public final class WebExtractTool extends ToolBase {
     /**
      * 发布Full文本。
      *
-     * @param url 资源或远端接口地址；具体访问范围由所属服务的配置校验。
+     * @param url   资源或远端接口地址；具体访问范围由所属服务的配置校验。
      * @param title 当前Web提取工具的可读标题，供宿主界面展示。
-     * @param text 面向消息或事件消费者的文本内容。
+     * @param text  面向消息或事件消费者的文本内容。
      * @param param 当前Web提取工具持有的参数对象，供相应处理步骤使用。
      * @return 本次操作返回的产物结果。
      */
@@ -269,7 +287,7 @@ public final class WebExtractTool extends ToolBase {
      * 生成当前操作所需的truncate文本，供调用方继续处理。
      *
      * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
-     * @param limit 本次处理或返回数量上限。
+     * @param limit   本次处理或返回数量上限。
      * @return 本次处理生成或读取的文本。
      */
     static String truncate(String content, int limit) {
@@ -287,8 +305,8 @@ public final class WebExtractTool extends ToolBase {
     /**
      * 提取Html。
      *
-     * @param bytes 当前操作处理的内容字节。
-     * @param uri 当前Web提取工具持有的URI对象，供相应处理步骤使用。
+     * @param bytes       当前操作处理的内容字节。
+     * @param uri         当前Web提取工具持有的URI对象，供相应处理步骤使用。
      * @param contentType 当前Web提取工具使用的正文类型，供其处理与状态记录使用。
      * @return 本次操作返回的提取结果结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -300,10 +318,10 @@ public final class WebExtractTool extends ToolBase {
                 document.body() == null
                         ? ""
                         : document.body()
-                                .text()
-                                .replaceAll("[ \\t]+", " ")
-                                .replaceAll("\\s*\\n\\s*", "\n")
-                                .trim();
+                        .text()
+                        .replaceAll("[ \\t]+", " ")
+                        .replaceAll("\\s*\\n\\s*", "\n")
+                        .trim();
         if (text.isEmpty()) throw new IllegalArgumentException("page contains no extractable text");
         return new Extracted(document.title().isBlank() ? uri.getHost() : document.title(), text);
     }
@@ -337,8 +355,8 @@ public final class WebExtractTool extends ToolBase {
                 || uri.getHost() == null
                 || uri.getUserInfo() != null
                 || SENSITIVE_QUERY
-                        .matcher(uri.getRawQuery() == null ? "" : "?" + uri.getRawQuery())
-                        .find()) {
+                .matcher(uri.getRawQuery() == null ? "" : "?" + uri.getRawQuery())
+                .find()) {
             throw new IllegalArgumentException(
                     "only public HTTP(S) URLs without credentials are allowed");
         }
@@ -361,7 +379,7 @@ public final class WebExtractTool extends ToolBase {
     /**
      * 判断Pdf。
      *
-     * @param uri 当前Web提取工具持有的URI对象，供相应处理步骤使用。
+     * @param uri         当前Web提取工具持有的URI对象，供相应处理步骤使用。
      * @param contentType 当前Web提取工具使用的正文类型，供其处理与状态记录使用。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -385,7 +403,7 @@ public final class WebExtractTool extends ToolBase {
      * 生成当前操作所需的safeFileName文本，供调用方继续处理。
      *
      * @param title 当前Web提取工具的可读标题，供宿主界面展示。
-     * @param url 资源或远端接口地址；具体访问范围由所属服务的配置校验。
+     * @param url   资源或远端接口地址；具体访问范围由所属服务的配置校验。
      * @return 本次处理生成或读取的文本。
      */
     private static String safeFileName(String title, String url) {
@@ -409,14 +427,20 @@ public final class WebExtractTool extends ToolBase {
         return DigestUtils.sha256Hex(value);
     }
 
-    /** Web提取工具内部的提取结果，封装该步骤需要的状态或输入输出。 */
+    /**
+     * Web提取工具内部的提取结果，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     static final class Extracted {
-        /** 当前提取结果的可读标题，供宿主界面展示。 */
+        /**
+         * 当前提取结果的可读标题，供宿主界面展示。
+         */
         @Getter(AccessLevel.PACKAGE)
         private final String title;
 
-        /** 当前记录或资源的正文内容；与资源标识和存储引用分开保存。 */
+        /**
+         * 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+         */
         @Getter(AccessLevel.PACKAGE)
         private final String content;
     }

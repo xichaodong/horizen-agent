@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     CheckCircleFilled,
     CloseCircleFilled,
@@ -37,24 +37,24 @@ import {
 import MessageContent from '../MessageContent.jsx';
 import ActivityItem from './ActivityItem.jsx';
 
-const SubagentExecutionCard = ({ message }) => {
+const SubagentExecutionCard = ({message}) => {
     const [expanded, setExpanded] = useState(message.status === 'running');
     const agentName = message.agentId || message.source || '子 Agent';
     return (
         <article
             className={`${PREFIX}__subagent-tree-node is-${message.status || 'running'}`}
-            style={{ '--subagent-depth': Math.min(Math.max(message.depth || 1, 1), 4) }}
+            style={{'--subagent-depth': Math.min(Math.max(message.depth || 1, 1), 4)}}
         >
             <details open={expanded} onToggle={(event) => setExpanded(event.currentTarget.open)}>
                 <summary className={`${PREFIX}__subagent-tree-head`}>
-                    <span className={`${PREFIX}__subagent-tree-branch`} aria-hidden="true" />
+                    <span className={`${PREFIX}__subagent-tree-branch`} aria-hidden="true"/>
                     <span className={`${PREFIX}__subagent-tree-title`}>{agentName}</span>
                     <span
                         className={`${PREFIX}__subagent-tree-status is-${message.status || 'running'}`}
                     >
                         {statusLabel(message.status || 'running')}
                     </span>
-                    <DownOutlined className={`${PREFIX}__timeline-chevron`} />
+                    <DownOutlined className={`${PREFIX}__timeline-chevron`}/>
                 </summary>
                 <div className={`${PREFIX}__subagent-tree-meta`}>
                     {message.taskId ? <span>任务 {message.taskId}</span> : null}
@@ -62,11 +62,11 @@ const SubagentExecutionCard = ({ message }) => {
                 </div>
                 <div className={`${PREFIX}__subagent-tree-steps`}>
                     {(message.steps || []).map((step) => (
-                        <ActivityItem message={step} key={step.id} />
+                        <ActivityItem message={step} key={step.id}/>
                     ))}
                     {message.result ? (
                         <div className={`${PREFIX}__subagent-tree-result`}>
-                            <MessageContent content={message.result} />
+                            <MessageContent content={message.result}/>
                         </div>
                     ) : null}
                     {!message.steps?.length && !message.result ? (

@@ -4,7 +4,9 @@ import dev.horizen.agent.identity.ExecutionIdentity;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/** 宿主把已经认证的请求转换为 Runtime 使用的不透明隔离身份。 */
+/**
+ * 宿主把已经认证的请求转换为 Runtime 使用的不透明隔离身份。
+ */
 public interface ExecutionIdentityResolver {
     /**
      * 解析执行身份解析器。

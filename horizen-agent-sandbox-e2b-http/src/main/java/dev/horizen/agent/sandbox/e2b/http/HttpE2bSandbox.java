@@ -27,40 +27,60 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-/** 使用 E2B 管理面和普通 JSON 同步 envd 协议的 AgentScope 沙箱。 */
+/**
+ * 使用 E2B 管理面和普通 JSON 同步 envd 协议的 AgentScope 沙箱。
+ */
 public final class HttpE2bSandbox extends AbstractBaseSandbox implements SandboxFileTransfer {
-    /** 当前组件的诊断日志器。 */
+    /**
+     * 当前组件的诊断日志器。
+     */
     private static final Logger log = LoggerFactory.getLogger(HttpE2bSandbox.class);
 
-    /** 传输CHUNK字节的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 传输CHUNK字节的固定取值，用于相应策略和边界判断。
+     */
     private static final int TRANSFER_CHUNK_BYTES = 65536;
 
-    /** 归档集合的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 归档集合的固定取值，用于相应策略和边界判断。
+     */
     private static final Semaphore ARCHIVES = new Semaphore(2);
 
-    /** 当前工作状态或状态存储对象，供执行与恢复流程使用。 */
+    /**
+     * 当前工作状态或状态存储对象，供执行与恢复流程使用。
+     */
     private final HttpE2bSandboxState state;
 
-    /** 沙箱控制面客户端，负责创建、恢复与销毁执行环境。 */
+    /**
+     * 沙箱控制面客户端，负责创建、恢复与销毁执行环境。
+     */
     private final E2bPlatformClient platform;
 
-    /** 沙箱运行端命令与文件传输客户端。 */
+    /**
+     * 沙箱运行端命令与文件传输客户端。
+     */
     private final EnvdSyncProcessClient envd;
 
-    /** 可供当前请求选择的选项或策略集合。 */
+    /**
+     * 可供当前请求选择的选项或策略集合。
+     */
     private final HttpE2bSandboxClientOptions options;
 
-    /** 检查点Saved的状态标记，用于选择当前组件的处理路径。 */
+    /**
+     * 检查点Saved的状态标记，用于选择当前组件的处理路径。
+     */
     private boolean checkpointSaved;
 
-    /** initialized的状态标记，用于选择当前组件的处理路径。 */
+    /**
+     * initialized的状态标记，用于选择当前组件的处理路径。
+     */
     private boolean initialized;
 
     /**
      * 创建HTTP2B沙箱，初始化该组件所需的状态、配置或依赖。
      *
-     * @param state 当前工作状态或状态存储对象，供执行与恢复流程使用。
-     * @param options 可供当前请求选择的选项或策略集合。
+     * @param state        当前工作状态或状态存储对象，供执行与恢复流程使用。
+     * @param options      可供当前请求选择的选项或策略集合。
      * @param objectMapper 提供对象映射器能力的依赖，具体实现由当前组件的组装方传入。
      */
     public HttpE2bSandbox(
@@ -76,6 +96,7 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
 
     /**
      * 向远端控制面创建或恢复当前执行使用的沙箱，并绑定所选隔离身份。
+     *
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
@@ -100,9 +121,9 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
                             + " if os.path.islink(p) or os.path.isfile(p): os.unlink(p)\n"
                             + " elif os.path.isdir(p): shutil.rmtree(p)\n";
             if (!doExec(
-                            null,
-                            "python3 -c " + shellQuote(script),
-                            options.getSnapshotTimeoutSeconds())
+                    null,
+                    "python3 -c " + shellQuote(script),
+                    options.getSnapshotTimeoutSeconds())
                     .ok()) {
                 throw new IOException("Failed to refresh published workspace");
             }
@@ -123,7 +144,9 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
         initialized = true;
     }
 
-    /** 停止当前沙箱执行资源，按生命周期策略清理相关句柄。 */
+    /**
+     * 停止当前沙箱执行资源，按生命周期策略清理相关句柄。
+     */
     @Override
     public void stop() throws Exception {
         // 创建阶段失败时 Harness 仍会执行 release；此时没有远端实例可供快照。
@@ -141,7 +164,9 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
         }
     }
 
-    /** 完成当前操作的shutdown步骤，按实现更新相应状态或依赖。 */
+    /**
+     * 完成当前操作的shutdown步骤，按实现更新相应状态或依赖。
+     */
     @Override
     public void shutdown() throws Exception {
         if (state.isSandboxOwned() && hasText(state.getSandboxId())) {
@@ -153,7 +178,7 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
      * 计算或取得本方法声明的结果，供当前HttpE2bSandbox处理步骤使用。
      *
      * @param runtimeContext 当前HTTP2B沙箱持有的运行时上下文对象，供相应处理步骤使用。
-     * @param command 当前HTTP2B沙箱使用的命令，供其处理与状态记录使用。
+     * @param command        当前HTTP2B沙箱使用的命令，供其处理与状态记录使用。
      * @param timeoutSeconds 超时，单位为秒。
      * @return 本次操作返回的Exec结果结果。
      */
@@ -187,9 +212,9 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
                             + shellQuote(getWorkspaceRoot())
                             + " .) && python3 -c "
                             + shellQuote(
-                                    "import os; print(os.path.getsize("
-                                            + pythonString(remote)
-                                            + "))");
+                            "import os; print(os.path.getsize("
+                                    + pythonString(remote)
+                                    + "))");
             long size =
                     Long.parseLong(
                             envd.runShell(state, getWorkspaceRoot(), command, remaining(deadline))
@@ -386,14 +411,18 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
         }
     }
 
-    /** 完成当前操作的doSetupWorkspace步骤，按实现更新相应状态或依赖。 */
+    /**
+     * 完成当前操作的doSetupWorkspace步骤，按实现更新相应状态或依赖。
+     */
     @Override
     protected void doSetupWorkspace() throws Exception {
         // 首次启动时工作区本身尚不存在，不能把它作为创建命令的 cwd。
         envd.runShell(state, "/", "mkdir -p " + shellQuote(getWorkspaceRoot()), 30);
     }
 
-    /** 按执行生命周期销毁远端工作区，避免保留旧执行环境。 */
+    /**
+     * 按执行生命周期销毁远端工作区，避免保留旧执行环境。
+     */
     @Override
     protected void doDestroyWorkspace() throws Exception {
         try {
@@ -463,7 +492,7 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
     /**
      * 在传输容量和路径约束内向沙箱写入输入文件。
      *
-     * @param path 需要读取、写入或校验的路径。
+     * @param path    需要读取、写入或校验的路径。
      * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -508,7 +537,9 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
         }
     }
 
-    /** 取得已启动的沙箱，尚未准备好时拒绝执行命令或文件操作。 */
+    /**
+     * 取得已启动的沙箱，尚未准备好时拒绝执行命令或文件操作。
+     */
     private void ensureSandbox() throws Exception {
         if (!hasText(state.getSandboxId())) {
             platform.applyIdentity(state, platform.create());
@@ -529,6 +560,7 @@ public final class HttpE2bSandbox extends AbstractBaseSandbox implements Sandbox
 
     /**
      * 核对调用上下文中的隔离身份与当前沙箱归属一致。
+     *
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void requireIdentity() {

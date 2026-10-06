@@ -40,7 +40,8 @@ class DurableWorkspaceSandboxContextTest {
     @Test
     void permanentPointerSeedsAColdStateWhenAllRuntimeStateIsMissing() {
         AtomicInteger closed = new AtomicInteger();
-        SandboxState fresh = new SandboxState() {};
+        SandboxState fresh = new SandboxState() {
+        };
         var recovery =
                 new DurableWorkspaceSandboxContext(
                         "agent",
@@ -66,7 +67,8 @@ class DurableWorkspaceSandboxContextTest {
                 return Optional.of("permanent-snapshot");
             }
 
-            public void saveCommitted(WorkspaceSnapshotKey key, String id) {}
+            public void saveCommitted(WorkspaceSnapshotKey key, String id) {
+            }
         };
     }
 

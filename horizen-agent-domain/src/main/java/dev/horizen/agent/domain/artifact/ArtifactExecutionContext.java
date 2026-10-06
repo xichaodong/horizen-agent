@@ -2,10 +2,14 @@ package dev.horizen.agent.domain.artifact;
 
 import lombok.Getter;
 
-/** 当前 Turn 的 Artifact 发布上下文，只由 Runtime 注入。 */
+/**
+ * 当前 Turn 的 Artifact 发布上下文，只由 Runtime 注入。
+ */
 @Getter
 public final class ArtifactExecutionContext {
-    /** 单次用户输入触发的执行标识，用于关联状态、消息和事件。 */
+    /**
+     * 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     */
     private final String turnId;
 
     /**

@@ -35,10 +35,13 @@ import java.nio.file.*;
 import java.time.Duration;
 import java.util.*;
 
-/** 显式启用且仅使用合成事实的验收，验证真实摘要和回复，以及新 Agent 共享 Redis 状态。 */
+/**
+ * 显式启用且仅使用合成事实的验收，验证真实摘要和回复，以及新 Agent 共享 Redis 状态。
+ */
 @EnabledIfSystemProperty(named = "horizen.context.compaction.live", matches = "true")
 class ContextCompactionConfiguredLiveTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void preservesDecisionsAndUnknownWriteOutcomeAcrossCompactionAndNewInstance() throws Exception {
@@ -74,14 +77,14 @@ class ContextCompactionConfiguredLiveTest {
         String prefix = "horizen-context-acceptance:" + UUID.randomUUID() + ":";
         URI uri = URI.create(System.getProperty("horizen.redis.url", "redis://127.0.0.1:6379"));
         try (var redis = new JedisPooled(uri);
-                var subscriptions = new JedisPool(uri)) {
+             var subscriptions = new JedisPool(uri)) {
             assertTrue(
                     redis.info("server").contains("redis_version:4.0."),
                     "This acceptance run requires Redis 4.0");
             try {
                 var storeA =
                         new RedisAgentRuntimeStore(
-                                        redis, subscriptions, prefix, Duration.ofMinutes(10))
+                                redis, subscriptions, prefix, Duration.ofMinutes(10))
                                 .agentStateStore();
                 List<Msg> history = history();
                 storeA.save(
@@ -117,7 +120,7 @@ class ContextCompactionConfiguredLiveTest {
                 context.setTriggerMessages(4);
                 var storeB =
                         new RedisAgentRuntimeStore(
-                                        redis, subscriptions, prefix, Duration.ofMinutes(10))
+                                redis, subscriptions, prefix, Duration.ofMinutes(10))
                                 .agentStateStore();
                 try (var runtime = runtime(properties, context, storeB)) {
                     assertAnswer(call(runtime, owner));
@@ -191,7 +194,7 @@ class ContextCompactionConfiguredLiveTest {
                                 e ->
                                         e.getType()
                                                 == AgentRuntimeEvent.Type
-                                                        .CONTEXT_COMPACTION_FAILED));
+                                                .CONTEXT_COMPACTION_FAILED));
         String text =
                 events.stream()
                         .filter(e -> e.getType() == AgentRuntimeEvent.Type.TURN_COMPLETED)

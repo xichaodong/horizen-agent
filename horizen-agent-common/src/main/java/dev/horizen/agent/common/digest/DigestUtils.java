@@ -5,10 +5,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-/** 仅提供摘要计算；规范化、前缀和身份规则由调用者决定。 */
+/**
+ * 仅提供摘要计算；规范化、前缀和身份规则由调用者决定。
+ */
 public final class DigestUtils {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private DigestUtils() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private DigestUtils() {
+    }
 
     /**
      * 生成当前操作所需的sha256Hex文本，供调用方继续处理。
@@ -44,7 +49,9 @@ public final class DigestUtils {
         }
     }
 
-    /** 创建新的增量摘要计算器，用于流式输入或规范化输入。 */
+    /**
+     * 创建新的增量摘要计算器，用于流式输入或规范化输入。
+     */
     public static MessageDigest newSha256() throws NoSuchAlgorithmException {
         return MessageDigest.getInstance("SHA-256");
     }

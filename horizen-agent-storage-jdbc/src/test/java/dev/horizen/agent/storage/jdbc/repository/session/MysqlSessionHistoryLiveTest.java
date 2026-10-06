@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
-/** 在可丢弃的数据库中，通过 MySQL 原生 JSON 函数验证同一召回契约。 */
+/**
+ * 在可丢弃的数据库中，通过 MySQL 原生 JSON 函数验证同一召回契约。
+ */
 @EnabledIfSystemProperty(named = "horizen.mysql.recall.live", matches = "true")
 class MysqlSessionHistoryLiveTest extends JdbcSessionHistoryRepositoryTest {
     private JdbcTemplate admin;
@@ -32,10 +34,10 @@ class MysqlSessionHistoryLiveTest extends JdbcSessionHistoryRepositoryTest {
     protected void setup() throws IOException {
         Properties config = new Properties();
         try (var input =
-                Files.newBufferedReader(
-                        Path.of(
-                                System.getProperty(
-                                        "horizen.mysql.recall.config", "../.env.yml")))) {
+                     Files.newBufferedReader(
+                             Path.of(
+                                     System.getProperty(
+                                             "horizen.mysql.recall.config", "../.env.yml")))) {
             config.putAll(YamlConfigFiles.load(input));
         }
         URI uri = URI.create(config.getProperty("horizen.agent.storage.jdbc-url").substring(5));

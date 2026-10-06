@@ -13,23 +13,33 @@ import io.agentscope.harness.agent.memory.compaction.ToolResultEvictionConfig;
 
 import lombok.RequiredArgsConstructor;
 
-/** 将已校验的宿主策略映射为当前固定版本的 AgentScope 能力。 */
+/**
+ * 将已校验的宿主策略映射为当前固定版本的 AgentScope 能力。
+ */
 @RequiredArgsConstructor
 public final class ContextRuntimeConfigurer {
-    /** 宿主绑定的配置对象，供组件组装与策略校验使用。 */
+    /**
+     * 宿主绑定的配置对象，供组件组装与策略校验使用。
+     */
     private final ContextProperties properties;
 
-    /** 将宿主配置映射到 AgentScope 原生上下文能力。 */
+    /**
+     * 将宿主配置映射到 AgentScope 原生上下文能力。
+     */
     public void apply(HarnessAgent.Builder builder) {
         apply(builder, null, null);
     }
 
-    /** 将策略应用到 AgentScope，并让常规压缩和超限恢复共用同一个压缩模型。 */
+    /**
+     * 将策略应用到 AgentScope，并让常规压缩和超限恢复共用同一个压缩模型。
+     */
     public void apply(HarnessAgent.Builder builder, Model compactionModel) {
         apply(builder, compactionModel, compactionModel);
     }
 
-    /** 独立压缩模型只负责摘要；触发阈值仍根据主模型窗口计算。 */
+    /**
+     * 独立压缩模型只负责摘要；触发阈值仍根据主模型窗口计算。
+     */
     public void apply(HarnessAgent.Builder builder, Model primaryModel, Model compactionModel) {
         ContextPolicyValidator.validate(properties);
         builder.maxContextTokens(properties.getWorkspaceContextMaxTokens());
@@ -88,7 +98,7 @@ public final class ContextRuntimeConfigurer {
     /**
      * 转换为压缩配置。
      *
-     * @param primaryModel 当前上下文运行时配置器持有的primary模型对象，供相应处理步骤使用。
+     * @param primaryModel    当前上下文运行时配置器持有的primary模型对象，供相应处理步骤使用。
      * @param compactionModel 当前上下文运行时配置器持有的压缩模型对象，供相应处理步骤使用。
      * @return 本次操作返回的压缩配置结果。
      */
@@ -131,11 +141,11 @@ public final class ContextRuntimeConfigurer {
                         .prune(
                                 properties.isPruneToolResultsEnabled()
                                         ? CompactionConfig.PruneConfig.builder()
-                                                .protectTokens(properties.getPruneProtectTokens())
-                                                .minimumTokens(properties.getPruneMinimumTokens())
-                                                .maxOutputChars(properties.getPruneMaxOutputChars())
-                                                .excludedTools(properties.getPruneExcludedTools())
-                                                .build()
+                                        .protectTokens(properties.getPruneProtectTokens())
+                                        .minimumTokens(properties.getPruneMinimumTokens())
+                                        .maxOutputChars(properties.getPruneMaxOutputChars())
+                                        .excludedTools(properties.getPruneExcludedTools())
+                                        .build()
                                         : null);
         if (compactionModel != null) {
             builder.model(compactionModel);
@@ -173,11 +183,11 @@ public final class ContextRuntimeConfigurer {
                         .prune(
                                 properties.isPruneToolResultsEnabled()
                                         ? CompactionConfig.PruneConfig.builder()
-                                                .protectTokens(properties.getPruneProtectTokens())
-                                                .minimumTokens(properties.getPruneMinimumTokens())
-                                                .maxOutputChars(properties.getPruneMaxOutputChars())
-                                                .excludedTools(properties.getPruneExcludedTools())
-                                                .build()
+                                        .protectTokens(properties.getPruneProtectTokens())
+                                        .minimumTokens(properties.getPruneMinimumTokens())
+                                        .maxOutputChars(properties.getPruneMaxOutputChars())
+                                        .excludedTools(properties.getPruneExcludedTools())
+                                        .build()
                                         : null);
         if (compactionModel != null) {
             builder.model(compactionModel);
@@ -196,22 +206,22 @@ public final class ContextRuntimeConfigurer {
                         ? "总长度不得超过 " + properties.getCompressionMaxOutputTokens() + " Token。"
                         : "在信息完整的前提下尽量精炼。";
         return """
-           你是会话上下文压缩器。请把下面历史整理成可供 Agent 继续执行的短摘要。
+                你是会话上下文压缩器。请把下面历史整理成可供 Agent 继续执行的短摘要。
 
-           只保留：
-           1. 用户目标、硬性约束和已确认决策；
-           2. 已完成动作、关键结论、重要文件或资源；
-           3. 仍有效的工具结果和错误原因；
-           4. 未完成事项与下一步。
+                只保留：
+                1. 用户目标、硬性约束和已确认决策；
+                2. 已完成动作、关键结论、重要文件或资源；
+                3. 仍有效的工具结果和错误原因；
+                4. 未完成事项与下一步。
 
-           删除重复叙述、寒暄、已失效的中间过程和可重新获取的冗长原始输出。
-           不推测，不补写未发生的事实；遇到凭据时写成 [REDACTED]。
-           %s仅输出摘要正文。
+                删除重复叙述、寒暄、已失效的中间过程和可重新获取的冗长原始输出。
+                不推测，不补写未发生的事实；遇到凭据时写成 [REDACTED]。
+                %s仅输出摘要正文。
 
-           <messages>
-           {messages}
-           </messages>
-           """
+                <messages>
+                {messages}
+                </messages>
+                """
                 .formatted(lengthInstruction);
     }
 }

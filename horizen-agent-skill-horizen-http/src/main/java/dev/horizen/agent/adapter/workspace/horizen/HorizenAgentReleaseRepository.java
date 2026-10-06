@@ -30,70 +30,110 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-/** 容量受限且可重建的缓存；租约在一次执行期间保护整个发布版本。 */
+/**
+ * 容量受限且可重建的缓存；租约在一次执行期间保护整个发布版本。
+ */
 public final class HorizenAgentReleaseRepository implements AgentReleaseRepository {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 读取发布描述并下载制品的 HTTP 客户端；本仓储不负责关闭调用方持有的客户端。 */
+    /**
+     * 读取发布描述并下载制品的 HTTP 客户端；本仓储不负责关闭调用方持有的客户端。
+     */
     private final HorizenSkillReleaseClient client;
 
-    /** 本地发布缓存根目录，各版本按 releaseHash 使用独立目录。 */
+    /**
+     * 本地发布缓存根目录，各版本按 releaseHash 使用独立目录。
+     */
     private final Path root;
 
-    /** 所有已准备和预留发布允许占用的缓存容量上限，单位为字节。 */
+    /**
+     * 所有已准备和预留发布允许占用的缓存容量上限，单位为字节。
+     */
     private final long maxCacheBytes;
 
-    /** 本地受管工作区的发布目录读取端口；远端来源模式可以不提供。 */
+    /**
+     * 本地受管工作区的发布目录读取端口；远端来源模式可以不提供。
+     */
     private final WorkspaceCatalogRepository localCatalog;
 
-    /** 读取本地受管发布制品实际字节的内容仓储。 */
+    /**
+     * 读取本地受管发布制品实际字节的内容仓储。
+     */
     private final WorkspaceContentRepository localContents;
 
-    /** 保护版本索引、容量预留和租约计数的共享锁；网络下载在锁外执行。 */
+    /**
+     * 保护版本索引、容量预留和租约计数的共享锁；网络下载在锁外执行。
+     */
     private final ReentrantLock lock = new ReentrantLock();
 
-    /** 最多同时接纳 17 个发布准备请求的许可，限制等待与准备任务数量。 */
+    /**
+     * 最多同时接纳 17 个发布准备请求的许可，限制等待与准备任务数量。
+     */
     private final Semaphore admission = new Semaphore(17);
 
-    /** 最多同时进行 4 个制品下载的许可，限制控制面与对象传输并发。 */
+    /**
+     * 最多同时进行 4 个制品下载的许可，限制控制面与对象传输并发。
+     */
     private final Semaphore downloads = new Semaphore(4);
 
-    /** 仍在准备的发布已预留的容量字节数，提交或失败后归还。 */
+    /**
+     * 仍在准备的发布已预留的容量字节数，提交或失败后归还。
+     */
     private long reservedBytes;
 
-    /** 仍在准备的发布已占用的缓存槽数量。 */
+    /**
+     * 仍在准备的发布已占用的缓存槽数量。
+     */
     private int reservedSlots;
 
-    /** 单个完整发布允许准备的最大字节数，当前上限为 50 MiB。 */
+    /**
+     * 单个完整发布允许准备的最大字节数，当前上限为 50 MiB。
+     */
     private static final long MAX_RELEASE_BYTES = 50L * 1024 * 1024;
 
-    /** 发布内容哈希到准备条目的并发索引，已被租约引用的条目不能被驱逐。 */
+    /**
+     * 发布内容哈希到准备条目的并发索引，已被租约引用的条目不能被驱逐。
+     */
     private final Map<String, Entry> entries = new ConcurrentHashMap<>();
 
-    /** 一个发布版本的本地准备、容量预留与租约引用状态。 */
+    /**
+     * 一个发布版本的本地准备、容量预留与租约引用状态。
+     */
     private static final class Entry {
-        /** 当前版本的准备锁，避免同一发布被重复下载或提交。 */
+        /**
+         * 当前版本的准备锁，避免同一发布被重复下载或提交。
+         */
         final ReentrantLock preparation = new ReentrantLock();
 
-        /** 当前进入该版本准备流程的使用者数量。 */
+        /**
+         * 当前进入该版本准备流程的使用者数量。
+         */
         int users;
 
-        /** 仍持有当前发布内容快照的租约数量。 */
+        /**
+         * 仍持有当前发布内容快照的租约数量。
+         */
         volatile int leases;
 
-        /** 当前准备流程预留的容量字节数。 */
+        /**
+         * 当前准备流程预留的容量字节数。
+         */
         long reservation;
 
-        /** 从该工作区发布中解析出的不可变 Skill 快照。 */
+        /**
+         * 从该工作区发布中解析出的不可变 Skill 快照。
+         */
         volatile SkillReleaseSnapshot skills;
     }
 
     /**
      * 创建HorizenAgent发布仓储，初始化该组件所需的状态、配置或依赖。
      *
-     * @param client 当前适配器使用的远端客户端，供实际网络或服务请求使用。
-     * @param root 当前操作允许使用的根路径。
+     * @param client        当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     * @param root          当前操作允许使用的根路径。
      * @param maxCacheBytes 最大缓存的字节数，用于容量或传输限制。
      */
     public HorizenAgentReleaseRepository(
@@ -104,11 +144,11 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
     /**
      * 创建HorizenAgent发布仓储，初始化该组件所需的状态、配置或依赖。
      *
-     * @param client 当前适配器使用的远端客户端，供实际网络或服务请求使用。
-     * @param root 当前操作允许使用的根路径。
+     * @param client        当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     * @param root          当前操作允许使用的根路径。
      * @param maxCacheBytes 最大缓存的字节数，用于容量或传输限制。
-     * @param catalog 当前资源目录或目录定位键，用于查找可用发布与工具。
-     * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     * @param catalog       当前资源目录或目录定位键，用于查找可用发布与工具。
+     * @param contents      资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public HorizenAgentReleaseRepository(
@@ -146,7 +186,7 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
     /**
      * 在原目录中取得会话绑定的指定发布，不回退到其他版本。
      *
-     * @param catalog 当前资源目录或目录定位键，用于查找可用发布与工具。
+     * @param catalog   当前资源目录或目录定位键，用于查找可用发布与工具。
      * @param releaseId 发布记录标识，用于取得会话绑定的具体发布快照。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      * @throws SecurityException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -158,14 +198,14 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
                         catalog,
                         localCatalog == null
                                 ? client.fetchWorkspaceVersion(
-                                        catalog.getProjectId(), catalog.getAgentKey(), releaseId)
+                                catalog.getProjectId(), catalog.getAgentKey(), releaseId)
                                 : localCatalog
-                                        .release(
-                                                catalog.getProjectId(),
-                                                catalog.getAgentKey(),
-                                                releaseId)
-                                        .map(this::localManifest)
-                                        .orElse(JSON.nullNode()));
+                                .release(
+                                        catalog.getProjectId(),
+                                        catalog.getAgentKey(),
+                                        releaseId)
+                                .map(this::localManifest)
+                                .orElse(JSON.nullNode()));
         if (result.isPresent() && result.get().getReleaseId() != releaseId) {
             throw new SecurityException("Publication releaseId mismatch");
         }
@@ -218,11 +258,11 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
      * 解析远端发布描述并校验归属与必要字段。
      *
      * @param catalog 当前资源目录或目录定位键，用于查找可用发布与工具。
-     * @param n 当前HorizenAgent发布仓储持有的n对象，供相应处理步骤使用。
+     * @param n       当前HorizenAgent发布仓储持有的n对象，供相应处理步骤使用。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws SecurityException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws SecurityException        当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private Optional<AgentReleaseManifest> parse(AgentCatalogKey catalog, JsonNode n) {
         if (n.isMissingNode() || n.isNull()) return Optional.empty();
@@ -302,9 +342,9 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
      *
      * @param manifest 当前HorizenAgent发布仓储持有的清单对象，供相应处理步骤使用。
      * @return 本次操作返回的Agent发布快照结果。
-     * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IOException              当前输入或运行状态不满足本方法的处理条件时抛出。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
     public AgentReleaseSnapshot acquire(AgentReleaseManifest manifest) {
@@ -342,15 +382,15 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
                         Files.write(path, downloadAsset(a));
                         if (a.getPath().startsWith("subagents/")
                                 && AgentSpecLoader.loadFromFile(path, staging.resolve("assets"))
-                                        == null)
+                                == null)
                             throw new IllegalArgumentException("Invalid subagent declaration");
                     }
                     if (!manifest.isWorkspaceFiles())
                         new SkillReleaseCache(
-                                        staging.resolve("skill-cache"),
-                                        500,
-                                        30L * 1024 * 1024,
-                                        1000)
+                                staging.resolve("skill-cache"),
+                                500,
+                                30L * 1024 * 1024,
+                                1000)
                                 .materialize(manifest.getSkillRelease(), client);
                     writeIntegrity(staging);
                     if (size(staging) > 50L * 1024 * 1024)
@@ -373,13 +413,13 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
                         manifest.isWorkspaceFiles()
                                 ? workspaceSkills(dir.resolve("assets"), manifest)
                                 : new SkillReleaseCache(
-                                                dir.resolve("skill-cache"),
-                                                500,
-                                                30L * 1024 * 1024,
-                                                1000)
-                                        .load(manifest.getSkillRelease().getReleaseHash())
-                                        .orElseThrow()
-                                        .withManifest(manifest.getSkillRelease());
+                                dir.resolve("skill-cache"),
+                                500,
+                                30L * 1024 * 1024,
+                                1000)
+                                .load(manifest.getSkillRelease().getReleaseHash())
+                                .orElseThrow()
+                                .withManifest(manifest.getSkillRelease());
             Files.setLastModifiedTime(dir, FileTime.fromMillis(System.currentTimeMillis()));
             lock.lock();
             try {
@@ -446,7 +486,7 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
      * 归还快照租约并维护缓存引用与容量账目。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param hash 内容或索引的摘要值，供去重、校验或缓存寻址使用。
+     * @param hash  内容或索引的摘要值，供去重、校验或缓存寻址使用。
      * @param entry 当前HorizenAgent发布仓储持有的条目对象，供相应处理步骤使用。
      */
     private void release(String hash, Entry entry) {
@@ -463,14 +503,16 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
     /**
      * 移除空闲。
      *
-     * @param hash 内容或索引的摘要值，供去重、校验或缓存寻址使用。
+     * @param hash  内容或索引的摘要值，供去重、校验或缓存寻址使用。
      * @param entry 当前HorizenAgent发布仓储持有的条目对象，供相应处理步骤使用。
      */
     private void removeIdle(String hash, Entry entry) {
         if (entry.users == 0 && entry.leases == 0) entries.remove(hash, entry);
     }
 
-    /** 仅在持有容量锁时调用；预留空间包含正在暂存的数据。 */
+    /**
+     * 仅在持有容量锁时调用；预留空间包含正在暂存的数据。
+     */
     private void unreserve(Entry entry) {
         if (entry.reservation == 0) return;
         reservedBytes -= entry.reservation;
@@ -482,7 +524,7 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
      * 在开始下载前预留该版本允许占用的容量与缓存槽。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param selected 当前HorizenAgent发布仓储使用的selected，供其处理与状态记录使用。
+     * @param selected      当前HorizenAgent发布仓储使用的selected，供其处理与状态记录使用。
      * @param selectedEntry 当前HorizenAgent发布仓储持有的selected条目对象，供相应处理步骤使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -553,7 +595,7 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
     /**
      * 核对发布目录中各制品的大小、路径与完整性信息。
      *
-     * @param dir 当前HorizenAgent发布仓储持有的dir对象，供相应处理步骤使用。
+     * @param dir      当前HorizenAgent发布仓储持有的dir对象，供相应处理步骤使用。
      * @param manifest 当前HorizenAgent发布仓储持有的清单对象，供相应处理步骤使用。
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -601,7 +643,7 @@ public final class HorizenAgentReleaseRepository implements AgentReleaseReposito
     /**
      * 从已验证的工作区文件提取 Skill 正文和资源，保留工作区发布的身份。
      *
-     * @param root 当前操作允许使用的根路径。
+     * @param root     当前操作允许使用的根路径。
      * @param manifest 当前HorizenAgent发布仓储持有的清单对象，供相应处理步骤使用。
      * @return 本次操作返回的Skill发布快照结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。

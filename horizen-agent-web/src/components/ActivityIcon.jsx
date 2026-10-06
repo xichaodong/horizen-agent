@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     CheckCircleFilled,
     CloseCircleFilled,
@@ -36,17 +36,17 @@ import {
 } from '../utils/chat.js';
 import MessageContent from '../MessageContent.jsx';
 
-const ActivityIcon = ({ message }) => {
+const ActivityIcon = ({message}) => {
     if (message.status === 'running') {
-        return <LoadingOutlined className={`${PREFIX}__timeline-icon is-running`} />;
+        return <LoadingOutlined className={`${PREFIX}__timeline-icon is-running`}/>;
     }
     if (message.status !== 'success') {
-        return <CloseCircleFilled className={`${PREFIX}__timeline-icon is-error`} />;
+        return <CloseCircleFilled className={`${PREFIX}__timeline-icon is-error`}/>;
     }
     return message.activityType === 'tool' ? (
-        <ToolOutlined className={`${PREFIX}__timeline-icon is-tool`} />
+        <ToolOutlined className={`${PREFIX}__timeline-icon is-tool`}/>
     ) : (
-        <CheckCircleFilled className={`${PREFIX}__timeline-icon is-success`} />
+        <CheckCircleFilled className={`${PREFIX}__timeline-icon is-success`}/>
     );
 };
 

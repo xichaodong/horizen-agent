@@ -27,12 +27,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/** 在运行时适配器边界转换 AgentScope 事件和消息。 */
+/**
+ * 在运行时适配器边界转换 AgentScope 事件和消息。
+ */
 final class HarnessAgentEventMapper {
-    /** NOTICE事件名称使用的固定标识或协议文本。 */
+    /**
+     * NOTICE事件名称使用的固定标识或协议文本。
+     */
     public static final String NOTICE_EVENT_NAME = "horizen.execution_notice";
 
-    /** 当前配置的 Agent 实例，承担模型与工具循环执行。 */
+    /**
+     * 当前配置的 Agent 实例，承担模型与工具循环执行。
+     */
     private final HarnessAgent agent;
 
     /**
@@ -47,14 +53,14 @@ final class HarnessAgentEventMapper {
     /**
      * 映射HarnessAgent事件映射器。
      *
-     * @param request 当前操作的请求参数。
-     * @param source 待解析或转换的来源对象。
-     * @param turnStartedAt 执行开始的时间，用于记录对应生命周期节点。
-     * @param stepStarts 步骤启动次数的索引映射，供按键查找或归并当前组件的数据。
-     * @param artifactEvents 当前HarnessAgent事件映射器持有的产物事件集合对象，供相应处理步骤使用。
+     * @param request            当前操作的请求参数。
+     * @param source             待解析或转换的来源对象。
+     * @param turnStartedAt      执行开始的时间，用于记录对应生命周期节点。
+     * @param stepStarts         步骤启动次数的索引映射，供按键查找或归并当前组件的数据。
+     * @param artifactEvents     当前HarnessAgent事件映射器持有的产物事件集合对象，供相应处理步骤使用。
      * @param presentationEvents 当前HarnessAgent事件映射器持有的呈现事件集合对象，供相应处理步骤使用。
-     * @param askUserEvents 当前HarnessAgent事件映射器持有的提问用户事件集合对象，供相应处理步骤使用。
-     * @param runtimeContext 当前HarnessAgent事件映射器持有的运行时上下文对象，供相应处理步骤使用。
+     * @param askUserEvents      当前HarnessAgent事件映射器持有的提问用户事件集合对象，供相应处理步骤使用。
+     * @param runtimeContext     当前HarnessAgent事件映射器持有的运行时上下文对象，供相应处理步骤使用。
      * @return 本次处理得到的结果集合。
      */
     List<AgentRuntimeEvent> map(
@@ -72,9 +78,9 @@ final class HarnessAgentEventMapper {
                 return List.of(
                         withProvenance(
                                 event(
-                                                request,
-                                                AgentRuntimeEvent.Type.ASK_USER_REQUIRED,
-                                                ask.getAskUserId())
+                                        request,
+                                        AgentRuntimeEvent.Type.ASK_USER_REQUIRED,
+                                        ask.getAskUserId())
                                         .status("waiting_ask_user")
                                         .toolName("ask_user")
                                         .details(ask)
@@ -87,9 +93,9 @@ final class HarnessAgentEventMapper {
             AgentRuntimeEvent completed =
                     withProvenance(
                             event(
-                                            request,
-                                            AgentRuntimeEvent.Type.TOOL_COMPLETED,
-                                            end.getToolCallId())
+                                    request,
+                                    AgentRuntimeEvent.Type.TOOL_COMPLETED,
+                                    end.getToolCallId())
                                     .text("error".equals(status) ? "工具执行出现异常，正在尝试继续处理。" : null)
                                     .status(status)
                                     .toolName(end.getToolCallName())
@@ -111,9 +117,9 @@ final class HarnessAgentEventMapper {
                 mapped.add(
                         withProvenance(
                                 event(
-                                                request,
-                                                AgentRuntimeEvent.Type.TODO_UPDATED,
-                                                end.getToolCallId())
+                                        request,
+                                        AgentRuntimeEvent.Type.TODO_UPDATED,
+                                        end.getToolCallId())
                                         .status("success")
                                         .toolName("todo_write")
                                         .details(todoDetails(runtimeContext))
@@ -127,9 +133,9 @@ final class HarnessAgentEventMapper {
                 mapped.add(
                         withProvenance(
                                 event(
-                                                request,
-                                                AgentRuntimeEvent.Type.PRESENTATION_CREATED,
-                                                block.getBlockId())
+                                        request,
+                                        AgentRuntimeEvent.Type.PRESENTATION_CREATED,
+                                        block.getBlockId())
                                         .status("success")
                                         .toolName(end.getToolCallName())
                                         .details(new PresentationOutput(end.getToolCallId(), block))
@@ -140,9 +146,9 @@ final class HarnessAgentEventMapper {
                 mapped.add(
                         withProvenance(
                                 event(
-                                                request,
-                                                AgentRuntimeEvent.Type.PRESENTATION_CREATED,
-                                                block.getBlockId())
+                                        request,
+                                        AgentRuntimeEvent.Type.PRESENTATION_CREATED,
+                                        block.getBlockId())
                                         .status("success")
                                         .toolName(end.getToolCallName())
                                         .details(new PresentationOutput(end.getToolCallId(), block))
@@ -161,12 +167,12 @@ final class HarnessAgentEventMapper {
     /**
      * 映射Single。
      *
-     * @param request 当前操作的请求参数。
-     * @param source 待解析或转换的来源对象。
-     * @param turnStartedAt 执行开始的时间，用于记录对应生命周期节点。
-     * @param stepStarts 步骤启动次数的索引映射，供按键查找或归并当前组件的数据。
+     * @param request        当前操作的请求参数。
+     * @param source         待解析或转换的来源对象。
+     * @param turnStartedAt  执行开始的时间，用于记录对应生命周期节点。
+     * @param stepStarts     步骤启动次数的索引映射，供按键查找或归并当前组件的数据。
      * @param runtimeContext 当前HarnessAgent事件映射器持有的运行时上下文对象，供相应处理步骤使用。
-     * @param notices notices的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param notices        notices的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @return 本次操作返回的Agent运行时事件结果。
      */
     private AgentRuntimeEvent mapSingle(

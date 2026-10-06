@@ -1,12 +1,12 @@
 # Horizen Agent contributor instructions
 
 - Target Java 17 and use the Maven Wrapper. Run `./mvnw verify` before delivery.
-- Apply `scripts/format.sh apply` after source changes. Java uses four-space Google Java Format (AOSP); XML and frontend use repository Prettier rules. `mvnw verify` checks Java formatting; CI checks XML/frontend formatting too.
+- Apply `scripts/format.sh apply` after source changes. Use the pinned native IntelliJ IDEA formatter and shared `.idea/codeStyles/Project.xml` plus `.editorconfig` for Java, XML and frontend/configuration sources. CI checks formatting with the same IDEA version; `mvnw verify` checks compilation and tests without requiring an IDE installation. Do not restore Google Java Format or Prettier as a competing formatter.
 - Do not use Java `record`; use ordinary Lombok POJOs and preserve explicit validation where required.
 - Use Lombok for plain getters, setters and assignment-only constructors. Use standard `getX`/`isX` accessors for project POJOs; preserve required SPI method names and method annotations. Keep explicit methods when they validate, copy mutable data, synchronize or implement behavior. Do not add setters merely to reduce code.
 - Document production classes, fields, methods and constructors with meaningful Javadoc. Explain responsibility, units, null semantics, ownership and state/version boundaries where relevant. Preserve useful existing comments and avoid repeating identifiers. Run `java scripts/CheckJavaDocs.java` before delivery.
 - Write explanatory source comments in Chinese, including production code, tests, frontend and scripts. Keep technical identifiers, protocol names and third-party copyright/license notices in their original form.
-- Import annotation and class types and use their simple names in source. Keep fully-qualified type names only where an actual naming conflict requires them; Spotless and `scripts/check-java-style.py` check this rule.
+- Import annotation and class types and use their simple names in source. Keep fully-qualified type names only where an actual naming conflict requires them; `scripts/check-java-style.py` checks this rule.
 - Validated domain snapshots and commands must not expose generated setters. Keep JSON creators explicit; preserve wire compatibility when changing accessors or constructors.
 - Keep the runtime independent of any application, internal service, or company network.
 - Use AgentScope Core for the agent loop. Keep harness policies replaceable through supported APIs.

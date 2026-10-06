@@ -27,41 +27,59 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/** 审批查询和决策用例。 */
+/**
+ * 审批查询和决策用例。
+ */
 public final class ApprovalApplicationService {
-    /** 会话对象或会话索引，按相应的归属键定位数据。 */
+    /**
+     * 会话对象或会话索引，按相应的归属键定位数据。
+     */
     private final SessionTurnStore sessions;
 
-    /** 审批存储或待处理审批集合，用于原执行的暂停与恢复。 */
+    /**
+     * 审批存储或待处理审批集合，用于原执行的暂停与恢复。
+     */
     private final ApprovalStore approvals;
 
-    /** 在交互事务提交后恢复原执行的入口。 */
+    /**
+     * 在交互事务提交后恢复原执行的入口。
+     */
     private final ApprovalTurnResumer resumer;
 
-    /** 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。 */
+    /**
+     * 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     */
     private final UnitOfWork transactions;
 
-    /** 持有当前执行段的执行实例标识，用于租约与跨实例控制。 */
+    /**
+     * 持有当前执行段的执行实例标识，用于租约与跨实例控制。
+     */
     private final String executorId;
 
-    /** 执行实例租约的有效时长。 */
+    /**
+     * 执行实例租约的有效时长。
+     */
     private final Duration leaseTtl;
 
-    /** 默认允许持续的最长等待时间。 */
+    /**
+     * 默认允许持续的最长等待时间。
+     */
     private final Duration defaultTimeout;
 
-    /** 时间来源，用于计算更新时间、过期时间或执行时限。 */
+    /**
+     * 时间来源，用于计算更新时间、过期时间或执行时限。
+     */
     private final Clock clock;
 
     /**
      * 创建审批应用服务，初始化该组件所需的状态、配置或依赖。
      *
-     * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
-     * @param approvals 审批存储或待处理审批集合，用于原执行的暂停与恢复。
-     * @param resumer 当前审批应用服务持有的恢复入口对象，供相应处理步骤使用。
-     * @param transactions 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
-     * @param executorId 持有当前执行段的执行实例标识，用于租约与跨实例控制。
-     * @param leaseTtl 执行实例租约的有效时长。
+     * @param sessions       会话对象或会话索引，按相应的归属键定位数据。
+     * @param approvals      审批存储或待处理审批集合，用于原执行的暂停与恢复。
+     * @param resumer        当前审批应用服务持有的恢复入口对象，供相应处理步骤使用。
+     * @param transactions   执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     * @param executorId     持有当前执行段的执行实例标识，用于租约与跨实例控制。
+     * @param leaseTtl       执行实例租约的有效时长。
      * @param defaultTimeout 默认允许持续的最长等待时间。
      */
     public ApprovalApplicationService(
@@ -86,14 +104,14 @@ public final class ApprovalApplicationService {
     /**
      * 创建审批应用服务，初始化该组件所需的状态、配置或依赖。
      *
-     * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
-     * @param approvals 审批存储或待处理审批集合，用于原执行的暂停与恢复。
-     * @param resumer 当前审批应用服务持有的恢复入口对象，供相应处理步骤使用。
-     * @param transactions 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
-     * @param executorId 持有当前执行段的执行实例标识，用于租约与跨实例控制。
-     * @param leaseTtl 执行实例租约的有效时长。
+     * @param sessions       会话对象或会话索引，按相应的归属键定位数据。
+     * @param approvals      审批存储或待处理审批集合，用于原执行的暂停与恢复。
+     * @param resumer        当前审批应用服务持有的恢复入口对象，供相应处理步骤使用。
+     * @param transactions   执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     * @param executorId     持有当前执行段的执行实例标识，用于租约与跨实例控制。
+     * @param leaseTtl       执行实例租约的有效时长。
      * @param defaultTimeout 默认允许持续的最长等待时间。
-     * @param clock 时间来源，用于计算更新时间、过期时间或执行时限。
+     * @param clock          时间来源，用于计算更新时间、过期时间或执行时限。
      */
     public ApprovalApplicationService(
             SessionTurnStore sessions,
@@ -117,9 +135,9 @@ public final class ApprovalApplicationService {
     /**
      * 计算或取得本方法声明的结果，供当前ApprovalApplicationService处理步骤使用。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次处理得到的结果集合。
      */
     public List<ApprovalRequest> pending(String ownerKey, String sessionId, String turnId) {
@@ -129,9 +147,9 @@ public final class ApprovalApplicationService {
     /**
      * 提交一批审批决定；数据库提交后才恢复原执行，避免在短事务中运行模型与工具。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param identity  可信宿主解析的执行身份，供访问范围与审计使用。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @param decisions 同一批待确认操作的决定集合，用于恢复原执行。
      * @return 本次操作返回的会话执行视图结果。
      */
@@ -153,9 +171,9 @@ public final class ApprovalApplicationService {
     /**
      * 在同一工作单元中更新审批记录与执行状态，生成提交后可用的恢复信息。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param identity  可信宿主解析的执行身份，供访问范围与审计使用。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @param decisions 同一批待确认操作的决定集合，用于恢复原执行。
      * @return 本次操作返回的已提交恢复执行结果。
      * @throws ApplicationError 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -185,8 +203,8 @@ public final class ApprovalApplicationService {
         Map<String, Boolean> choices = choices(decisions);
         if (choices.size() != pending.size()
                 || !choices.keySet()
-                        .containsAll(
-                                pending.stream().map(ApprovalRequest::getApprovalId).toList())) {
+                .containsAll(
+                        pending.stream().map(ApprovalRequest::getApprovalId).toList())) {
             throw new ApplicationError(
                     ApplicationError.Code.INVALID_ARGUMENT, "必须处理当前 Turn 的全部待审批工具");
         }
@@ -195,16 +213,16 @@ public final class ApprovalApplicationService {
         if (turn.getDeadlineAt() != null && !now.isBefore(turn.getDeadlineAt())) {
             sessions.transitionTurn(
                     new TransitionTurnCommand(
-                                    identity.getOwnerKey(),
-                                    sessionId,
-                                    turnId,
-                                    TurnStatus.TIMED_OUT,
-                                    null,
-                                    null,
-                                    now,
-                                    "APPROVAL_TIMEOUT",
-                                    null,
-                                    null)
+                            identity.getOwnerKey(),
+                            sessionId,
+                            turnId,
+                            TurnStatus.TIMED_OUT,
+                            null,
+                            null,
+                            now,
+                            "APPROVAL_TIMEOUT",
+                            null,
+                            null)
                             .expectVersion(turn.getVersion()));
             return null;
         }
@@ -213,16 +231,16 @@ public final class ApprovalApplicationService {
         TransitionTurnResult transitioned =
                 sessions.transitionTurn(
                         new TransitionTurnCommand(
-                                        identity.getOwnerKey(),
-                                        sessionId,
-                                        turnId,
-                                        TurnStatus.RUNNING,
-                                        executorId,
-                                        now.plus(leaseTtl),
-                                        now,
-                                        null,
-                                        null,
-                                        null)
+                                identity.getOwnerKey(),
+                                sessionId,
+                                turnId,
+                                TurnStatus.RUNNING,
+                                executorId,
+                                now.plus(leaseTtl),
+                                now,
+                                null,
+                                null,
+                                null)
                                 .expectVersion(turn.getVersion()));
         if (transitioned.getOutcome() != TransitionTurnResult.Outcome.UPDATED) {
             return null;
@@ -248,9 +266,9 @@ public final class ApprovalApplicationService {
      * 根据原审批的状态、版本和有效期提交一条决定。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param value 待校验、转换或保存的原始值。
+     * @param value    待校验、转换或保存的原始值。
      * @param approved 本次审批是否允许执行；拒绝时不会恢复为已批准的工具调用。
-     * @param now 用于本次更新或过期判断的当前时间。
+     * @param now      用于本次更新或过期判断的当前时间。
      * @return 本次操作返回的审批Resolution结果。
      * @throws ApplicationError 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -267,35 +285,43 @@ public final class ApprovalApplicationService {
         ApprovalRequest stored = result == null ? null : result.getApproval();
         if (stored == null
                 || (result.getOutcome() != ApprovalDecisionResult.Outcome.UPDATED
-                        && result.getOutcome() != ApprovalDecisionResult.Outcome.ALREADY_DECIDED)
+                && result.getOutcome() != ApprovalDecisionResult.Outcome.ALREADY_DECIDED)
                 || !value.getApprovalId().equals(stored.getApprovalId())
                 || !value.getOwnerKey().equals(stored.getOwnerKey())
                 || !value.getSessionId().equals(stored.getSessionId())
                 || !value.getTurnId().equals(stored.getTurnId())
                 || (stored.getStatus() != ApprovalStatus.APPROVED
-                        && stored.getStatus() != ApprovalStatus.DENIED)) {
+                && stored.getStatus() != ApprovalStatus.DENIED)) {
             throw new ApplicationError(ApplicationError.Code.CONFLICT, "审批决定未成功保存，不能恢复执行");
         }
         return new ApprovalResolution(stored, stored.getStatus() == ApprovalStatus.APPROVED);
     }
 
-    /** 审批数据库事务提交后可执行的恢复信息，避免在事务中运行 Agent。 */
+    /**
+     * 审批数据库事务提交后可执行的恢复信息，避免在事务中运行 Agent。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class CommittedResume {
-        /** 当前操作所关联的原执行事实。 */
+        /**
+         * 当前操作所关联的原执行事实。
+         */
         private final AgentTurn turn;
 
-        /** 决定结果集合的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+        /**
+         * 决定结果集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+         */
         private final List<ApprovalResolution> resolutions;
 
-        /** 剩余的时间配置，供等待、调度或失效判断使用。 */
+        /**
+         * 剩余的时间配置，供等待、调度或失效判断使用。
+         */
         private final Duration remaining;
     }
 
     /**
      * 把最新执行事实投影为宿主可查询的执行状态。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次操作返回的会话执行视图结果。
      */
@@ -304,12 +330,12 @@ public final class ApprovalApplicationService {
         return latest == null
                 ? SessionExecutionView.idle(sessionId)
                 : new SessionExecutionView(
-                        sessionId,
-                        latest.getTurnId(),
-                        latest.getStatus(),
-                        latest.getStartedAt(),
-                        latest.getFinishedAt(),
-                        latest.getFailureCode());
+                sessionId,
+                latest.getTurnId(),
+                latest.getStatus(),
+                latest.getStartedAt(),
+                latest.getFinishedAt(),
+                latest.getFailureCode());
     }
 
     /**

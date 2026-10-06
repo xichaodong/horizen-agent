@@ -3,11 +3,15 @@ package dev.horizen.agent.adapter.agentscope.workspace.snapshot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/** 恢复前记录的最近一次已提交目录身份。 */
+/**
+ * 恢复前记录的最近一次已提交目录身份。
+ */
 @AllArgsConstructor
 @Getter
 public final class WorkspaceSnapshotBase {
-    /** 当前工作区快照基础的定位标识。 */
+    /**
+     * 当前工作区快照基础的定位标识。
+     */
     private String id;
 
     /**

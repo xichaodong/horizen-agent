@@ -12,10 +12,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-/** 显式离线迁移命令，不删除旧表，也不输出凭据。 */
+/**
+ * 显式离线迁移命令，不删除旧表，也不输出凭据。
+ */
 public final class WorkspaceFileMigrationCommand {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private WorkspaceFileMigrationCommand() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private WorkspaceFileMigrationCommand() {
+    }
 
     /**
      * 完成当前操作的main步骤，按实现更新相应状态或依赖。
@@ -77,7 +82,7 @@ public final class WorkspaceFileMigrationCommand {
     /**
      * 生成当前操作所需的required文本，供调用方继续处理。
      *
-     * @param p 当前工作区文件迁移命令持有的参数对象，供相应处理步骤使用。
+     * @param p   当前工作区文件迁移命令持有的参数对象，供相应处理步骤使用。
      * @param key 当前对象的查找或写入键。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。

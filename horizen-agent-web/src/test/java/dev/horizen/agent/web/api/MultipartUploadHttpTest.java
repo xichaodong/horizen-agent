@@ -21,13 +21,15 @@ import java.util.Map;
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
-            "horizen.local-config=",
-            "horizen.agent.model-mode=scripted",
-            "horizen.agent.artifact.bos.max-object-bytes=4194304"
+                "horizen.local-config=",
+                "horizen.agent.model-mode=scripted",
+                "horizen.agent.artifact.bos.max-object-bytes=4194304"
         })
 class MultipartUploadHttpTest {
-    @Autowired private TestRestTemplate http;
-    @MockitoBean private AgentService service;
+    @Autowired
+    private TestRestTemplate http;
+    @MockitoBean
+    private AgentService service;
 
     @Test
     void twoMegabyteMultipartUploadPassesConfiguredHttpBoundary() throws Exception {

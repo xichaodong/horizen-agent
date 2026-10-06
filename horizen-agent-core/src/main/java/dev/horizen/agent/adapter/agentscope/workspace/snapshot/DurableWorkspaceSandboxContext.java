@@ -19,30 +19,42 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-/** 解析永久定位信息，与恢复及检查点操作共享执行租约。 */
+/**
+ * 解析永久定位信息，与恢复及检查点操作共享执行租约。
+ */
 public final class DurableWorkspaceSandboxContext {
-    /** 当前执行 Agent 的标识，用于区分主 Agent 与委派执行者。 */
+    /**
+     * 当前执行 Agent 的标识，用于区分主 Agent 与委派执行者。
+     */
     private final String agentId;
 
-    /** 创建当前模型或沙箱对象时使用的默认策略配置。 */
+    /**
+     * 创建当前模型或沙箱对象时使用的默认策略配置。
+     */
     private final SandboxContext defaults;
 
-    /** 按会话定位最近持久工作区快照的指针仓储。 */
+    /**
+     * 按会话定位最近持久工作区快照的指针仓储。
+     */
     private final WorkspaceSnapshotPointerRepository pointers;
 
-    /** 当前执行的并发或权限保护对象，在受保护操作前取得准入。 */
+    /**
+     * 当前执行的并发或权限保护对象，在受保护操作前取得准入。
+     */
     private final SandboxExecutionGuard guard;
 
-    /** 本次启动是否按新的执行状态准备工作区。 */
+    /**
+     * 本次启动是否按新的执行状态准备工作区。
+     */
     private final Function<String, SandboxState> freshState;
 
     /**
      * 创建持久工作区沙箱上下文，初始化该组件所需的状态、配置或依赖。
      *
-     * @param agentId 当前执行 Agent 的标识，用于区分主 Agent 与委派执行者。
-     * @param defaults 当前持久工作区沙箱上下文持有的默认值对象，供相应处理步骤使用。
-     * @param pointers 提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param guard 当前持久工作区沙箱上下文持有的防护对象，供相应处理步骤使用。
+     * @param agentId    当前执行 Agent 的标识，用于区分主 Agent 与委派执行者。
+     * @param defaults   当前持久工作区沙箱上下文持有的默认值对象，供相应处理步骤使用。
+     * @param pointers   提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param guard      当前持久工作区沙箱上下文持有的防护对象，供相应处理步骤使用。
      * @param freshState 当前持久工作区沙箱上下文持有的fresh工作状态对象，供相应处理步骤使用。
      */
     public DurableWorkspaceSandboxContext(
@@ -106,13 +118,19 @@ public final class DurableWorkspaceSandboxContext {
         if (lease != null) lease.close();
     }
 
-    /** 持久工作区沙箱上下文内部的作用域租约，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 持久工作区沙箱上下文内部的作用域租约，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     private static final class ScopeLease implements AutoCloseable {
-        /** 当前操作取得的工作区或发布资源租约，使用结束后归还。 */
+        /**
+         * 当前操作取得的工作区或发布资源租约，使用结束后归还。
+         */
         private final SandboxLease lease;
 
-        /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+        /**
+         * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+         */
         private final AtomicBoolean closed = new AtomicBoolean();
 
         /**

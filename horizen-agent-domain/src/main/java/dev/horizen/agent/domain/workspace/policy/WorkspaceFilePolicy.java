@@ -4,10 +4,15 @@ import lombok.Value;
 
 import java.util.Set;
 
-/** 持久化层和运行时适配器共享的工作区分类及所有权规则。 */
+/**
+ * 持久化层和运行时适配器共享的工作区分类及所有权规则。
+ */
 public final class WorkspaceFilePolicy {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private WorkspaceFilePolicy() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private WorkspaceFilePolicy() {
+    }
 
     /**
      * 生成当前操作所需的kind文本，供调用方继续处理。
@@ -42,8 +47,7 @@ public final class WorkspaceFilePolicy {
         String kind = kind(path);
         String policy =
                 switch (kind) {
-                    case "AGENTS", "TOOLS", "KNOWLEDGE", "SKILL", "SUBAGENT", "SKILL_CACHE" ->
-                            "SERVER";
+                    case "AGENTS", "TOOLS", "KNOWLEDGE", "SKILL", "SUBAGENT", "SKILL_CACHE" -> "SERVER";
                     default -> "AGENT";
                 };
         return new Classification(area, kind, policy);
@@ -60,16 +64,24 @@ public final class WorkspaceFilePolicy {
                 || Set.of("knowledge", "skills", "subagents", ".skills-cache").contains(path);
     }
 
-    /** 工作区文件类型与允许写入方式的策略分类。 */
+    /**
+     * 工作区文件类型与允许写入方式的策略分类。
+     */
     @Value
     public static class Classification {
-        /** 文件所属工作区区域，用于区分共享文档、会话任务与发布内容。 */
+        /**
+         * 文件所属工作区区域，用于区分共享文档、会话任务与发布内容。
+         */
         String area;
 
-        /** 当前资源或请求类别，供生命周期、存储与呈现策略选择处理路径。 */
+        /**
+         * 当前资源或请求类别，供生命周期、存储与呈现策略选择处理路径。
+         */
         String kind;
 
-        /** 当前对象使用的处理策略，决定校验、权限或执行边界。 */
+        /**
+         * 当前对象使用的处理策略，决定校验、权限或执行边界。
+         */
         String policy;
     }
 }

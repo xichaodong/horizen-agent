@@ -8,12 +8,19 @@ import io.agentscope.harness.agent.sandbox.snapshot.SandboxSnapshotSpec;
 
 import lombok.Getter;
 
-/** 沙箱和非沙箱执行视图共用的云端归档提供器。 */
+/**
+ * 沙箱和非沙箱执行视图共用的云端归档提供器。
+ */
 public final class RepositorySnapshotSpec implements SandboxSnapshotSpec {
-    /** 当前组件依赖的领域仓储，隔离实际持久化实现。 */
-    @Getter private final WorkspaceSnapshotRepository repository;
+    /**
+     * 当前组件依赖的领域仓储，隔离实际持久化实现。
+     */
+    @Getter
+    private final WorkspaceSnapshotRepository repository;
 
-    /** 被包装的原始实现，由本组件补充隔离、观测或恢复行为。 */
+    /**
+     * 被包装的原始实现，由本组件补充隔离、观测或恢复行为。
+     */
     private final RemoteSnapshotSpec delegate;
 
     /**

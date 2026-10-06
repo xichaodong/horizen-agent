@@ -8,21 +8,34 @@ import lombok.Value;
 import java.util.Collection;
 import java.util.Comparator;
 
-/** 版本化发布内容的身份标识，不包含 URL 和数据库 ID。 */
+/**
+ * 版本化发布内容的身份标识，不包含 URL 和数据库 ID。
+ */
 public final class ReleaseManifestCanonicalizer {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private ReleaseManifestCanonicalizer() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private ReleaseManifestCanonicalizer() {
+    }
 
-    /** 发布清单规范化器内部的正文条目，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 发布清单规范化器内部的正文条目，封装该步骤需要的状态或输入输出。
+     */
     @Value
     public static class ContentEntry {
-        /** 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。 */
+        /**
+         * 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。
+         */
         String path;
 
-        /** 内容校验值，用于确认传输或存储后的内容一致。 */
+        /**
+         * 内容校验值，用于确认传输或存储后的内容一致。
+         */
         String checksum;
 
-        /** 当前内容或集合的大小，计量方式由所属资源协议定义。 */
+        /**
+         * 当前内容或集合的大小，计量方式由所属资源协议定义。
+         */
         long size;
     }
 
@@ -30,8 +43,8 @@ public final class ReleaseManifestCanonicalizer {
      * 生成当前操作所需的workspaceHash文本，供调用方继续处理。
      *
      * @param project 当前发布清单规范化器使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param assets 当前发布清单规范化器持有的assets对象，供相应处理步骤使用。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param assets  当前发布清单规范化器持有的assets对象，供相应处理步骤使用。
      * @return 本次处理生成或读取的文本。
      */
     public static String workspaceHash(
@@ -42,9 +55,9 @@ public final class ReleaseManifestCanonicalizer {
     /**
      * 释放哈希。
      *
-     * @param project 当前发布清单规范化器使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param assets 当前发布清单规范化器持有的assets对象，供相应处理步骤使用。
+     * @param project   当前发布清单规范化器使用的Project，供其处理与状态记录使用。
+     * @param agent     当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param assets    当前发布清单规范化器持有的assets对象，供相应处理步骤使用。
      * @param skillHash Skill的内容摘要，供校验或去重使用。
      * @return 本次处理生成或读取的文本。
      */
@@ -101,7 +114,7 @@ public final class ReleaseManifestCanonicalizer {
     public static void verify(AgentReleaseManifest manifest) {
         if (!manifest.isWorkspaceFiles()
                 && !skillHash(manifest.getSkillRelease())
-                        .equals(manifest.getSkillRelease().getReleaseHash()))
+                .equals(manifest.getSkillRelease().getReleaseHash()))
             throw new IllegalArgumentException("Skill manifest content hash mismatch");
         String computed =
                 releaseHash(

@@ -31,7 +31,9 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/** 仅在显式提供 E2B 凭据时运行的真实沙箱兼容性测试。 */
+/**
+ * 仅在显式提供 E2B 凭据时运行的真实沙箱兼容性测试。
+ */
 @Tag("live-sandbox")
 @EnabledIfSystemProperty(named = "horizen.e2b.browser.live", matches = "true")
 class E2bLiveSmokeTest {
@@ -108,14 +110,14 @@ class E2bLiveSmokeTest {
                                                             "patch",
                                                             "patch",
                                                             """
-                              *** Begin Patch
-                              *** Update File: patch-live.txt
-                              @@ heading @@
-                               heading
-                              -old
-                              +new
-                              *** End Patch
-                              """))
+                                                                    *** Begin Patch
+                                                                    *** Update File: patch-live.txt
+                                                                    @@ heading @@
+                                                                     heading
+                                                                    -old
+                                                                    +new
+                                                                    *** End Patch
+                                                                    """))
                                             .build())
                             .block();
             String patchOutput = ((TextBlock) patchResult.getOutput().get(0)).getText();

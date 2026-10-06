@@ -1,7 +1,8 @@
-import { request as apiRequest } from '../api/client.js';
-import { createId } from '../utils/chat.js';
+import {request as apiRequest} from '../api/client.js';
+import {createId} from '../utils/chat.js';
+
 /** 查询当前会话的子任务和审批状态，并将结果合并到对应会话；失败说明写入原会话。 */
-export function useAgentQueries({ updateSession, sessionsRef, upsertActivity, appendMessage }) {
+export function useAgentQueries({updateSession, sessionsRef, upsertActivity, appendMessage}) {
     const loadSubtasks = async (sessionId) => {
         try {
             const response = await apiRequest(
@@ -14,11 +15,11 @@ export function useAgentQueries({ updateSession, sessionsRef, upsertActivity, ap
                 messages: session.messages.map((message) =>
                     message.id === `subtask-query-notice-${sessionId}`
                         ? {
-                              ...message,
-                              title: '子任务状态查询已恢复',
-                              content: '已恢复子任务状态。',
-                              status: 'success',
-                          }
+                            ...message,
+                            title: '子任务状态查询已恢复',
+                            content: '已恢复子任务状态。',
+                            status: 'success',
+                        }
                         : message
                 ),
             }));
@@ -27,7 +28,7 @@ export function useAgentQueries({ updateSession, sessionsRef, upsertActivity, ap
                 messages: session.messages.map((message) => {
                     if (message.role !== 'subtask') return message;
                     const task = tasks.find((value) => value.taskId === message.taskId);
-                    return task ? { ...message, ...task } : message;
+                    return task ? {...message, ...task} : message;
                 }),
             }));
         } catch (_) {
@@ -36,7 +37,7 @@ export function useAgentQueries({ updateSession, sessionsRef, upsertActivity, ap
                 sessionId,
                 session?.currentAssistantMessageId || `subtasks-${sessionId}`,
                 `subtask-query-notice-${sessionId}`,
-                { activityType: 'notice' },
+                {activityType: 'notice'},
                 (message) => ({
                     ...message,
                     title: '子任务状态查询异常',
@@ -51,7 +52,7 @@ export function useAgentQueries({ updateSession, sessionsRef, upsertActivity, ap
         try {
             const response = await apiRequest('/api/session/approvals/query', {
                 method: 'POST',
-                body: JSON.stringify({ sessionId, turnId }),
+                body: JSON.stringify({sessionId, turnId}),
             });
             if (!response.ok) {
                 throw new Error('无法读取待审批操作');
@@ -73,8 +74,8 @@ export function useAgentQueries({ updateSession, sessionsRef, upsertActivity, ap
                         updatedAt: Date.now(),
                         messages: exists
                             ? session.messages.map((message) =>
-                                  message.id === card.id ? { ...message, ...card } : message
-                              )
+                                message.id === card.id ? {...message, ...card} : message
+                            )
                             : [...session.messages, card],
                     };
                 });
@@ -92,7 +93,7 @@ export function useAgentQueries({ updateSession, sessionsRef, upsertActivity, ap
         try {
             const response = await apiRequest('/api/session/subtasks/cancel', {
                 method: 'POST',
-                body: JSON.stringify({ sessionId, taskId }),
+                body: JSON.stringify({sessionId, taskId}),
             });
             if (!response.ok) throw new Error('取消子任务失败');
             await loadSubtasks(sessionId);
@@ -104,5 +105,5 @@ export function useAgentQueries({ updateSession, sessionsRef, upsertActivity, ap
             });
         }
     };
-    return { loadSubtasks, loadApprovals, cancelSubtask };
+    return {loadSubtasks, loadApprovals, cancelSubtask};
 }

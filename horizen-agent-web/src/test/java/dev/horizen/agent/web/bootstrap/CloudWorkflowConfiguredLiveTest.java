@@ -68,12 +68,12 @@ class CloudWorkflowConfiguredLiveTest {
                 exchange -> {
                     byte[] body =
                             """
-{"protocolVersion":1,"status":"success","tools":[{"name":"acceptance_record_decision",
-"description":"记录合成验收的编辑范围，仅返回模拟回执，无业务动作，必须审批后调用。",
-"inputSchema":{"type":"object","properties":{"scope":{"type":"string","enum":["full","tags_only"]}},"required":["scope"],"additionalProperties":false},
-"readOnly":false,"riskLevel":"high","approvalPolicy":"required","timeoutSeconds":10,
-"idempotent":false,"concurrencySafe":false,"groupId":"acceptance","groupActiveByDefault":true}]}
-"""
+                                    {"protocolVersion":1,"status":"success","tools":[{"name":"acceptance_record_decision",
+                                    "description":"记录合成验收的编辑范围，仅返回模拟回执，无业务动作，必须审批后调用。",
+                                    "inputSchema":{"type":"object","properties":{"scope":{"type":"string","enum":["full","tags_only"]}},"required":["scope"],"additionalProperties":false},
+                                    "readOnly":false,"riskLevel":"high","approvalPolicy":"required","timeoutSeconds":10,
+                                    "idempotent":false,"concurrencySafe":false,"groupId":"acceptance","groupActiveByDefault":true}]}
+                                    """
                                     .getBytes(StandardCharsets.UTF_8);
                     exchange.getResponseHeaders().set("Content-Type", "application/json");
                     exchange.sendResponseHeaders(200, body.length);
@@ -97,8 +97,8 @@ class CloudWorkflowConfiguredLiveTest {
                 });
         provider.start();
         try (var first = host(prefix, "workflow-a", identity, provider.getAddress().getPort());
-                var second =
-                        host(prefix, "workflow-b", identity, provider.getAddress().getPort())) {
+             var second =
+                     host(prefix, "workflow-b", identity, provider.getAddress().getPort())) {
             var a = first.getBean(AgentService.class);
             var b = second.getBean(AgentService.class);
             var storage = first.getBean(RuntimeStorageProperties.class);
@@ -203,11 +203,11 @@ class CloudWorkflowConfiguredLiveTest {
                         diagnostics(completed));
                 assertEquals(1, calls.get());
                 try (var restarted =
-                        host(
-                                prefix,
-                                "workflow-a-restarted",
-                                identity,
-                                provider.getAddress().getPort())) {
+                             host(
+                                     prefix,
+                                     "workflow-a-restarted",
+                                     identity,
+                                     provider.getAddress().getPort())) {
                     var restored =
                             restarted
                                     .getBean(AgentService.class)
@@ -254,8 +254,8 @@ class CloudWorkflowConfiguredLiveTest {
                     idle(second);
                     assertTrue(
                             second.getBean(AgentController.class)
-                                            .streamStatus()
-                                            .getTotalConnections()
+                                    .streamStatus()
+                                    .getTotalConnections()
                                     >= 3,
                             "Real SSE connections must have been exercised");
                     System.out.println(
@@ -268,11 +268,11 @@ class CloudWorkflowConfiguredLiveTest {
                     var running = b.sessionExecution(identity, session);
                     if (running.getCurrentTurnId() != null
                             && Set.of(
-                                            "running",
-                                            "waiting_approval",
-                                            "waiting_ask_user",
-                                            "cancelling")
-                                    .contains(running.getStatus())) {
+                                    "running",
+                                    "waiting_approval",
+                                    "waiting_ask_user",
+                                    "cancelling")
+                            .contains(running.getStatus())) {
                         b.cancelSession(
                                 identity,
                                 new SessionApi.SessionCancelRequest(
@@ -326,21 +326,21 @@ class CloudWorkflowConfiguredLiveTest {
 
     private static String prompt() {
         return """
-这是合成整体验收。请严格按阶段执行：
-1. 必须先用 agent_spawn 委派 general_worker。让它调用 ask_user，只提出一题编辑范围单选题，
-   questionId=edit_scope，两个 optionId 必须是 full 和 tags_only，required=true。
-   子 Agent 不读文件、不运行代码、不调用其他工具；需要交互时交给主 Agent。
-2. 主 Agent 接到子任务需求后调用 ask_user，并等待我的回答，不得自己选择。
-3. 得到我的选择后，主 Agent 调用 acceptance_record_decision，scope 为我选择的 optionId，等待真实审批流程。
-   未审批时，不得创建文件；这个工具只返回合成回执。
-4. 工具获批成功后，使用 execute 在沙箱中运行 Python，创建 outputs/cloud-acceptance.csv。
-   UTF-8 文件内容必须精确为：
-   marker,scope,value
-   HZ_CLOUD_ACCEPTANCE_20261003,full,42
-   文件末尾必须有换行；禁止联网，不使用业务工具，不读写工作区之外的路径。
-5. 调用 deliver_artifact，filePath=outputs/cloud-acceptance.csv，fileName=cloud-acceptance.csv。
-   最后简短说明已交付。不要保存长期记忆或读取 Skill。
-""";
+                这是合成整体验收。请严格按阶段执行：
+                1. 必须先用 agent_spawn 委派 general_worker。让它调用 ask_user，只提出一题编辑范围单选题，
+                   questionId=edit_scope，两个 optionId 必须是 full 和 tags_only，required=true。
+                   子 Agent 不读文件、不运行代码、不调用其他工具；需要交互时交给主 Agent。
+                2. 主 Agent 接到子任务需求后调用 ask_user，并等待我的回答，不得自己选择。
+                3. 得到我的选择后，主 Agent 调用 acceptance_record_decision，scope 为我选择的 optionId，等待真实审批流程。
+                   未审批时，不得创建文件；这个工具只返回合成回执。
+                4. 工具获批成功后，使用 execute 在沙箱中运行 Python，创建 outputs/cloud-acceptance.csv。
+                   UTF-8 文件内容必须精确为：
+                   marker,scope,value
+                   HZ_CLOUD_ACCEPTANCE_20261003,full,42
+                   文件末尾必须有换行；禁止联网，不使用业务工具，不读写工作区之外的路径。
+                5. 调用 deliver_artifact，filePath=outputs/cloud-acceptance.csv，fileName=cloud-acceptance.csv。
+                   最后简短说明已交付。不要保存长期记忆或读取 Skill。
+                """;
     }
 
     private static void until(BooleanSupplier condition, Duration timeout) throws Exception {
@@ -395,8 +395,8 @@ class CloudWorkflowConfiguredLiveTest {
                         Map.of("sessionId", session, "expectedTurnId", turn));
         List<ChatApi.ChatStreamEvent> events = new ArrayList<>();
         try (var reader =
-                new BufferedReader(
-                        new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
+                     new BufferedReader(
+                             new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
             for (String line; (line = reader.readLine()) != null; ) {
                 if (line.startsWith("data:") && !line.substring(5).isBlank()) {
                     events.add(

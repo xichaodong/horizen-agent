@@ -49,12 +49,12 @@ class GatewayClientTest {
             new GatewayContext("owner-1", "session-1", "turn-1", false);
     private static final String CATALOG =
             """
-      {"tools":[
-        {"name":"inspect","description":"Inspect an item","inputSchema":{"type":"object"},
-         "riskLevel":"low","requiresApproval":false},
-        {"name":"report","description":"Report","input_schema":"{\\\"type\\\":\\\"object\\\"}"}
-      ]}
-      """;
+                    {"tools":[
+                      {"name":"inspect","description":"Inspect an item","inputSchema":{"type":"object"},
+                       "riskLevel":"low","requiresApproval":false},
+                      {"name":"report","description":"Report","input_schema":"{\\\"type\\\":\\\"object\\\"}"}
+                    ]}
+                    """;
     private final List<Request> requests = new CopyOnWriteArrayList<>();
     private HttpServer server;
     private URI baseUrl;
@@ -224,15 +224,15 @@ class GatewayClientTest {
         requests.clear();
         assertTrue(
                 text(new GatewayToolAdapter(client)
-                                .invokeGateway(CONTEXT, "call-1", "report", Map.of())
-                                .block())
+                        .invokeGateway(CONTEXT, "call-1", "report", Map.of())
+                        .block())
                         .contains("tool_not_allowed"));
         assertTrue(requests.isEmpty());
         catalogResponse = "{\"tools\":[]}";
         assertTrue(
                 text(new GatewayToolAdapter(client)
-                                .invokeGateway(CONTEXT, "call-1", "inspect", Map.of())
-                                .block())
+                        .invokeGateway(CONTEXT, "call-1", "inspect", Map.of())
+                        .block())
                         .contains("tool_not_available"));
         assertEquals(1, requests.size());
         assertEquals("/api/tools/list", requests.get(0).path());

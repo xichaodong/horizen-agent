@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { followTurnStream, readEventStream, isTurnSettled } from './turnRecovery.js';
+import {followTurnStream, readEventStream, isTurnSettled} from './turnRecovery.js';
 
 const response = (...events) =>
     new Response(events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join(''), {
-        headers: { 'Content-Type': 'text/event-stream' },
+        headers: {'Content-Type': 'text/event-stream'},
     });
-const start = { type: 'turn_start', id: 'turn' };
+const start = {type: 'turn_start', id: 'turn'};
 
 function context(overrides = {}) {
     const events = [],
@@ -19,7 +19,8 @@ function context(overrides = {}) {
             expectedTurnId: 'turn',
             onEvent: (event) => events.push(event),
             onConnection: (notice) => notices.push(notice),
-            delay: async () => {},
+            delay: async () => {
+            },
             queryExecution: async () => ({
                 currentTurnId: 'turn',
                 status: 'failed',
@@ -37,7 +38,7 @@ function context(overrides = {}) {
 }
 
 test('unknown server failure is visible after premature EOF even when history is unavailable', async () => {
-    const { events, notices, options } = context();
+    const {events, notices, options} = context();
     await followTurnStream(options);
     assert.deepEqual(
         events.map((event) => event.type),
@@ -49,12 +50,12 @@ test('unknown server failure is visible after premature EOF even when history is
 
 test('disconnect recovery follows the same turn without resubmitting the task', async () => {
     let subscriptions = 0;
-    const { events, notices, options } = context({
-        queryExecution: async () => ({ currentTurnId: 'turn', status: 'running' }),
+    const {events, notices, options} = context({
+        queryExecution: async () => ({currentTurnId: 'turn', status: 'running'}),
         subscribe: async (turn) => {
             assert.equal(turn, 'turn');
             subscriptions++;
-            return response({ type: 'done', id: 'turn', text: 'result' });
+            return response({type: 'done', id: 'turn', text: 'result'});
         },
     });
     await followTurnStream(options);
@@ -64,15 +65,15 @@ test('disconnect recovery follows the same turn without resubmitting the task', 
 });
 
 test('stream recovery notice does not end a still-running task', async () => {
-    const { events, options } = context({
+    const {events, options} = context({
         response: response(start, {
             type: 'execution_notice',
             id: 'stream-recovery',
             status: 'unknown',
             text: '实时输出无法恢复',
         }),
-        queryExecution: async () => ({ currentTurnId: 'turn', status: 'running' }),
-        subscribe: async () => response({ type: 'done', id: 'turn', text: 'confirmed result' }),
+        queryExecution: async () => ({currentTurnId: 'turn', status: 'running'}),
+        subscribe: async () => response({type: 'done', id: 'turn', text: 'confirmed result'}),
     });
     await followTurnStream(options);
     assert.deepEqual(
@@ -83,13 +84,13 @@ test('stream recovery notice does not end a still-running task', async () => {
 
 test('repeated network failures keep one recovery notice and then recover durable reply', async () => {
     let attempts = 0;
-    const { events, notices, options } = context({
+    const {events, notices, options} = context({
         queryExecution: async () => {
             if (++attempts < 3) throw new Error('network unavailable');
-            return { currentTurnId: 'turn', status: 'completed' };
+            return {currentTurnId: 'turn', status: 'completed'};
         },
         loadHistory: async () => ({
-            messages: [{ turnId: 'turn', role: 'assistant', content: 'durable reply' }],
+            messages: [{turnId: 'turn', role: 'assistant', content: 'durable reply'}],
         }),
     });
     await followTurnStream(options);
@@ -99,10 +100,10 @@ test('repeated network failures keep one recovery notice and then recover durabl
 });
 
 test('approval recovery restores interaction rather than inventing completion', async () => {
-    const pending = { type: 'approval_required', id: 'approval', details: 'synthetic approval' };
-    const { events, options } = context({
-        queryExecution: async () => ({ currentTurnId: 'turn', status: 'waiting_approval' }),
-        loadHistory: async () => ({ timelineEvents: [{ turnId: 'turn', event: pending }] }),
+    const pending = {type: 'approval_required', id: 'approval', details: 'synthetic approval'};
+    const {events, options} = context({
+        queryExecution: async () => ({currentTurnId: 'turn', status: 'waiting_approval'}),
+        loadHistory: async () => ({timelineEvents: [{turnId: 'turn', event: pending}]}),
     });
     await followTurnStream(options);
     assert.equal(events.at(-1).type, 'approval_required');
@@ -114,10 +115,10 @@ test('approval recovery restores interaction rather than inventing completion', 
 
 test('a changed turn or previous turn never supplies a false result', async () => {
     for (const overrides of [
-        { queryExecution: async () => ({ currentTurnId: 'other', status: 'completed' }) },
-        { response: response(), expectedTurnId: null, previousTurnId: 'turn' },
+        {queryExecution: async () => ({currentTurnId: 'other', status: 'completed'})},
+        {response: response(), expectedTurnId: null, previousTurnId: 'turn'},
     ]) {
-        const { events, notices, options } = context(overrides);
+        const {events, notices, options} = context(overrides);
         await followTurnStream(options);
         assert.equal(events.some(isTurnSettled), false);
         assert.equal(notices.at(-1), 'unknown');
@@ -125,13 +126,13 @@ test('a changed turn or previous turn never supplies a false result', async () =
 });
 
 test('malformed SSE is reported through recovery, while intentional abort stops recovery', async () => {
-    const { events, options } = context({ response: new Response('data: not-json\n\n') });
+    const {events, options} = context({response: new Response('data: not-json\n\n')});
     await followTurnStream(options);
     assert.equal(events.at(-1).type, 'error');
     const controller = new AbortController();
     controller.abort();
-    const aborted = context({ signal: controller.signal });
-    await assert.rejects(followTurnStream(aborted.options), { name: 'AbortError' });
+    const aborted = context({signal: controller.signal});
+    await assert.rejects(followTurnStream(aborted.options), {name: 'AbortError'});
     assert.equal(aborted.notices.length, 0);
 });
 
@@ -139,9 +140,9 @@ test('child failure does not settle root; a terminal root stops consumption and 
     const events = [];
     const settled = await readEventStream(
         response(
-            { type: 'error', source: 'session/worker' },
-            { type: 'done', text: 'root result' },
-            { type: 'error', text: 'late duplicate' }
+            {type: 'error', source: 'session/worker'},
+            {type: 'done', text: 'root result'},
+            {type: 'error', text: 'late duplicate'}
         ),
         (event) => events.push(event)
     );
@@ -161,7 +162,7 @@ test('truncated UTF-8 transport and abrupt reader failure both enter recovery', 
             },
         })
     );
-    const { events, options } = context({ response: broken });
+    const {events, options} = context({response: broken});
     await followTurnStream(options);
     assert.equal(events.at(-1).type, 'error');
 });

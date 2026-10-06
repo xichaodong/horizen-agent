@@ -425,16 +425,16 @@ class JdbcSessionTurnStoreTest {
         var result =
                 store.transitionTurn(
                         new TransitionTurnCommand(
-                                        "owner-1",
-                                        "session-1",
-                                        "turn-1",
-                                        TurnStatus.FAILED,
-                                        null,
-                                        null,
-                                        now.plusSeconds(31),
-                                        "EXECUTOR_LOST",
-                                        null,
-                                        null)
+                                "owner-1",
+                                "session-1",
+                                "turn-1",
+                                TurnStatus.FAILED,
+                                null,
+                                null,
+                                now.plusSeconds(31),
+                                "EXECUTOR_LOST",
+                                null,
+                                null)
                                 .expectVersion(stale.getVersion()));
         assertEquals(TransitionTurnResult.Outcome.STATUS_CHANGED, result.getOutcome());
         var current = store.findTurn("owner-1", "turn-1").orElseThrow();

@@ -9,17 +9,24 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-/** 共享 JSON 配置与常用操作，配置在初始化后不再修改。 */
+/**
+ * 共享 JSON 配置与常用操作，配置在初始化后不再修改。
+ */
 public final class JsonUtils {
     // 确定性的统一传输格式，不受类路径发现或类加载顺序影响。
-    /** 默认的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 默认的固定取值，用于相应策略和边界判断。
+     */
     private static final ObjectMapper DEFAULT =
             new ObjectMapper()
                     .registerModule(new JavaTimeModule())
                     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private JsonUtils() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private JsonUtils() {
+    }
 
     /**
      * 为长期使用的协议编解码器创建独立映射器，修改配置不影响其他编解码器。
@@ -91,7 +98,7 @@ public final class JsonUtils {
      * 读取JSON工具。
      *
      * @param value 待校验、转换或保存的原始值。
-     * @param type 当前操作使用的目标类型或类别。
+     * @param type  当前操作使用的目标类型或类别。
      * @return 本次操作返回的类型参数结果。
      */
     public static <T> T read(String value, Class<T> type) throws JsonProcessingException {
@@ -102,7 +109,7 @@ public final class JsonUtils {
      * 读取JSON工具。
      *
      * @param value 待校验、转换或保存的原始值。
-     * @param type 当前操作使用的目标类型或类别。
+     * @param type  当前操作使用的目标类型或类别。
      * @return 本次操作返回的类型参数结果。
      */
     public static <T> T read(String value, TypeReference<T> type) throws JsonProcessingException {

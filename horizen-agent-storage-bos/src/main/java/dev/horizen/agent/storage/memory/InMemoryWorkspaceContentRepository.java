@@ -13,10 +13,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-/** 供开发和测试显式选用的提供器，云端宿主不能隐式选择此实现。 */
+/**
+ * 供开发和测试显式选用的提供器，云端宿主不能隐式选择此实现。
+ */
 @RequiredArgsConstructor
 public final class InMemoryWorkspaceContentRepository implements WorkspaceContentRepository {
-    /** SHARED的固定取值，用于相应策略和边界判断。 */
+    /**
+     * SHARED的固定取值，用于相应策略和边界判断。
+     */
     private static final LinkedHashMap<String, InMemoryWorkspaceContentRepository> SHARED =
             new LinkedHashMap<>(16, 0.75f, true);
 
@@ -50,16 +54,24 @@ public final class InMemoryWorkspaceContentRepository implements WorkspaceConten
         }
     }
 
-    /** 保存工作区实际内容字节的对象存储访问端口。 */
+    /**
+     * 保存工作区实际内容字节的对象存储访问端口。
+     */
     private final Map<String, byte[]> objects = new ConcurrentHashMap<>();
 
-    /** 最大的字节数，用于容量或传输限制。 */
+    /**
+     * 最大的字节数，用于容量或传输限制。
+     */
     private final long maximumBytes;
 
-    /** 当前内容存储已经占用的字节数。 */
+    /**
+     * 当前内容存储已经占用的字节数。
+     */
     private long used;
 
-    /** 创建输入侧记忆工作区正文仓储，初始化该组件所需的状态、配置或依赖。 */
+    /**
+     * 创建输入侧记忆工作区正文仓储，初始化该组件所需的状态、配置或依赖。
+     */
     public InMemoryWorkspaceContentRepository() {
         this(64L * 1024 * 1024);
     }
@@ -68,7 +80,7 @@ public final class InMemoryWorkspaceContentRepository implements WorkspaceConten
      * 上传输入侧记忆工作区正文仓储。
      * 处理数组时使用副本，避免直接共享原数组内容。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -87,7 +99,7 @@ public final class InMemoryWorkspaceContentRepository implements WorkspaceConten
      * 下载输入侧记忆工作区正文仓储。
      * 处理数组时使用副本，避免直接共享原数组内容。
      *
-     * @param reference 当前输入侧记忆工作区正文仓储使用的引用，供其处理与状态记录使用。
+     * @param reference    当前输入侧记忆工作区正文仓储使用的引用，供其处理与状态记录使用。
      * @param maximumBytes 最大的字节数，用于容量或传输限制。
      * @return 本次处理取得或生成的内容字节。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -130,7 +142,9 @@ public final class InMemoryWorkspaceContentRepository implements WorkspaceConten
         return objects.containsKey(reference);
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
     public synchronized void close() {
         objects.clear();

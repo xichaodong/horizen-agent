@@ -15,35 +15,51 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/** 单一职责的追踪采集器，由单次调用独占。 */
+/**
+ * 单一职责的追踪采集器，由单次调用独占。
+ */
 final class ModelCallCapture {
-    /** 本组件使用的 {@code HorizenTraceRun} 状态或依赖，用于 run 的处理。 */
+    /**
+     * 本组件使用的 {@code HorizenTraceRun} 状态或依赖，用于 run 的处理。
+     */
     private final HorizenTraceRun run;
 
-    /** 当前模型或工具操作正在记录的 Span。 */
+    /**
+     * 当前模型或工具操作正在记录的 Span。
+     */
     final SpanDraft span;
 
-    /** 模型服务识别的模型名称，脚本模式使用对应的演示名称。 */
+    /**
+     * 模型服务识别的模型名称，脚本模式使用对应的演示名称。
+     */
     final String modelName;
 
-    /** 面向消息或事件消费者的文本内容。 */
+    /**
+     * 面向消息或事件消费者的文本内容。
+     */
     final StringBuilder text = new StringBuilder();
 
-    /** 工具调用集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 工具调用集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     final Map<String, ToolCallOutput> toolCalls = new LinkedHashMap<>();
 
-    /** 结束的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * 结束的原子状态，供并发更新与统计读取使用。
+     */
     final AtomicBoolean finished = new AtomicBoolean();
 
-    /** 模型提供方报告的 token 或调用用量，不按消息长度伪造实际用量。 */
+    /**
+     * 模型提供方报告的 token 或调用用量，不按消息长度伪造实际用量。
+     */
     ChatUsage usage;
 
     /**
      * 创建模型调用采集，初始化该组件所需的状态、配置或依赖。
      *
-     * @param run 当前模型调用采集持有的运行对象，供相应处理步骤使用。
+     * @param run    当前模型调用采集持有的运行对象，供相应处理步骤使用。
      * @param spanId 当前观测操作的 Span 标识，供追踪父子操作关系。
-     * @param input 本次处理的输入。
+     * @param input  本次处理的输入。
      */
     ModelCallCapture(HorizenTraceRun run, String spanId, ModelCallInput input) {
         this(run, spanId, input, "llm.call." + run.modelIndex.get(), "reasoning");
@@ -52,10 +68,10 @@ final class ModelCallCapture {
     /**
      * 创建模型调用采集，初始化该组件所需的状态、配置或依赖。
      *
-     * @param run 当前模型调用采集持有的运行对象，供相应处理步骤使用。
-     * @param spanId 当前观测操作的 Span 标识，供追踪父子操作关系。
-     * @param input 本次处理的输入。
-     * @param spanName 当前模型调用采集使用的Span名称，供其处理与状态记录使用。
+     * @param run       当前模型调用采集持有的运行对象，供相应处理步骤使用。
+     * @param spanId    当前观测操作的 Span 标识，供追踪父子操作关系。
+     * @param input     本次处理的输入。
+     * @param spanName  当前模型调用采集使用的Span名称，供其处理与状态记录使用。
      * @param operation 当前模型调用采集使用的操作，供其处理与状态记录使用。
      */
     ModelCallCapture(

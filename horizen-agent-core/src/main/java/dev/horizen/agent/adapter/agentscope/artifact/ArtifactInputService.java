@@ -21,19 +21,25 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/** 将已发布的 Artifact 下载到当前执行段沙箱，并记录 INPUT 引用。 */
+/**
+ * 将已发布的 Artifact 下载到当前执行段沙箱，并记录 INPUT 引用。
+ */
 public final class ArtifactInputService {
-    /** 产物管理依赖或产物集合，用于引用、读取与交付资源。 */
+    /**
+     * 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     */
     private final ArtifactStore artifacts;
 
-    /** 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。 */
+    /**
+     * 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     */
     private final ArtifactContentStore contents;
 
     /**
      * 创建产物输入服务，初始化该组件所需的状态、配置或依赖。
      *
      * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
-     * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     * @param contents  资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      */
     public ArtifactInputService(ArtifactStore artifacts, ArtifactContentStore contents) {
         this.artifacts = Objects.requireNonNull(artifacts, "artifacts");
@@ -43,12 +49,12 @@ public final class ArtifactInputService {
     /**
      * 把宿主输入资源写入当前执行可访问的文件系统，并返回对应资源位置。
      *
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param artifactId 产物资源标识；访问内容时仍需校验所属隔离范围。
+     * @param context       当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param artifactId    产物资源标识；访问内容时仍需校验所属隔离范围。
      * @param requestedPath 当前产物输入服务使用的请求的路径，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public String materialize(RuntimeContext context, String artifactId, String requestedPath) {
         Objects.requireNonNull(context, "context");
@@ -83,18 +89,18 @@ public final class ArtifactInputService {
         String referenceId =
                 "ref_"
                         + UUID.nameUUIDFromBytes(
-                                        (context.getUserId()
-                                                        + '\0'
-                                                        + context.getSessionId()
-                                                        + '\0'
-                                                        + execution.getTurnId()
-                                                        + '\0'
-                                                        + artifact.getArtifactId()
-                                                        + '\0'
-                                                        + ArtifactReferenceRole.INPUT.name())
-                                                .getBytes(StandardCharsets.UTF_8))
-                                .toString()
-                                .replace("-", "");
+                                (context.getUserId()
+                                        + '\0'
+                                        + context.getSessionId()
+                                        + '\0'
+                                        + execution.getTurnId()
+                                        + '\0'
+                                        + artifact.getArtifactId()
+                                        + '\0'
+                                        + ArtifactReferenceRole.INPUT.name())
+                                        .getBytes(StandardCharsets.UTF_8))
+                        .toString()
+                        .replace("-", "");
         artifacts.addReference(
                 new ArtifactReference(
                         referenceId,
@@ -112,7 +118,7 @@ public final class ArtifactInputService {
      * 规范化输入资源路径，拒绝把资源写到允许工作目录之外。
      *
      * @param requestedPath 当前产物输入服务使用的请求的路径，供其处理与状态记录使用。
-     * @param artifactId 产物资源标识；访问内容时仍需校验所属隔离范围。
+     * @param artifactId    产物资源标识；访问内容时仍需校验所属隔离范围。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

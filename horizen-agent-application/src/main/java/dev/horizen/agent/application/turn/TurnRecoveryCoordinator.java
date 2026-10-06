@@ -31,53 +31,79 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-/** 处理跨实例取消、租约续期和失去执行宿主的 Turn 恢复。 */
+/**
+ * 处理跨实例取消、租约续期和失去执行宿主的 Turn 恢复。
+ */
 public final class TurnRecoveryCoordinator implements AutoCloseable {
-    /** 当前组件的诊断日志器。 */
+    /**
+     * 当前组件的诊断日志器。
+     */
     private static final Logger log = LoggerFactory.getLogger(TurnRecoveryCoordinator.class);
 
-    /** 跨实例执行控制通道，将取消请求送到原执行持有方。 */
+    /**
+     * 跨实例执行控制通道，将取消请求送到原执行持有方。
+     */
     private final TurnControlChannel controls;
 
-    /** 当前对象使用的处理策略，决定校验、权限或执行边界。 */
+    /**
+     * 当前对象使用的处理策略，决定校验、权限或执行边界。
+     */
     private final TurnRecoveryPolicy policy;
 
-    /** 会话对象或会话索引，按相应的归属键定位数据。 */
+    /**
+     * 会话对象或会话索引，按相应的归属键定位数据。
+     */
     private final SessionTurnStore sessions;
 
-    /** 执行 Agent 模型与工具循环的运行时接口。 */
+    /**
+     * 执行 Agent 模型与工具循环的运行时接口。
+     */
     private final AgentRuntime runtime;
 
-    /** 当前实例持有的执行句柄管理器。 */
+    /**
+     * 当前实例持有的执行句柄管理器。
+     */
     private final TurnExecutionManager executions;
 
-    /** 当前实例的执行租约续期管理器。 */
+    /**
+     * 当前实例的执行租约续期管理器。
+     */
     private final InstanceLeaseRenewer leases;
 
-    /** 把运行事件收敛为正式状态、交互记录与回放增量的持久化协调器。 */
+    /**
+     * 把运行事件收敛为正式状态、交互记录与回放增量的持久化协调器。
+     */
     private final TurnEventPersistence eventPersistence;
 
-    /** 跨实例控制信号的轮询订阅句柄，关闭时需要停止。 */
+    /**
+     * 跨实例控制信号的轮询订阅句柄，关闭时需要停止。
+     */
     private Disposable controlPoller;
 
-    /** 租约失联与执行过期检查的周期任务句柄。 */
+    /**
+     * 租约失联与执行过期检查的周期任务句柄。
+     */
     private Disposable leaseReconciler;
 
-    /** 开始的状态标记，用于选择当前组件的处理路径。 */
+    /**
+     * 开始的状态标记，用于选择当前组件的处理路径。
+     */
     private boolean started;
 
-    /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+    /**
+     * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+     */
     private boolean closed;
 
     /**
      * 创建执行恢复协调器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param controls 当前执行恢复协调器持有的控制集合对象，供相应处理步骤使用。
-     * @param policy 当前对象使用的处理策略，决定校验、权限或执行边界。
-     * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
-     * @param runtime 执行 Agent 模型与工具循环的运行时接口。
-     * @param executions 当前执行恢复协调器持有的执行集合对象，供相应处理步骤使用。
-     * @param leases 当前执行恢复协调器持有的租约集合对象，供相应处理步骤使用。
+     * @param controls         当前执行恢复协调器持有的控制集合对象，供相应处理步骤使用。
+     * @param policy           当前对象使用的处理策略，决定校验、权限或执行边界。
+     * @param sessions         会话对象或会话索引，按相应的归属键定位数据。
+     * @param runtime          执行 Agent 模型与工具循环的运行时接口。
+     * @param executions       当前执行恢复协调器持有的执行集合对象，供相应处理步骤使用。
+     * @param leases           当前执行恢复协调器持有的租约集合对象，供相应处理步骤使用。
      * @param eventPersistence 当前执行恢复协调器持有的事件持久化对象，供相应处理步骤使用。
      */
     public TurnRecoveryCoordinator(
@@ -97,7 +123,9 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
         this.eventPersistence = Objects.requireNonNull(eventPersistence, "eventPersistence");
     }
 
-    /** 启动分布式执行控制轮询与租约失联检查。 */
+    /**
+     * 启动分布式执行控制轮询与租约失联检查。
+     */
     public synchronized void start() {
         if (started || closed) return;
         started = true;
@@ -109,9 +137,9 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
     /**
      * 核对当前执行与实例归属，选择本地取消或跨实例取消控制。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param identity  可信宿主解析的执行身份，供访问范围与审计使用。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @throws ApplicationError 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public void cancel(ExecutionIdentity identity, String sessionId, String turnId) {
@@ -165,7 +193,7 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
      * @param turn 当前执行恢复协调器持有的执行对象，供相应处理步骤使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public Flux<AgentRuntimeEvent> replayTerminal(AgentTurn turn) {
         if (!turn.getStatus().isTerminal()) {
@@ -174,13 +202,13 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
         String text =
                 turn.getStatus() == TurnStatus.COMPLETED
                         ? sessions
-                                .listFinalMessages(turn.getOwnerKey(), turn.getSessionId())
-                                .stream()
-                                .filter(message -> message.getTurnId().equals(turn.getTurnId()))
-                                .filter(message -> message.getRole() == MessageRole.ASSISTANT)
-                                .map(ConversationMessage::getContent)
-                                .findFirst()
-                                .orElse("")
+                        .listFinalMessages(turn.getOwnerKey(), turn.getSessionId())
+                        .stream()
+                        .filter(message -> message.getTurnId().equals(turn.getTurnId()))
+                        .filter(message -> message.getRole() == MessageRole.ASSISTANT)
+                        .map(ConversationMessage::getContent)
+                        .findFirst()
+                        .orElse("")
                         : null;
         AgentRuntimeEvent.Type type =
                 switch (turn.getStatus()) {
@@ -248,7 +276,8 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
                                                 }))
                 .then()
                 .repeatWhen(rounds -> rounds.delayElements(policy.getControlPollInterval()))
-                .subscribe(ignored -> {}, error -> log.warn("Control poller stopped", error));
+                .subscribe(ignored -> {
+                }, error -> log.warn("Control poller stopped", error));
     }
 
     /**
@@ -271,7 +300,9 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
                 .subscribe();
     }
 
-    /** 读取需要收敛的执行事实，并按最新状态应用失联或超时规则。 */
+    /**
+     * 读取需要收敛的执行事实，并按最新状态应用失联或超时规则。
+     */
     private void reconcileExpiredTurns() {
         Instant now = Instant.now();
         sessions.findOverdueTurns(now, 100)
@@ -286,10 +317,10 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
     /**
      * 隔离单条执行恢复失败，使它不终止后续协调任务。
      *
-     * @param turn 当前执行恢复协调器持有的执行对象，供相应处理步骤使用。
-     * @param target 本次转换、状态更新或内容写入的目标。
+     * @param turn        当前执行恢复协调器持有的执行对象，供相应处理步骤使用。
+     * @param target      本次转换、状态更新或内容写入的目标。
      * @param failureCode 机器可识别的失败分类，供状态恢复与错误展示使用。
-     * @param now 用于本次更新或过期判断的当前时间。
+     * @param now         用于本次更新或过期判断的当前时间。
      */
     private void recoverSafely(AgentTurn turn, TurnStatus target, String failureCode, Instant now) {
         try {
@@ -305,25 +336,25 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
     /**
      * 根据当前执行事实判断是否仍可由原实例继续持有或需要结束执行。
      *
-     * @param turn 当前执行恢复协调器持有的执行对象，供相应处理步骤使用。
-     * @param target 本次转换、状态更新或内容写入的目标。
+     * @param turn        当前执行恢复协调器持有的执行对象，供相应处理步骤使用。
+     * @param target      本次转换、状态更新或内容写入的目标。
      * @param failureCode 机器可识别的失败分类，供状态恢复与错误展示使用。
-     * @param now 用于本次更新或过期判断的当前时间。
+     * @param now         用于本次更新或过期判断的当前时间。
      */
     void recover(AgentTurn turn, TurnStatus target, String failureCode, Instant now) {
         TransitionTurnResult result =
                 sessions.transitionTurn(
                         new TransitionTurnCommand(
-                                        turn.getOwnerKey(),
-                                        turn.getSessionId(),
-                                        turn.getTurnId(),
-                                        target,
-                                        null,
-                                        null,
-                                        now,
-                                        failureCode,
-                                        null,
-                                        null)
+                                turn.getOwnerKey(),
+                                turn.getSessionId(),
+                                turn.getTurnId(),
+                                target,
+                                null,
+                                null,
+                                now,
+                                failureCode,
+                                null,
+                                null)
                                 .expectVersion(turn.getVersion()));
         if (result.getOutcome() != TransitionTurnResult.Outcome.UPDATED) return;
         try {
@@ -398,9 +429,9 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
     /**
      * 收敛取消。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      */
     private void finishCancellation(String ownerKey, String sessionId, String turnId) {
         sessions.transitionTurn(
@@ -417,7 +448,9 @@ public final class TurnRecoveryCoordinator implements AutoCloseable {
                         null));
     }
 
-    /** 关闭控制轮询与租约检查任务，释放当前协调器持有的调度资源。 */
+    /**
+     * 关闭控制轮询与租约检查任务，释放当前协调器持有的调度资源。
+     */
     @Override
     public synchronized void close() {
         if (closed) return;

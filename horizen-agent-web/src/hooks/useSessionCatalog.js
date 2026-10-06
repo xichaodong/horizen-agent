@@ -1,7 +1,7 @@
-import { request as apiRequest } from '../api/client.js';
-import { useState, useRef, useEffect, useReducer } from 'react';
-import { useLatest } from './useLatest.js';
-import { sessionsReducer } from '../state/sessions.js';
+import {request as apiRequest} from '../api/client.js';
+import {useState, useRef, useEffect, useReducer} from 'react';
+import {useLatest} from './useLatest.js';
+import {sessionsReducer} from '../state/sessions.js';
 import {
     createSession,
     SESSION_PAGE_SIZE,
@@ -12,11 +12,11 @@ import {
 } from '../utils/chat.js';
 
 /** 维护会话目录、分页、重命名与置顶，异步结果只合并到其对应的会话。 */
-export function useSessionCatalog({ status, setInputValue, inputRef }) {
+export function useSessionCatalog({status, setInputValue, inputRef}) {
     const [sessions, dispatch] = useReducer(sessionsReducer, undefined, () => [createSession()]);
-    const setSessions = (sessions) => dispatch({ type: 'catalog/replace', sessions });
+    const setSessions = (sessions) => dispatch({type: 'catalog/replace', sessions});
     const setObserving = (sessionId, value) =>
-        dispatch({ type: 'session/observing', sessionId, value });
+        dispatch({type: 'session/observing', sessionId, value});
 
     const [activeSessionId, setActiveSessionId] = useState(() => sessions[0].id);
 
@@ -30,7 +30,7 @@ export function useSessionCatalog({ status, setInputValue, inputRef }) {
 
     const [openSessionMenuId, setOpenSessionMenuId] = useState(null);
 
-    const [sessionMenuPosition, setSessionMenuPosition] = useState({ top: 0, left: 0 });
+    const [sessionMenuPosition, setSessionMenuPosition] = useState({top: 0, left: 0});
 
     const [renameSessionId, setRenameSessionId] = useState(null);
 
@@ -52,7 +52,7 @@ export function useSessionCatalog({ status, setInputValue, inputRef }) {
         setHistoryStatus('loading');
         apiRequest('/api/sessions/query', {
             method: 'POST',
-            body: JSON.stringify({ limit: SESSION_PAGE_SIZE }),
+            body: JSON.stringify({limit: SESSION_PAGE_SIZE}),
             signal: controller.signal,
         })
             .then((response) => {
@@ -72,11 +72,11 @@ export function useSessionCatalog({ status, setInputValue, inputRef }) {
                         const live = liveById.get(session.id);
                         return live
                             ? {
-                                  ...session,
-                                  messages: live.messages,
-                                  historyLoaded: live.historyLoaded,
-                                  currentAssistantMessageId: live.currentAssistantMessageId,
-                              }
+                                ...session,
+                                messages: live.messages,
+                                historyLoaded: live.historyLoaded,
+                                currentAssistantMessageId: live.currentAssistantMessageId,
+                            }
                             : session;
                     });
                     return [...drafts, ...restored];
@@ -95,7 +95,7 @@ export function useSessionCatalog({ status, setInputValue, inputRef }) {
     }, [status.ready]);
 
     const updateSession = (sessionId, update) =>
-        dispatch({ type: 'session/update', sessionId, update });
+        dispatch({type: 'session/update', sessionId, update});
 
     const handleLoadMoreSessions = async () => {
         if (!sessionHasMore || !sessionCursor || loadingMoreRef.current) return;
@@ -104,7 +104,7 @@ export function useSessionCatalog({ status, setInputValue, inputRef }) {
         try {
             const response = await apiRequest('/api/sessions/query', {
                 method: 'POST',
-                body: JSON.stringify({ limit: SESSION_PAGE_SIZE, cursor: sessionCursor }),
+                body: JSON.stringify({limit: SESSION_PAGE_SIZE, cursor: sessionCursor}),
             });
             if (!response.ok) throw new Error('会话列表加载失败');
             const payload = await response.json();
@@ -137,14 +137,14 @@ export function useSessionCatalog({ status, setInputValue, inputRef }) {
             (entries) => {
                 if (entries.some((entry) => entry.isIntersecting)) loadMore.current();
             },
-            { root: target.closest(`.${PREFIX}__session-list`), rootMargin: '80px 0px' }
+            {root: target.closest(`.${PREFIX}__session-list`), rootMargin: '80px 0px'}
         );
         observer.observe(target);
         return () => observer.disconnect();
     }, [sessionHasMore, sessionCursor, loadingMoreSessions, loadMore]);
 
     const appendMessage = (sessionId, message) =>
-        dispatch({ type: 'session/message', sessionId, message, at: Date.now() });
+        dispatch({type: 'session/message', sessionId, message, at: Date.now()});
 
     const handleNewSession = () => {
         const session = createSession();
@@ -163,7 +163,7 @@ export function useSessionCatalog({ status, setInputValue, inputRef }) {
         if (target?.persisted) {
             const response = await apiRequest('/api/session/delete', {
                 method: 'POST',
-                body: JSON.stringify({ sessionId }),
+                body: JSON.stringify({sessionId}),
             });
             if (!response.ok) {
                 const error = await response.json().catch(() => ({}));
@@ -207,10 +207,10 @@ export function useSessionCatalog({ status, setInputValue, inputRef }) {
         try {
             const response = await apiRequest('/api/session/rename', {
                 method: 'POST',
-                body: JSON.stringify({ sessionId: session.id, title }),
+                body: JSON.stringify({sessionId: session.id, title}),
             });
             if (!response.ok) throw new Error('rename failed');
-            updateSession(session.id, (current) => ({ ...current, title }));
+            updateSession(session.id, (current) => ({...current, title}));
         } catch (error) {
             appendMessage(session.id, {
                 id: createId(),
@@ -226,10 +226,10 @@ export function useSessionCatalog({ status, setInputValue, inputRef }) {
         try {
             const response = await apiRequest('/api/session/pin', {
                 method: 'POST',
-                body: JSON.stringify({ sessionId: session.id, pinned }),
+                body: JSON.stringify({sessionId: session.id, pinned}),
             });
             if (!response.ok) throw new Error('pin failed');
-            updateSession(session.id, (current) => ({ ...current, pinned }));
+            updateSession(session.id, (current) => ({...current, pinned}));
         } catch (error) {
             appendMessage(session.id, {
                 id: createId(),

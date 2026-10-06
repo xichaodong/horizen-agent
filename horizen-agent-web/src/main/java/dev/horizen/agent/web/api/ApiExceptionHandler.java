@@ -14,13 +14,19 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Map;
 
-/** 将应用异常转换成稳定的 HTTP 错误响应，保留错误分类并避免泄露内部异常正文。 */
+/**
+ * 将应用异常转换成稳定的 HTTP 错误响应，保留错误分类并避免泄露内部异常正文。
+ */
 @RestControllerAdvice
 public class ApiExceptionHandler {
-    /** 当前组件的诊断日志器。 */
+    /**
+     * 当前组件的诊断日志器。
+     */
     private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
-    /** multipart 入口拒绝超限文件时返回明确的 413，正文尚未进入上传业务。 */
+    /**
+     * multipart 入口拒绝超限文件时返回明确的 413，正文尚未进入上传业务。
+     */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Map<String, String>> handleUploadTooLarge(
             MaxUploadSizeExceededException error) {

@@ -14,10 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/** 解码外部 Provider 工具目录 JSON，并校验版本、工具定义与扩展呈现结构。 */
+/**
+ * 解码外部 Provider 工具目录 JSON，并校验版本、工具定义与扩展呈现结构。
+ */
 public final class ProviderCatalogCodec {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private ProviderCatalogCodec() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private ProviderCatalogCodec() {
+    }
 
     /**
      * 解码提供方目录编解码器。

@@ -8,15 +8,23 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-/** 工具目录的访问范围与版本定位信息。 */
+/**
+ * 工具目录的访问范围与版本定位信息。
+ */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CatalogScope implements WireValue {
-    /** 仅查询工具目录注册信息，不代表实际业务调用已经授权。 */
+    /**
+     * 仅查询工具目录注册信息，不代表实际业务调用已经授权。
+     */
     REGISTRATION("registration"),
-    /** 与具体执行关联的目录或调用范围。 */
+    /**
+     * 与具体执行关联的目录或调用范围。
+     */
     TURN("turn");
 
-    /** 对外协议使用的固定文本值，与 Java 枚举成员名称分开维护。 */
+    /**
+     * 对外协议使用的固定文本值，与 Java 枚举成员名称分开维护。
+     */
     @Getter(onMethod_ = {@Override, @JsonValue})
     @Accessors(fluent = true)
     private final String wireValue;

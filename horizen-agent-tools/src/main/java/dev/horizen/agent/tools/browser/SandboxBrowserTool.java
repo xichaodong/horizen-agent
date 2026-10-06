@@ -33,33 +33,45 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-/** 由活跃沙箱内固定 CDP 驱动执行的结构化浏览器操作。 */
+/**
+ * 由活跃沙箱内固定 CDP 驱动执行的结构化浏览器操作。
+ */
 public final class SandboxBrowserTool extends ToolBase {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 校验SENSITIVE查询的模式，限定允许接受的输入形式。 */
+    /**
+     * 校验SENSITIVE查询的模式，限定允许接受的输入形式。
+     */
     private static final Pattern SENSITIVE_QUERY =
             Pattern.compile("(?i)(token|api[_-]?key|secret|authorization|signature)=");
 
-    /** 校验令牌值的模式，限定允许接受的输入形式。 */
+    /**
+     * 校验令牌值的模式，限定允许接受的输入形式。
+     */
     private static final Pattern TOKEN_VALUE =
             Pattern.compile(
                     "(?i)(bearer\\s+|sk-[a-z0-9_-]{8,}|access[_-]?token[=:]\\s*)[^\\s,\\\"]+");
 
-    /** 当前工具执行的具体动作实现。 */
+    /**
+     * 当前工具执行的具体动作实现。
+     */
     private final String action;
 
-    /** 产物管理依赖或产物集合，用于引用、读取与交付资源。 */
+    /**
+     * 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     */
     private final ArtifactLifecycleService artifacts;
 
     /**
      * 创建沙箱浏览器工具，初始化该组件所需的状态、配置或依赖。
      *
-     * @param action 在当前处理边界中执行的操作。
+     * @param action      在当前处理边界中执行的操作。
      * @param description 当前沙箱浏览器工具的用途说明，供目录或配置阅读者理解。
-     * @param schema Schema的索引映射，供按键查找或归并当前组件的数据。
-     * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
+     * @param schema      Schema的索引映射，供按键查找或归并当前组件的数据。
+     * @param artifacts   产物管理依赖或产物集合，用于引用、读取与交付资源。
      */
     SandboxBrowserTool(
             String action,
@@ -149,8 +161,8 @@ public final class SandboxBrowserTool extends ToolBase {
                     prefix
                             + "eval "
                             + quote(
-                                    "JSON.stringify([...document.images].map(img=>({src:img.src,alt:img.alt||'',width:img.naturalWidth,height:img.naturalHeight})).filter(img=>img.src&&!img.src.startsWith('data:')))"
-                                            + " ");
+                            "JSON.stringify([...document.images].map(img=>({src:img.src,alt:img.alt||'',width:img.naturalWidth,height:img.naturalHeight})).filter(img=>img.src&&!img.src.startsWith('data:')))"
+                                    + " ");
         else if ("console".equals(action))
             command =
                     prefix + "console" + (request.path("clear").asBoolean(false) ? " --clear" : "");
@@ -158,8 +170,8 @@ public final class SandboxBrowserTool extends ToolBase {
             command =
                     prefix
                             + ("screenshot".equals(action)
-                                    ? "screenshot "
-                                    : "download " + quote(ref(request)) + " ")
+                            ? "screenshot "
+                            : "download " + quote(ref(request)) + " ")
                             + "\"$PWD/\""
                             + quote(".horizen/" + request.path("file_name").asText());
         command = prepare + command;
@@ -295,9 +307,9 @@ public final class SandboxBrowserTool extends ToolBase {
     /**
      * 发布沙箱浏览器工具。
      *
-     * @param param 当前沙箱浏览器工具持有的参数对象，供相应处理步骤使用。
-     * @param bytes 当前操作处理的内容字节。
-     * @param title 当前沙箱浏览器工具的可读标题，供宿主界面展示。
+     * @param param     当前沙箱浏览器工具持有的参数对象，供相应处理步骤使用。
+     * @param bytes     当前操作处理的内容字节。
+     * @param title     当前沙箱浏览器工具的可读标题，供宿主界面展示。
      * @param mediaType 当前沙箱浏览器工具使用的媒体类型，供其处理与状态记录使用。
      * @return 本次操作返回的产物结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。

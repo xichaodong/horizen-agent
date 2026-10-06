@@ -12,14 +12,15 @@ export function request(url, options = {}) {
     } else if (typeof body === 'string' && !headers.has('Content-Type')) {
         headers.set('Content-Type', 'application/json');
     }
-    return fetch(url, { ...options, headers, body });
+    return fetch(url, {...options, headers, body});
 }
+
 /** 提交 JSON 或流式 POST 请求，统一携带取消信号和响应格式。 */
-export function post(url, body, { signal, stream = false } = {}) {
+export function post(url, body, {signal, stream = false} = {}) {
     return request(url, {
         method: 'POST',
         body,
         signal,
-        headers: stream ? { Accept: 'text/event-stream' } : undefined,
+        headers: stream ? {Accept: 'text/event-stream'} : undefined,
     });
 }

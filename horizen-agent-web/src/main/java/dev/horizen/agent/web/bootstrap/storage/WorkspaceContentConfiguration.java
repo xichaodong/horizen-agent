@@ -12,7 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** 组装工作区文件内容存储与领域访问服务。 */
+/**
+ * 组装工作区文件内容存储与领域访问服务。
+ */
 @Configuration(proxyBeanMethods = false)
 public class WorkspaceContentConfiguration {
     /**
@@ -32,7 +34,7 @@ public class WorkspaceContentConfiguration {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
-     * @param snapshots 当前工作区正文组装持有的快照集合对象，供相应处理步骤使用。
+     * @param snapshots  当前工作区正文组装持有的快照集合对象，供相应处理步骤使用。
      * @return 本次操作返回的工作区快照仓储结果。
      */
     @Bean(destroyMethod = "close")

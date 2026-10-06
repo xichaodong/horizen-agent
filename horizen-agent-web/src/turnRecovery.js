@@ -38,8 +38,8 @@ export async function readEventStream(response, onEvent) {
     };
     try {
         while (!settled) {
-            const { value, done } = await reader.read();
-            buffer += decoder.decode(value, { stream: !done });
+            const {value, done} = await reader.read();
+            buffer += decoder.decode(value, {stream: !done});
             consume(done);
             if (done) break;
         }
@@ -67,7 +67,7 @@ const abortableDelay = (milliseconds, signal) =>
             reject(new DOMException('Aborted', 'AbortError'));
         };
         const timer = setTimeout(finish, milliseconds);
-        signal?.addEventListener('abort', abort, { once: true });
+        signal?.addEventListener('abort', abort, {once: true});
         if (signal?.aborted) abort();
     });
 
@@ -83,29 +83,30 @@ export function executionFailureEvent(execution) {
         text: cancelled
             ? '本轮执行已取消。'
             : timedOut
-              ? '本轮执行超过时间限制，已停止。'
-              : limited
-                ? '本轮已达到执行次数限制，尚未确认任务完成。'
-                : '本轮执行出现异常，已停止。',
+                ? '本轮执行超过时间限制，已停止。'
+                : limited
+                    ? '本轮已达到执行次数限制，尚未确认任务完成。'
+                    : '本轮执行出现异常，已停止。',
         status: execution.status,
-        details: JSON.stringify({ errorCode: execution.failureCode || 'EXECUTION_ERROR' }),
+        details: JSON.stringify({errorCode: execution.failureCode || 'EXECUTION_ERROR'}),
     };
 }
 
 // 仅恢复事件传输，不重新提交用户请求或重复执行业务工具。
 /** 跟踪原执行的事件流；断开后查询事实状态与正式历史，再按游标恢复，避免重新提交用户任务。 */
 export async function followTurnStream({
-    response,
-    expectedTurnId,
-    previousTurnId,
-    onEvent,
-    queryExecution,
-    subscribe,
-    loadHistory,
-    onConnection = () => {},
-    signal,
-    delay = abortableDelay,
-}) {
+                                           response,
+                                           expectedTurnId,
+                                           previousTurnId,
+                                           onEvent,
+                                           queryExecution,
+                                           subscribe,
+                                           loadHistory,
+                                           onConnection = () => {
+                                           },
+                                           signal,
+                                           delay = abortableDelay,
+                                       }) {
     let turnId = expectedTurnId;
     let attempt = 0;
     let recovering = false;
@@ -171,8 +172,8 @@ export async function followTurnStream({
                     execution.status === 'completed'
                         ? 'done'
                         : execution.status === 'waiting_approval'
-                          ? 'approval_required'
-                          : 'ask_user_required';
+                            ? 'approval_required'
+                            : 'ask_user_required';
                 const settled = events.findLast(
                     (event) => !event.source && event.type === expected
                 );
@@ -183,7 +184,7 @@ export async function followTurnStream({
                         (message) => message.turnId === turnId && message.role === 'assistant'
                     );
                     if (!reply) throw new Error('Completed reply is not available');
-                    deliver({ type: 'done', id: turnId, status: 'success', text: reply.content });
+                    deliver({type: 'done', id: turnId, status: 'success', text: reply.content});
                 } else {
                     throw new Error('Pending interaction is not available');
                 }

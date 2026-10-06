@@ -14,10 +14,14 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-/** 在常规工具目录授权和审批治理完成后，装饰 Provider。 */
+/**
+ * 在常规工具目录授权和审批治理完成后，装饰 Provider。
+ */
 @RequiredArgsConstructor
 public final class EvaluationToolProvider implements ToolProvider {
-    /** 被包装的原始实现，由本组件补充隔离、观测或恢复行为。 */
+    /**
+     * 被包装的原始实现，由本组件补充隔离、观测或恢复行为。
+     */
     private final ToolProvider delegate;
 
     /**
@@ -34,9 +38,9 @@ public final class EvaluationToolProvider implements ToolProvider {
      * 调用评测工具提供方。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param id 目标对象的标识。
-     * @param tool 当前评测工具提供方使用的工具，供其处理与状态记录使用。
-     * @param input 本次处理的输入。
+     * @param id      目标对象的标识。
+     * @param tool    当前评测工具提供方使用的工具，供其处理与状态记录使用。
+     * @param input   本次处理的输入。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     public Mono<ToolResultBlock> invoke(
@@ -56,10 +60,10 @@ public final class EvaluationToolProvider implements ToolProvider {
                                 catalog != null
                                         && catalog.getTurnId().equals(context.getTurnId())
                                         && catalog.getDefinitions().stream()
-                                                .anyMatch(
-                                                        definition ->
-                                                                definition.getName().equals(tool)
-                                                                        && definition.isReadOnly());
+                                        .anyMatch(
+                                                definition ->
+                                                        definition.getName().equals(tool)
+                                                                && definition.isReadOnly());
                         if (!readOnly) return Mono.just(fixture.replay(tool, input, false));
                         ToolResultBlock replay = fixture.tryReplay(tool, input, true);
                         if (replay != null) return Mono.just(replay);
@@ -89,10 +93,10 @@ public final class EvaluationToolProvider implements ToolProvider {
                                 catalog != null
                                         && catalog.getTurnId().equals(context.getTurnId())
                                         && catalog.getDefinitions().stream()
-                                                .anyMatch(
-                                                        definition ->
-                                                                definition.getName().equals(tool)
-                                                                        && definition.isReadOnly());
+                                        .anyMatch(
+                                                definition ->
+                                                        definition.getName().equals(tool)
+                                                                && definition.isReadOnly());
                         return Mono.just(fixture.replay(tool, input, readOnly));
                     }
                     return delegate.invoke(context, id, tool, input)

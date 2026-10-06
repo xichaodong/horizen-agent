@@ -9,10 +9,15 @@ import java.util.function.Supplier;
 
 import javax.sql.DataSource;
 
-/** 独立执行模式下，提供与 agentTransactionManager 相同的 REQUIRED 传播和 15 秒事务边界。 */
+/**
+ * 独立执行模式下，提供与 agentTransactionManager 相同的 REQUIRED 传播和 15 秒事务边界。
+ */
 public final class StandaloneTransactions {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private StandaloneTransactions() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private StandaloneTransactions() {
+    }
 
     /**
      * 构造并返回当前操作所需的结果对象。

@@ -29,28 +29,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** 需要本地 Redis，验证宿主级原生工具审批流程。 */
+/**
+ * 需要本地 Redis，验证宿主级原生工具审批流程。
+ */
 @EnabledIfSystemProperty(named = "horizen.redis.live", matches = "true")
 @Import(WorkspaceTestConfiguration.class)
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = {
-            "horizen.agent.model-mode=SCRIPTED",
-            "horizen.agent.storage.mode=DISTRIBUTED",
-            "horizen.agent.storage.jdbc-username=sa",
-            "horizen.agent.storage.jdbc-password=",
-            "horizen.agent.storage.redis-url=redis://127.0.0.1:6379",
-            "horizen.agent.storage.redis-key-prefix=horizen-approval-flow-test:",
-            "horizen.agent.storage.instance-id=approval-flow-instance",
-            "horizen.agent.gateway.mode=remote",
-            "horizen.agent.gateway.url=",
-            "horizen.agent.gateway.token=",
-            "horizen.trace.enabled=false",
-            "horizen.agent.workspace-release.enabled=false",
-            "horizen.agent.skill-release.enabled=false",
-            "horizen.agent.sandbox.e2b.enabled=false",
-            "horizen.agent.sandbox.snapshot.bos.enabled=false",
-            "horizen.agent.artifact.bos.enabled=false"
+                "horizen.agent.model-mode=SCRIPTED",
+                "horizen.agent.storage.mode=DISTRIBUTED",
+                "horizen.agent.storage.jdbc-username=sa",
+                "horizen.agent.storage.jdbc-password=",
+                "horizen.agent.storage.redis-url=redis://127.0.0.1:6379",
+                "horizen.agent.storage.redis-key-prefix=horizen-approval-flow-test:",
+                "horizen.agent.storage.instance-id=approval-flow-instance",
+                "horizen.agent.gateway.mode=remote",
+                "horizen.agent.gateway.url=",
+                "horizen.agent.gateway.token=",
+                "horizen.trace.enabled=false",
+                "horizen.agent.workspace-release.enabled=false",
+                "horizen.agent.skill-release.enabled=false",
+                "horizen.agent.sandbox.e2b.enabled=false",
+                "horizen.agent.sandbox.snapshot.bos.enabled=false",
+                "horizen.agent.artifact.bos.enabled=false"
         })
 class ApprovalDistributedFlowLiveTest {
     private static final String DATABASE =
@@ -64,7 +66,8 @@ class ApprovalDistributedFlowLiveTest {
     private static final ExecutionIdentity IDENTITY =
             new ExecutionIdentity("approval-owner", "approval-actor");
 
-    @Autowired private AgentService service;
+    @Autowired
+    private AgentService service;
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
@@ -149,8 +152,8 @@ class ApprovalDistributedFlowLiveTest {
                                 event ->
                                         "done".equals(event.getType())
                                                 && event.getText()
-                                                        .contains(
-                                                                "scripted-tool:approved:approval publish report")));
+                                                .contains(
+                                                        "scripted-tool:approved:approval publish report")));
         assertEquals(
                 TurnStatus.COMPLETED.name().toLowerCase(),
                 service.sessionExecution(IDENTITY, SESSION_ID).getStatus());
@@ -161,7 +164,7 @@ class ApprovalDistributedFlowLiveTest {
                                 item ->
                                         "tool_input_delta".equals(item.getEvent().getType())
                                                 || "tool_output_delta"
-                                                        .equals(item.getEvent().getType())));
+                                                .equals(item.getEvent().getType())));
         var tool =
                 history.getTimelineEvents().stream()
                         .map(SessionApi.TimelineEventResponse::getEvent)
@@ -214,7 +217,7 @@ class ApprovalDistributedFlowLiveTest {
                                 event ->
                                         event.getText() != null
                                                 && event.getText()
-                                                        .contains(
-                                                                "approved:approval reject demo")));
+                                                .contains(
+                                                        "approved:approval reject demo")));
     }
 }

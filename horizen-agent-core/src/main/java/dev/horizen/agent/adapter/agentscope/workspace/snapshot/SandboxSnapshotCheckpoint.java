@@ -12,16 +12,21 @@ import io.agentscope.harness.agent.sandbox.SandboxContext;
 import io.agentscope.harness.agent.sandbox.SandboxIsolationKey;
 import io.agentscope.harness.agent.sandbox.SessionSandboxStateStore;
 
-/** 在发出成功或暂停事件前，先提交归档及其共享指针。 */
+/**
+ * 在发出成功或暂停事件前，先提交归档及其共享指针。
+ */
 public final class SandboxSnapshotCheckpoint {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private SandboxSnapshotCheckpoint() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private SandboxSnapshotCheckpoint() {
+    }
 
     /**
      * 保存沙箱快照检查点。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param states 提供states能力的依赖，具体实现由当前组件的组装方传入。
+     * @param states  提供states能力的依赖，具体实现由当前组件的组装方传入。
      * @param agentId 当前执行 Agent 的标识，用于区分主 Agent 与委派执行者。
      */
     public static void save(RuntimeContext context, AgentStateStore states, String agentId) {
@@ -31,11 +36,11 @@ public final class SandboxSnapshotCheckpoint {
     /**
      * 保存沙箱快照检查点。
      *
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param states 提供states能力的依赖，具体实现由当前组件的组装方传入。
-     * @param agentId 当前执行 Agent 的标识，用于区分主 Agent 与委派执行者。
+     * @param context  当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param states   提供states能力的依赖，具体实现由当前组件的组装方传入。
+     * @param agentId  当前执行 Agent 的标识，用于区分主 Agent 与委派执行者。
      * @param pointers 提供指针集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException       当前输入或运行状态不满足本方法的处理条件时抛出。
      * @throws SnapshotCheckpointException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public static void save(
@@ -61,11 +66,11 @@ public final class SandboxSnapshotCheckpoint {
                 var execution = context.get(ArtifactExecutionContext.class);
                 if (base == null
                         || !pointers.compareAndSetCommitted(
-                                new WorkspaceSnapshotKey(
-                                        context.getUserId(), context.getSessionId()),
-                                base.getId(),
-                                snapshot.getId(),
-                                execution == null ? null : execution.getTurnId())) {
+                        new WorkspaceSnapshotKey(
+                                context.getUserId(), context.getSessionId()),
+                        base.getId(),
+                        snapshot.getId(),
+                        execution == null ? null : execution.getTurnId())) {
                     throw new IllegalStateException(
                             "Session workspace changed or execution lease was lost");
                 }
@@ -79,7 +84,9 @@ public final class SandboxSnapshotCheckpoint {
         }
     }
 
-    /** 快照检查点异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。 */
+    /**
+     * 快照检查点异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。
+     */
     public static final class SnapshotCheckpointException extends RuntimeException {
         /**
          * 创建快照检查点异常，初始化该组件所需的状态、配置或依赖。

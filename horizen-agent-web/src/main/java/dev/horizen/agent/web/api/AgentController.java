@@ -56,23 +56,31 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Map;
 
-/** 本地 HTTP 接口入口；解析可信宿主身份，把会话、交互与执行观察请求交给应用门面。 */
+/**
+ * 本地 HTTP 接口入口；解析可信宿主身份，把会话、交互与执行观察请求交给应用门面。
+ */
 @RestController
 @RequestMapping("/api")
 public class AgentController {
-    /** 本地 Agent HTTP 应用门面，承接查询、执行与交互操作。 */
+    /**
+     * 本地 Agent HTTP 应用门面，承接查询、执行与交互操作。
+     */
     private final AgentService agentService;
 
-    /** 从可信 HTTP 宿主上下文取得不透明执行身份的解析器。 */
+    /**
+     * 从可信 HTTP 宿主上下文取得不透明执行身份的解析器。
+     */
     private final ExecutionIdentityResolver identityResolver;
 
-    /** 本实例 SSE 观察连接的有界队列、发送与关闭管理器。 */
+    /**
+     * 本实例 SSE 观察连接的有界队列、发送与关闭管理器。
+     */
     private final SseConnectionManager sseConnections;
 
     /**
      * 创建Agent接口控制器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param agentService 提供Agent服务能力的依赖，具体实现由当前组件的组装方传入。
+     * @param agentService     提供Agent服务能力的依赖，具体实现由当前组件的组装方传入。
      * @param identityResolver 提供身份解析器能力的依赖，具体实现由当前组件的组装方传入。
      */
     public AgentController(AgentService agentService, ExecutionIdentityResolver identityResolver) {
@@ -82,9 +90,9 @@ public class AgentController {
     /**
      * 创建Agent接口控制器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param agentService 提供Agent服务能力的依赖，具体实现由当前组件的组装方传入。
+     * @param agentService     提供Agent服务能力的依赖，具体实现由当前组件的组装方传入。
      * @param identityResolver 提供身份解析器能力的依赖，具体实现由当前组件的组装方传入。
-     * @param sseProperties 当前Agent接口控制器持有的SSE配置对象，供相应处理步骤使用。
+     * @param sseProperties    当前Agent接口控制器持有的SSE配置对象，供相应处理步骤使用。
      */
     public AgentController(
             AgentService agentService,
@@ -98,8 +106,8 @@ public class AgentController {
     /**
      * 创建Agent接口控制器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param service 提供服务能力的依赖，具体实现由当前组件的组装方传入。
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param service     提供服务能力的依赖，具体实现由当前组件的组装方传入。
+     * @param identity    可信宿主解析的执行身份，供访问范围与审计使用。
      * @param connections 当前Agent接口控制器持有的连接对象，供相应处理步骤使用。
      */
     @Autowired
@@ -170,7 +178,7 @@ public class AgentController {
     /**
      * 计算或取得本方法声明的结果，供当前AgentController处理步骤使用。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的会话执行响应结果。
      */
@@ -184,7 +192,7 @@ public class AgentController {
     /**
      * 订阅会话。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的SSE发送器结果。
      */
@@ -198,7 +206,7 @@ public class AgentController {
     /**
      * 取消会话。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的会话执行响应结果。
      */
@@ -211,7 +219,7 @@ public class AgentController {
     /**
      * 计算或取得本方法声明的结果，供当前AgentController处理步骤使用。
      *
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param sessionId   会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次处理得到的结果集合。
      */
@@ -224,7 +232,7 @@ public class AgentController {
     /**
      * 取消子任务。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 按返回类型约定组织的结果映射。
      */
@@ -239,22 +247,28 @@ public class AgentController {
         return Map.of("cancelled", cancelled);
     }
 
-    /** 子任务取消的接口请求，承载调用方提交的定位信息与输入。 */
+    /**
+     * 子任务取消的接口请求，承载调用方提交的定位信息与输入。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SubtaskCancelRequest {
-        /** 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。 */
+        /**
+         * 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+         */
         private String sessionId;
 
-        /** 任务的标识，用于关联相应记录或执行。 */
+        /**
+         * 任务的标识，用于关联相应记录或执行。
+         */
         private String taskId;
     }
 
     /**
      * 计算或取得本方法声明的结果，供当前AgentController处理步骤使用。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的会话消息集合响应结果。
      */
@@ -268,7 +282,7 @@ public class AgentController {
     /**
      * 查询列表中的会话集合。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的会话列表响应结果。
      */
@@ -282,7 +296,7 @@ public class AgentController {
     /**
      * 计算或取得本方法声明的结果，供当前AgentController处理步骤使用。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的会话摘要响应结果。
      */
@@ -295,7 +309,7 @@ public class AgentController {
     /**
      * 设置会话置顶。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的会话摘要响应结果。
      */
@@ -308,7 +322,7 @@ public class AgentController {
     /**
      * 删除会话。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 按返回类型约定组织的结果映射。
      */
@@ -322,7 +336,7 @@ public class AgentController {
     /**
      * 计算或取得本方法声明的结果，供当前AgentController处理步骤使用。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的审批集合响应结果。
      */
@@ -335,7 +349,7 @@ public class AgentController {
     /**
      * 提交决定并处理审批。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的会话执行响应结果。
      */
@@ -348,7 +362,7 @@ public class AgentController {
     /**
      * 计算或取得本方法声明的结果，供当前AgentController处理步骤使用。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的对话响应结果。
      */
@@ -361,7 +375,7 @@ public class AgentController {
     /**
      * 产生执行流并返回对话。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的SSE发送器结果。
      */
@@ -374,7 +388,7 @@ public class AgentController {
     /**
      * 上传产物。
      *
-     * @param file 当前Agent接口控制器持有的文件对象，供相应处理步骤使用。
+     * @param file        当前Agent接口控制器持有的文件对象，供相应处理步骤使用。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的产物响应结果。
      */
@@ -387,7 +401,7 @@ public class AgentController {
     /**
      * 计算或取得本方法声明的结果，供当前AgentController处理步骤使用。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的产物下载响应结果。
      */
@@ -400,7 +414,7 @@ public class AgentController {
     /**
      * 提交回答并处理提问用户。
      *
-     * @param request 当前操作的请求参数。
+     * @param request     当前操作的请求参数。
      * @param httpRequest 当前Agent接口控制器持有的HTTP请求对象，供相应处理步骤使用。
      * @return 本次操作返回的会话执行响应结果。
      */
@@ -421,98 +435,154 @@ public class AgentController {
                 events, new SseEmitter(agentService.streamTimeout().plusSeconds(5).toMillis()));
     }
 
-    /** 包内可见的测试入口，用于在不建立真实 Socket 连接时模拟慢客户端。 */
+    /**
+     * 包内可见的测试入口，用于在不建立真实 Socket 连接时模拟慢客户端。
+     */
     SseEmitter stream(Flux<ChatStreamEvent> events, SseEmitter emitter) {
         return sseConnections.open(events, emitter);
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @PreDestroy
     public void close() {
         sseConnections.close();
     }
 
-    /** 本实例 SSE、事件回放、租约及存储连接池的运行资源快照。 */
+    /**
+     * 本实例 SSE、事件回放、租约及存储连接池的运行资源快照。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StreamRuntimeStatus {
-        /** 当前仍处于观察状态的 SSE 连接数。 */
+        /**
+         * 当前仍处于观察状态的 SSE 连接数。
+         */
         private int activeConnections;
 
-        /** 自本实例启动以来接收的 SSE 连接总数。 */
+        /**
+         * 自本实例启动以来接收的 SSE 连接总数。
+         */
         private long totalConnections;
 
-        /** 因连接容量或准入条件被拒绝的 SSE 连接累计次数。 */
+        /**
+         * 因连接容量或准入条件被拒绝的 SSE 连接累计次数。
+         */
         private long rejectedConnections;
 
-        /** 当前 SSE 连接队列中等待发送的事件数量。 */
+        /**
+         * 当前 SSE 连接队列中等待发送的事件数量。
+         */
         private int queuedEvents;
 
-        /** 当前 SSE 连接队列中等待发送的内容字节数。 */
+        /**
+         * 当前 SSE 连接队列中等待发送的内容字节数。
+         */
         private long queuedBytes;
 
-        /** 观察期间 SSE 待发送内容字节数的峰值。 */
+        /**
+         * 观察期间 SSE 待发送内容字节数的峰值。
+         */
         private long peakQueuedBytes;
 
-        /** SSE 写入线程池当前正在执行工作的线程数。 */
+        /**
+         * SSE 写入线程池当前正在执行工作的线程数。
+         */
         private int writerActiveThreads;
 
-        /** SSE 写入线程池当前保留的线程数。 */
+        /**
+         * SSE 写入线程池当前保留的线程数。
+         */
         private int writerPoolSize;
 
-        /** SSE 写入线程池尚未开始处理的任务数。 */
+        /**
+         * SSE 写入线程池尚未开始处理的任务数。
+         */
         private int writerQueueSize;
 
-        /** 自本实例启动以来正常结束的 SSE 连接次数。 */
+        /**
+         * 自本实例启动以来正常结束的 SSE 连接次数。
+         */
         private long normalCloses;
 
-        /** 因写入或连接错误而结束的 SSE 连接累计次数。 */
+        /**
+         * 因写入或连接错误而结束的 SSE 连接累计次数。
+         */
         private long errorCloses;
 
-        /** 因客户端消费过慢而结束的 SSE 连接累计次数。 */
+        /**
+         * 因客户端消费过慢而结束的 SSE 连接累计次数。
+         */
         private long slowClientCloses;
 
-        /** 因观察连接时限到期而结束的 SSE 连接累计次数。 */
+        /**
+         * 因观察连接时限到期而结束的 SSE 连接累计次数。
+         */
         private long timeoutCloses;
 
-        /** 因浏览器或网络断开而结束的 SSE 连接累计次数。 */
+        /**
+         * 因浏览器或网络断开而结束的 SSE 连接累计次数。
+         */
         private long disconnectedCloses;
 
-        /** 当前分布式事件桥的轮询统计。 */
+        /**
+         * 当前分布式事件桥的轮询统计。
+         */
         private RedisTurnEventBridge.EventBridgeStatus redisPolling;
 
-        /** 当前执行实例的租约续期统计。 */
+        /**
+         * 当前执行实例的租约续期统计。
+         */
         private InstanceLeaseRenewer.Status leaseRenewal;
 
-        /** 当前 JDBC 连接池的使用与等待统计。 */
+        /**
+         * 当前 JDBC 连接池的使用与等待统计。
+         */
         private RuntimeStorage.DatabasePoolStatus databasePool;
 
-        /** 当前 Redis 命令池与订阅池的使用统计。 */
+        /**
+         * 当前 Redis 命令池与订阅池的使用统计。
+         */
         private RuntimeStorage.RedisPoolsStatus redisPools;
 
-        /** 当前 JVM 的内存、线程与处理器资源统计。 */
+        /**
+         * 当前 JVM 的内存、线程与处理器资源统计。
+         */
         private ProcessResourceStatus process;
     }
 
-    /** 当前 JVM 进程的内存、线程与处理器资源快照。 */
+    /**
+     * 当前 JVM 进程的内存、线程与处理器资源快照。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ProcessResourceStatus {
-        /** JVM 当前已使用的堆内存字节数。 */
+        /**
+         * JVM 当前已使用的堆内存字节数。
+         */
         private long heapUsedBytes;
 
-        /** JVM 当前已提交的堆内存字节数。 */
+        /**
+         * JVM 当前已提交的堆内存字节数。
+         */
         private long heapCommittedBytes;
 
-        /** JVM 允许使用的最大堆内存字节数。 */
+        /**
+         * JVM 允许使用的最大堆内存字节数。
+         */
         private long heapMaxBytes;
 
-        /** JVM 当前存活的线程数量。 */
+        /**
+         * JVM 当前存活的线程数量。
+         */
         private int liveThreads;
 
-        /** JVM 当前可使用的处理器数量。 */
+        /**
+         * JVM 当前可使用的处理器数量。
+         */
         private int availableProcessors;
     }
 }

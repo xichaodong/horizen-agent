@@ -42,37 +42,54 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-/** 协调单个 Turn 的生命周期、回放、取消和租约恢复。 */
+/**
+ * 协调单个 Turn 的生命周期、回放、取消和租约恢复。
+ */
 public final class AgentTurnCoordinator implements AutoCloseable {
-    /** 将未知执行故障记录在服务端，客户端只接收固定的错误提示。 */
+    /**
+     * 将未知执行故障记录在服务端，客户端只接收固定的错误提示。
+     */
     private static final Logger log = LoggerFactory.getLogger(AgentTurnCoordinator.class);
 
-    /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+    /**
+     * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+     */
     private final AtomicBoolean closed = new AtomicBoolean();
 
-    /** 单次执行流允许持续的最长时间。 */
-    @Getter private final Duration streamTimeout;
+    /**
+     * 单次执行流允许持续的最长时间。
+     */
+    @Getter
+    private final Duration streamTimeout;
 
-    /** 当前宿主组装的执行、控制、恢复和持久化服务集合。 */
+    /**
+     * 当前宿主组装的执行、控制、恢复和持久化服务集合。
+     */
     private final Optional<TurnServices> services;
 
-    /** 把运行时事件与领域状态转换为 Web DTO 的映射器。 */
+    /**
+     * 把运行时事件与领域状态转换为 Web DTO 的映射器。
+     */
     private final AgentApiMapper apiMapper;
 
-    /** 会话目录、执行状态与历史查询接口的应用服务。 */
+    /**
+     * 会话目录、执行状态与历史查询接口的应用服务。
+     */
     private final AgentSessionApiService sessionApi;
 
-    /** 从诊断消息中去除已配置服务凭据的清理器。 */
+    /**
+     * 从诊断消息中去除已配置服务凭据的清理器。
+     */
     private final Function<String, String> redactor;
 
     /**
      * 创建Agent执行协调器，初始化该组件所需的状态、配置或依赖。
      *
      * @param streamTimeout 单次执行流允许持续的最长时间。
-     * @param services 当前Agent执行协调器持有的服务集合对象，供相应处理步骤使用。
-     * @param apiMapper 提供API映射器能力的依赖，具体实现由当前组件的组装方传入。
-     * @param sessionApi 提供会话API能力的依赖，具体实现由当前组件的组装方传入。
-     * @param redactor 当前Agent执行协调器持有的脱敏器对象，供相应处理步骤使用。
+     * @param services      当前Agent执行协调器持有的服务集合对象，供相应处理步骤使用。
+     * @param apiMapper     提供API映射器能力的依赖，具体实现由当前组件的组装方传入。
+     * @param sessionApi    提供会话API能力的依赖，具体实现由当前组件的组装方传入。
+     * @param redactor      当前Agent执行协调器持有的脱敏器对象，供相应处理步骤使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public AgentTurnCoordinator(
@@ -95,7 +112,7 @@ public final class AgentTurnCoordinator implements AutoCloseable {
      * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 本次操作返回的对话响应结果。
      * @throws ApiException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -147,7 +164,7 @@ public final class AgentTurnCoordinator implements AutoCloseable {
      * 产生执行流并返回对话。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     public Flux<ChatApi.ChatStreamEvent> streamChat(
@@ -160,7 +177,9 @@ public final class AgentTurnCoordinator implements AutoCloseable {
                 .onErrorMap(ApplicationError.class, AgentApiMapper::apiError);
     }
 
-    /** 向可信适配器提供完整执行证据，浏览器展示仍经过过滤。 */
+    /**
+     * 向可信适配器提供完整执行证据，浏览器展示仍经过过滤。
+     */
     public Flux<AgentRuntimeEvent> executionEvents(
             ExecutionIdentity identity, ChatRequest request) {
         return requireReady().start(identity, AgentRequestValidator.validateChat(request));
@@ -169,7 +188,7 @@ public final class AgentTurnCoordinator implements AutoCloseable {
     /**
      * 检查executionSettled对应的条件，供调用方选择后续处理分支。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param identity  可信宿主解析的执行身份，供访问范围与审计使用。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -180,9 +199,9 @@ public final class AgentTurnCoordinator implements AutoCloseable {
     /**
      * 恢复提问用户执行。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param turn 当前Agent执行协调器持有的执行对象，供相应处理步骤使用。
-     * @param ask 当前Agent执行协调器持有的提问对象，供相应处理步骤使用。
+     * @param identity    可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param turn        当前Agent执行协调器持有的执行对象，供相应处理步骤使用。
+     * @param ask         当前Agent执行协调器持有的提问对象，供相应处理步骤使用。
      * @param answersJson 回答集合的 JSON 表示，供持久化或协议转换使用。
      */
     public void resumeAskUserTurn(
@@ -193,10 +212,10 @@ public final class AgentTurnCoordinator implements AutoCloseable {
     /**
      * 恢复批准执行。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param turn 当前Agent执行协调器持有的执行对象，供相应处理步骤使用。
+     * @param identity    可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param turn        当前Agent执行协调器持有的执行对象，供相应处理步骤使用。
      * @param resolutions 决定结果集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param remaining 剩余的时间配置，供等待、调度或失效判断使用。
+     * @param remaining   剩余的时间配置，供等待、调度或失效判断使用。
      */
     public void resumeApprovedTurn(
             ExecutionIdentity identity,
@@ -210,7 +229,7 @@ public final class AgentTurnCoordinator implements AutoCloseable {
      * 订阅会话。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     public Flux<ChatApi.ChatStreamEvent> subscribeSession(
@@ -235,7 +254,7 @@ public final class AgentTurnCoordinator implements AutoCloseable {
      * 计算或取得本方法声明的结果，供当前AgentTurnCoordinator处理步骤使用。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     public Flux<AgentRuntimeEvent> replayExecutionEvents(
@@ -266,7 +285,7 @@ public final class AgentTurnCoordinator implements AutoCloseable {
      * 取消会话。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 本次操作返回的会话执行响应结果。
      */
     public SessionApi.SessionExecutionResponse cancelSession(
@@ -305,15 +324,13 @@ public final class AgentTurnCoordinator implements AutoCloseable {
     private static boolean replyOutcome(AgentRuntimeEvent event) {
         return switch (event.getType()) {
             case TURN_COMPLETED,
-                    TURN_FAILED,
-                    TURN_TIMED_OUT,
-                    TURN_CANCELLED,
-                    APPROVAL_REQUIRED,
-                    ASK_USER_REQUIRED ->
-                    true;
-            case EXECUTION_NOTICE ->
-                    event.getDetails() instanceof Map<?, ?> details
-                            && "EVENT_PERSISTENCE_FAILED".equals(details.get("errorCode"));
+                 TURN_FAILED,
+                 TURN_TIMED_OUT,
+                 TURN_CANCELLED,
+                 APPROVAL_REQUIRED,
+                 ASK_USER_REQUIRED -> true;
+            case EXECUTION_NOTICE -> event.getDetails() instanceof Map<?, ?> details
+                    && "EVENT_PERSISTENCE_FAILED".equals(details.get("errorCode"));
             default -> false;
         };
     }
@@ -326,9 +343,9 @@ public final class AgentTurnCoordinator implements AutoCloseable {
      */
     private static void requireCompletedReply(AgentRuntimeEvent reply) {
         switch (reply.getType()) {
-            case TURN_COMPLETED -> {}
-            case TURN_TIMED_OUT ->
-                    throw new ApiException(HttpStatus.GATEWAY_TIMEOUT, "本轮执行超时，请查询会话状态。");
+            case TURN_COMPLETED -> {
+            }
+            case TURN_TIMED_OUT -> throw new ApiException(HttpStatus.GATEWAY_TIMEOUT, "本轮执行超时，请查询会话状态。");
             case TURN_FAILED -> throw new ApiException(HttpStatus.BAD_GATEWAY, "本轮执行失败，请查询会话状态。");
             case TURN_CANCELLED -> throw new ApiException(HttpStatus.CONFLICT, "本轮执行已取消。");
             case APPROVAL_REQUIRED ->
@@ -360,7 +377,9 @@ public final class AgentTurnCoordinator implements AutoCloseable {
         return services.map(TurnServices::leaseStatus).orElseGet(InstanceLeaseRenewer.Status::new);
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
     public void close() {
         closed.set(true);

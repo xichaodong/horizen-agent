@@ -2,9 +2,13 @@ package dev.horizen.agent.domain.askuser;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/** 接收当前执行产生的澄清请求事件，连接运行时工具与宿主交互流程。 */
+/**
+ * 接收当前执行产生的澄清请求事件，连接运行时工具与宿主交互流程。
+ */
 public final class AskUserEventCollector {
-    /** 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。 */
+    /**
+     * 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。
+     */
     private final ConcurrentLinkedQueue<AskUserRequest> pending = new ConcurrentLinkedQueue<>();
 
     /**

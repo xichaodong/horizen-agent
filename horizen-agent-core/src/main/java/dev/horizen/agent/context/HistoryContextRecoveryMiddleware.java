@@ -28,7 +28,9 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor
 public final class HistoryContextRecoveryMiddleware implements MiddlewareBase {
-    /** 负责store对应持久化访问的仓储依赖；调用方通过端口隔离具体存储实现。 */
+    /**
+     * 负责store对应持久化访问的仓储依赖；调用方通过端口隔离具体存储实现。
+     */
     private final HistoryRecoveringAgentStateStore store;
 
     /**
@@ -44,10 +46,10 @@ public final class HistoryContextRecoveryMiddleware implements MiddlewareBase {
     /**
      * 响应模型推理。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override

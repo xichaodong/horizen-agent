@@ -19,14 +19,16 @@ import io.agentscope.harness.agent.HarnessAgent;
 import java.util.List;
 import java.util.Map;
 
-/** ToolDeltaEventMapper 仅转换自身负责的原生事件类型。 */
+/**
+ * ToolDeltaEventMapper 仅转换自身负责的原生事件类型。
+ */
 final class ToolDeltaEventMapper {
     /**
      * 映射工具增量事件映射器。
      * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param source 待解析或转换的来源对象。
+     * @param source  待解析或转换的来源对象。
      * @return 本次操作返回的Agent运行时事件结果。
      */
     static AgentRuntimeEvent map(RuntimeEventMappingContext context, AgentEvent source) {

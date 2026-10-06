@@ -166,7 +166,7 @@ npm run build
 GitHub CI 覆盖 Linux 下 Java 17/21、前端、公开内容检查和无凭据 Web 冒烟测试。真实模型、数据库、对象存储和沙箱测试需要显式配置，不属于公开 CI 基线。上述命令可在本地复现 CI 基线，贡献规则见 [贡献指南](CONTRIBUTING.md)，版本调整见 [变更记录](CHANGELOG.md)。
 
 安装前端依赖后，用 `./scripts/format.sh apply` 一键格式化，或用 `./scripts/format.sh check` 只检查格式。
-Java 由 Spotless 处理，Maven POM 和前端代码由 Prettier 处理；Maven 验证和 GitHub CI 会检查格式。
+代码统一使用 IDEA 原生格式化器，项目共享 `.idea/codeStyles/Project.xml` 和 `.editorconfig`；在 IDEA 中使用“代码 → 重新格式化代码”即可。CI 固定同一版本检查格式，Maven 验证负责编译和测试。安装及版本说明见 [贡献指南](CONTRIBUTING.md#changes-and-review)。
 
 维护者：**xichaodong**。问题和建议通过当前仓库 Issues 提交，贡献通过 PR 提交。安全问题遵循 [SECURITY.md](SECURITY.md)，贡献规则见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 

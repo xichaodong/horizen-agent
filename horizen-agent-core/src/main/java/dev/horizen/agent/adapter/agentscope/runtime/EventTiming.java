@@ -8,13 +8,15 @@ import static dev.horizen.agent.adapter.agentscope.runtime.RuntimeFailureClassif
 import java.time.Duration;
 import java.util.Map;
 
-/** 运行时事件计时边界：EventTiming。 */
+/**
+ * 运行时事件计时边界：EventTiming。
+ */
 final class EventTiming {
     /**
      * 计算或取得本方法声明的结果，供当前EventTiming处理步骤使用。
      *
      * @param starts 启动次数的索引映射，供按键查找或归并当前组件的数据。
-     * @param key 当前对象的查找或写入键。
+     * @param key    当前对象的查找或写入键。
      * @return 本次操作返回的长整型结果。
      */
     static Long stepDuration(Map<String, Long> starts, String key) {

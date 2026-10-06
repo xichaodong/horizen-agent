@@ -7,35 +7,49 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.Objects;
 
-/** Session 最新 Turn 的视图，不依赖传输协议。 */
+/**
+ * Session 最新 Turn 的视图，不依赖传输协议。
+ */
 @Getter
 public final class SessionExecutionView {
-    /** 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。 */
+    /**
+     * 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     */
     private final String sessionId;
 
-    /** 单次用户输入触发的执行标识，用于关联状态、消息和事件。 */
+    /**
+     * 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     */
     private final String turnId;
 
-    /** 当前记录或执行的状态，具体取值由所属领域或协议约定。 */
+    /**
+     * 当前记录或执行的状态，具体取值由所属领域或协议约定。
+     */
     private final TurnStatus status;
 
-    /** 当前执行或执行段的开始时间。 */
+    /**
+     * 当前执行或执行段的开始时间。
+     */
     private final Instant startedAt;
 
-    /** 执行结束时间；尚未结束的记录可以没有该时间。 */
+    /**
+     * 执行结束时间；尚未结束的记录可以没有该时间。
+     */
     private final Instant finishedAt;
 
-    /** 机器可识别的失败分类，供状态恢复与错误展示使用。 */
+    /**
+     * 机器可识别的失败分类，供状态恢复与错误展示使用。
+     */
     private final String failureCode;
 
     /**
      * 创建会话执行视图，初始化该组件所需的状态、配置或依赖。
      *
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
-     * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param startedAt 当前执行或执行段的开始时间。
-     * @param finishedAt 执行结束时间；尚未结束的记录可以没有该时间。
+     * @param sessionId   会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param turnId      单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param status      当前记录或执行的状态，具体取值由所属领域或协议约定。
+     * @param startedAt   当前执行或执行段的开始时间。
+     * @param finishedAt  执行结束时间；尚未结束的记录可以没有该时间。
      * @param failureCode 机器可识别的失败分类，供状态恢复与错误展示使用。
      */
     public SessionExecutionView(

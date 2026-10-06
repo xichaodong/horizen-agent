@@ -7,13 +7,13 @@
         JOIN ha_session c ON c.owner_key = #{owner} AND c.session_id = #{current}
         <if test="withMessages">
             JOIN ha_conversation_history h
-                ON h.owner_key = s.owner_key AND h.session_id = s.session_id
+            ON h.owner_key = s.owner_key AND h.session_id = s.session_id
         </if>
         WHERE s.owner_key = c.owner_key
-            AND s.status = 'ACTIVE'
-            AND c.status = 'ACTIVE'
-            AND (s.project_id = c.project_id OR (s.project_id IS NULL AND c.project_id IS NULL))
-            AND (s.agent_key = c.agent_key OR (s.agent_key IS NULL AND c.agent_key IS NULL))
+        AND s.status = 'ACTIVE'
+        AND c.status = 'ACTIVE'
+        AND (s.project_id = c.project_id OR (s.project_id IS NULL AND c.project_id IS NULL))
+        AND (s.agent_key = c.agent_key OR (s.agent_key IS NULL AND c.agent_key IS NULL))
     </sql>
 
     <sql id="Content">
@@ -37,8 +37,8 @@
         </if>
         <if test="searching">
             AND (
-                LOWER(s.title) LIKE #{pattern} ESCAPE '!'
-                OR LOWER(<include refid="Content" />) LIKE #{pattern} ESCAPE '!'
+            LOWER(s.title) LIKE #{pattern} ESCAPE '!'
+            OR LOWER(<include refid="Content"/>) LIKE #{pattern} ESCAPE '!'
             )
         </if>
     </sql>
@@ -46,7 +46,7 @@
     <sql id="Start">
         <choose>
             <when test="searching">
-                GREATEST(1, LOCATE(#{keyword}, LOWER(<include refid="Content" />)) - 60)
+                GREATEST(1, LOCATE(#{keyword}, LOWER(<include refid="Content"/>)) - 60)
             </when>
             <otherwise>
                 #{textStart}
@@ -60,7 +60,7 @@
         timeout="${leaseQueryTimeoutSeconds}"
     >
         SELECT c.session_id
-        <include refid="Visible" />
+        <include refid="Visible"/>
         AND s.session_id = #{current}
     </select>
 
@@ -70,7 +70,7 @@
         timeout="${leaseQueryTimeoutSeconds}"
     >
         SELECT s.title
-        <include refid="Visible" />
+        <include refid="Visible"/>
         AND s.session_id = #{target}
     </select>
 
@@ -80,8 +80,8 @@
         timeout="${leaseQueryTimeoutSeconds}"
     >
         SELECT COUNT(*)
-        <include refid="Visible" />
-        <include refid="HistoryFilter" />
+        <include refid="Visible"/>
+        <include refid="HistoryFilter"/>
     </select>
 
     <select
@@ -90,20 +90,22 @@
         timeout="${leaseQueryTimeoutSeconds}"
     >
         SELECT
-            s.session_id,
-            s.title,
-            h.turn_id,
-            h.record_id,
-            h.message_sequence,
-            h.created_at,
-            JSON_UNQUOTE(JSON_EXTRACT(h.payload_json, '$.role')) AS message_role,
-            SUBSTRING(<include refid="Content" />, <include
-            refid="Start"
-        />, #{contentLimit}) AS excerpt,
-            (<include refid="Start" /> - 1) AS content_offset,
-            CHAR_LENGTH(<include refid="Content" />) AS content_length
-        <include refid="Visible" />
-        <include refid="HistoryFilter" />
+        s.session_id,
+        s.title,
+        h.turn_id,
+        h.record_id,
+        h.message_sequence,
+        h.created_at,
+        JSON_UNQUOTE(JSON_EXTRACT(h.payload_json, '$.role')) AS message_role,
+        SUBSTRING(<include refid="Content"/>,<include
+        refid="Start"
+    />, #{contentLimit}) AS excerpt,
+        (
+        <include refid="Start"/>
+        - 1) AS content_offset,
+        CHAR_LENGTH(<include refid="Content"/>) AS content_length
+        <include refid="Visible"/>
+        <include refid="HistoryFilter"/>
         <choose>
             <when test="searching">
                 ORDER BY h.created_at DESC, h.history_sequence DESC

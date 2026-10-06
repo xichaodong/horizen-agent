@@ -5,9 +5,13 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/** 按工具调用收集展示块，避免并发工具的输出混合。 */
+/**
+ * 按工具调用收集展示块，避免并发工具的输出混合。
+ */
 public final class PresentationEventCollector {
-    /** 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。 */
+    /**
+     * 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。
+     */
     private final ConcurrentHashMap<String, ConcurrentLinkedQueue<PresentationBlock>> pending =
             new ConcurrentHashMap<>();
 
@@ -15,7 +19,7 @@ public final class PresentationEventCollector {
      * 记录呈现事件收集器。
      *
      * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
-     * @param block 当前呈现事件收集器持有的块对象，供相应处理步骤使用。
+     * @param block      当前呈现事件收集器持有的块对象，供相应处理步骤使用。
      */
     public void record(String toolCallId, PresentationBlock block) {
         if (toolCallId == null || toolCallId.isBlank() || block == null) return;

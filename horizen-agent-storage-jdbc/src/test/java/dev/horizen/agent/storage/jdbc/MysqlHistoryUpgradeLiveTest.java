@@ -30,17 +30,19 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-/** 在已配置本地 MySQL 上使用独立临时库，不修改现有表。 */
+/**
+ * 在已配置本地 MySQL 上使用独立临时库，不修改现有表。
+ */
 @EnabledIfSystemProperty(named = "horizen.mysql.history.live", matches = "true")
 class MysqlHistoryUpgradeLiveTest {
     @Test
     void preservesOldCursorsAndBodiesThenAcceptsNewWrites() throws Exception {
         Properties config = new Properties();
         try (var input =
-                Files.newBufferedReader(
-                        Path.of(
-                                System.getProperty(
-                                        "horizen.mysql.history.config", "../.env.yml")))) {
+                     Files.newBufferedReader(
+                             Path.of(
+                                     System.getProperty(
+                                             "horizen.mysql.history.config", "../.env.yml")))) {
             config.putAll(YamlConfigFiles.load(input));
         }
         String configured = config.getProperty("horizen.agent.storage.jdbc-url");
@@ -61,8 +63,8 @@ class MysqlHistoryUpgradeLiveTest {
                     new DriverManagerDataSource(prefix + database + suffix, username, password);
             var jdbc = new JdbcTemplate(source);
             new ResourceDatabasePopulator(
-                            new ClassPathResource("schema/legacy-history.sql"),
-                            new ClassPathResource("schema/mysql.sql"))
+                    new ClassPathResource("schema/legacy-history.sql"),
+                    new ClassPathResource("schema/mysql.sql"))
                     .execute(source);
             Instant at = Instant.parse("2026-10-03T00:00:00Z");
             Timestamp stamp = Timestamp.from(at);
@@ -126,7 +128,7 @@ class MysqlHistoryUpgradeLiveTest {
                         stamp);
             }
             new ResourceDatabasePopulator(
-                            new ClassPathResource("schema/mysql-conversation-history-upgrade.sql"))
+                    new ClassPathResource("schema/mysql-conversation-history-upgrade.sql"))
                     .execute(source);
             var timeline = new JdbcTurnTimelineStore(source);
             var history = timeline.listForSession("owner", "session");

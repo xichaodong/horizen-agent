@@ -58,14 +58,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/** 使用两个真实应用 JVM 与 HTTP/SSE，连接真实 E2B、BOS 和 Redis，模型回复使用合成数据。 */
+/**
+ * 使用两个真实应用 JVM 与 HTTP/SSE，连接真实 E2B、BOS 和 Redis，模型回复使用合成数据。
+ */
 @EnabledIfSystemProperty(named = "horizen.snapshot.web.live", matches = "true")
 class WebSnapshotTurnLiveTest {
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final String AGENT = "horizen-web-agent";
     private static final HttpClient HTTP =
             HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
-    @TempDir Path root;
+    @TempDir
+    Path root;
 
     @Test
     @Timeout(value = 10, unit = TimeUnit.MINUTES)
@@ -87,16 +90,17 @@ class WebSnapshotTurnLiveTest {
         DriverManagerDataSource dataSource =
                 mysql
                         ? new DriverManagerDataSource(
-                                required(storage, "horizen.agent.storage.jdbc-url"),
-                                required(storage, "horizen.agent.storage.jdbc-username"),
-                                required(storage, "horizen.agent.storage.jdbc-password"))
+                        required(storage, "horizen.agent.storage.jdbc-url"),
+                        required(storage, "horizen.agent.storage.jdbc-username"),
+                        required(storage, "horizen.agent.storage.jdbc-password"))
                         : new DriverManagerDataSource(localJdbc, "sa", "");
         Server sql = null;
         String jdbc;
         if (mysql) {
             jdbc = required(storage, "horizen.agent.storage.jdbc-url");
             new JdbcTemplate(dataSource)
-                    .query("SELECT snapshot_id FROM ha_session WHERE 1=0", rs -> {});
+                    .query("SELECT snapshot_id FROM ha_session WHERE 1=0", rs -> {
+                    });
             System.out.println(
                     "Web snapshot live: configured real MySQL enabled; test rows use a unique owner");
         } else {
@@ -112,9 +116,9 @@ class WebSnapshotTurnLiveTest {
         }
         Set<String> snapshots = new LinkedHashSet<>();
         try (LiveEndpoints endpoints = new LiveEndpoints(sandbox);
-                JedisPooled redis =
-                        new JedisPooled(
-                                URI.create(required(storage, "horizen.agent.storage.redis-url")))) {
+             JedisPooled redis =
+                     new JedisPooled(
+                             URI.create(required(storage, "horizen.agent.storage.redis-url")))) {
             Child a = null;
             Child b = null;
             var pointers = new JdbcWorkspaceSnapshotPointerRepository(dataSource);
@@ -273,12 +277,12 @@ class WebSnapshotTurnLiveTest {
         Path log = directory.resolve("app.log");
         Process child =
                 new ProcessBuilder(
-                                Path.of(System.getProperty("java.home"), "bin", "java").toString(),
-                                "-Xmx512m",
-                                "-cp",
-                                cp,
-                                AgentWebApplication.class.getName(),
-                                "--spring.config.location=" + config.toUri())
+                        Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                        "-Xmx512m",
+                        "-cp",
+                        cp,
+                        AgentWebApplication.class.getName(),
+                        "--spring.config.location=" + config.toUri())
                         .directory(directory.toFile())
                         .redirectErrorStream(true)
                         .redirectOutput(log.toFile())
@@ -595,30 +599,25 @@ class WebSnapshotTurnLiveTest {
             } else {
                 String python =
                         switch (mode) {
-                            case "snapshot-create" ->
-                                    "import pathlib; p=pathlib.Path('acceptance'); p.mkdir();"
-                                            + " p.joinpath('report.md').write_text('from-a');"
-                                            + " p.joinpath('binary.bin').write_bytes(bytes(range(256))*1024);"
-                                            + " print('created')";
-                            case "snapshot-update" ->
-                                    "import pathlib; p=pathlib.Path('acceptance'); assert"
-                                            + " p.joinpath('report.md').read_text()=='from-a'; assert"
-                                            + " p.joinpath('binary.bin').read_bytes()==bytes(range(256))*1024;"
-                                            + " p.joinpath('report.md').write_text('updated-by-b');"
-                                            + " print('restored-and-updated')";
-                            case "snapshot-read" ->
-                                    "import pathlib; p=pathlib.Path('acceptance'); assert"
-                                            + " p.joinpath('report.md').read_text()=='updated-by-b'; assert"
-                                            + " p.joinpath('binary.bin').read_bytes()==bytes(range(256))*1024;"
-                                            + " print('b-update-restored')";
-                            case "snapshot-other-create" ->
-                                    "import pathlib; p=pathlib.Path('acceptance'); p.mkdir();"
-                                            + " p.joinpath('report.md').write_text('other-session-report');"
-                                            + " print('other-created')";
-                            case "snapshot-other-read" ->
-                                    "import pathlib; assert"
-                                            + " pathlib.Path('acceptance/report.md').read_text()=='other-session-report';"
-                                            + " print('other-restored')";
+                            case "snapshot-create" -> "import pathlib; p=pathlib.Path('acceptance'); p.mkdir();"
+                                    + " p.joinpath('report.md').write_text('from-a');"
+                                    + " p.joinpath('binary.bin').write_bytes(bytes(range(256))*1024);"
+                                    + " print('created')";
+                            case "snapshot-update" -> "import pathlib; p=pathlib.Path('acceptance'); assert"
+                                    + " p.joinpath('report.md').read_text()=='from-a'; assert"
+                                    + " p.joinpath('binary.bin').read_bytes()==bytes(range(256))*1024;"
+                                    + " p.joinpath('report.md').write_text('updated-by-b');"
+                                    + " print('restored-and-updated')";
+                            case "snapshot-read" -> "import pathlib; p=pathlib.Path('acceptance'); assert"
+                                    + " p.joinpath('report.md').read_text()=='updated-by-b'; assert"
+                                    + " p.joinpath('binary.bin').read_bytes()==bytes(range(256))*1024;"
+                                    + " print('b-update-restored')";
+                            case "snapshot-other-create" -> "import pathlib; p=pathlib.Path('acceptance'); p.mkdir();"
+                                    + " p.joinpath('report.md').write_text('other-session-report');"
+                                    + " print('other-created')";
+                            case "snapshot-other-read" -> "import pathlib; assert"
+                                    + " pathlib.Path('acceptance/report.md').read_text()=='other-session-report';"
+                                    + " print('other-restored')";
                             default -> throw new IOException("Unexpected fixture model request");
                         };
                 String command = "python3 -c '" + python.replace("'", "'\"'\"'") + "'";

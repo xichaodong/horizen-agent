@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-/** 显式启用的验收，验证 Horizen 自有工具经 envd 访问本地 CDP。 */
+/**
+ * 显式启用的验收，验证 Horizen 自有工具经 envd 访问本地 CDP。
+ */
 @Tag("live-sandbox")
 class E2bBrowserToolsLiveTest {
     private static final ObjectMapper JSON = new ObjectMapper();
@@ -114,12 +116,12 @@ class E2bBrowserToolsLiveTest {
                                     .sessionId("browser-cli-session")
                                     .build(),
                             """
-agent-browser --cdp http://127.0.0.1:9222 --json open 'data:text/html,<input aria-label="name"><button>Apply</button>' &&
-agent-browser --cdp http://127.0.0.1:9222 --json snapshot -c &&
-agent-browser --cdp http://127.0.0.1:9222 --json fill e1 horizen &&
-agent-browser --cdp http://127.0.0.1:9222 --json click e2 &&
-agent-browser --cdp http://127.0.0.1:9222 --json screenshot /tmp/horizen-agent/.horizen/direct-agent-browser.png
-""",
+                                    agent-browser --cdp http://127.0.0.1:9222 --json open 'data:text/html,<input aria-label="name"><button>Apply</button>' &&
+                                    agent-browser --cdp http://127.0.0.1:9222 --json snapshot -c &&
+                                    agent-browser --cdp http://127.0.0.1:9222 --json fill e1 horizen &&
+                                    agent-browser --cdp http://127.0.0.1:9222 --json click e2 &&
+                                    agent-browser --cdp http://127.0.0.1:9222 --json screenshot /tmp/horizen-agent/.horizen/direct-agent-browser.png
+                                    """,
                             90);
             assertTrue(result.ok(), result.combinedOutput());
             assertTrue(result.stdout().contains("ref=e1"));
@@ -151,10 +153,10 @@ agent-browser --cdp http://127.0.0.1:9222 --json screenshot /tmp/horizen-agent/.
                     sandbox.exec(
                             context,
                             """
-agent-browser --cdp http://127.0.0.1:9222 --json open 'data:text/html,<img alt="sample" src="https://example.com/a.png"><script>console.log("horizen-console")</script>' &&
-agent-browser --cdp http://127.0.0.1:9222 --json eval 'JSON.stringify([...document.images].map(i=>({src:i.src,alt:i.alt})))' &&
-agent-browser --cdp http://127.0.0.1:9222 --json console
-""",
+                                    agent-browser --cdp http://127.0.0.1:9222 --json open 'data:text/html,<img alt="sample" src="https://example.com/a.png"><script>console.log("horizen-console")</script>' &&
+                                    agent-browser --cdp http://127.0.0.1:9222 --json eval 'JSON.stringify([...document.images].map(i=>({src:i.src,alt:i.alt})))' &&
+                                    agent-browser --cdp http://127.0.0.1:9222 --json console
+                                    """,
                             90);
             assertTrue(result.ok(), result.combinedOutput());
             assertTrue(result.stdout().contains("sample"), result.stdout());

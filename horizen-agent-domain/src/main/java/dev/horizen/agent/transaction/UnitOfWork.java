@@ -2,7 +2,9 @@ package dev.horizen.agent.transaction;
 
 import java.util.function.Supplier;
 
-/** 统一提交相关仓储变更，失败时全部回滚。 */
+/**
+ * 统一提交相关仓储变更，失败时全部回滚。
+ */
 public interface UnitOfWork {
     /**
      * 在同一工作单元中执行回调，使相关仓储修改一起提交；失败时由具体实现回滚。

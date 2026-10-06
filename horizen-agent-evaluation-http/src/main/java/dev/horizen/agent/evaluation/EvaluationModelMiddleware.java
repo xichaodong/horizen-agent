@@ -18,18 +18,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/** 在中间件边界采集模型调用事实，包含继承上下文的子调用。 */
+/**
+ * 在中间件边界采集模型调用事实，包含继承上下文的子调用。
+ */
 public final class EvaluationModelMiddleware implements MiddlewareBase {
-    /** 作用域的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 作用域的固定取值，用于相应策略和边界判断。
+     */
     private static final String SCOPE = EvaluationModelMiddleware.class.getName();
 
     /**
      * 响应Agent。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -49,10 +53,10 @@ public final class EvaluationModelMiddleware implements MiddlewareBase {
      * 并发状态更新包含比较交换操作。
      * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

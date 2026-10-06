@@ -32,7 +32,8 @@ import java.util.concurrent.atomic.*;
 import java.util.zip.*;
 
 class HorizenAgentReleaseRepositoryTest {
-    @TempDir Path root;
+    @TempDir
+    Path root;
     private static final ObjectMapper JSON = new ObjectMapper();
 
     @Test
@@ -142,12 +143,12 @@ class HorizenAgentReleaseRepositoryTest {
             }
             HorizenAgentReleaseRepository.delete(root); // 模拟删除缓存后的刷新和重启。
             try (var latest =
-                    new AgentReleaseService(
-                                    new AgentCatalogKey(7, "test-agent"),
-                                    new HorizenAgentReleaseRepository(
-                                            transport, root, 128L * 1024 * 1024),
-                                    bindings)
-                            .beginExecution("owner", "old-session", true)) {
+                         new AgentReleaseService(
+                                 new AgentCatalogKey(7, "test-agent"),
+                                 new HorizenAgentReleaseRepository(
+                                         transport, root, 128L * 1024 * 1024),
+                                 bindings)
+                                 .beginExecution("owner", "old-session", true)) {
                 assertEquals("AGENTS R1", read(latest, "AGENTS.md"));
                 assertEquals("old knowledge", read(latest, "knowledge/removed.md"));
             }
@@ -178,11 +179,11 @@ class HorizenAgentReleaseRepositoryTest {
         assertEquals(
                 "MEMORY.md",
                 new AgentReleaseManifest.Asset(
-                                "MEMORY.md",
-                                "https://assets.example/a",
-                                "a".repeat(64),
-                                1,
-                                "text/plain")
+                        "MEMORY.md",
+                        "https://assets.example/a",
+                        "a".repeat(64),
+                        1,
+                        "text/plain")
                         .getPath());
     }
 
@@ -204,13 +205,13 @@ class HorizenAgentReleaseRepositoryTest {
             id++;
             byte[] zip;
             try (var buffer = new ByteArrayOutputStream();
-                    var output = new ZipOutputStream(buffer)) {
+                 var output = new ZipOutputStream(buffer)) {
                 output.putNextEntry(new ZipEntry("SKILL.md"));
                 output.write(
                         ("---\nname: "
-                                        + name
-                                        + "\ndescription: synthetic example\n---\nR"
-                                        + version)
+                                + name
+                                + "\ndescription: synthetic example\n---\nR"
+                                + version)
                                 .getBytes(StandardCharsets.UTF_8));
                 output.closeEntry();
                 output.putNextEntry(new ZipEntry("refs/guide.txt"));

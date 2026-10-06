@@ -18,9 +18,13 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
-/** 只读 MySQL JSON 召回，不维护额外搜索索引或重复消息正文。 */
+/**
+ * 只读 MySQL JSON 召回，不维护额外搜索索引或重复消息正文。
+ */
 public final class JdbcSessionHistoryRepository implements SessionHistoryRepository {
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final SessionHistoryMapper mapper;
 
     /**

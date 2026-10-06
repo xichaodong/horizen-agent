@@ -27,54 +27,89 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** 向 Horizen 批量接口导出数据，使用容量受限的队列和单个工作线程。 */
+/**
+ * 向 Horizen 批量接口导出数据，使用容量受限的队列和单个工作线程。
+ */
 public final class HorizenHttpBatchExporter implements HorizenTraceBatchSink, AutoCloseable {
-    /** 当前组件的诊断日志器。 */
+    /**
+     * 当前组件的诊断日志器。
+     */
     private static final Logger log = LoggerFactory.getLogger(HorizenHttpBatchExporter.class);
 
-    /** 批次路径使用的固定标识或协议文本。 */
+    /**
+     * 批次路径使用的固定标识或协议文本。
+     */
     private static final String BATCH_PATH = "/api/v1/sdk/traces/batch";
 
-    /** 当前组件的配置与策略参数。 */
+    /**
+     * 当前组件的配置与策略参数。
+     */
     private final HorizenTraceConfig config;
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final ObjectMapper mapper;
 
-    /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+    /**
+     * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     */
     private final HttpClient client;
 
-    /** 已解析的服务接口地址，供实际网络请求使用。 */
-    @Getter private final URI endpoint;
+    /**
+     * 已解析的服务接口地址，供实际网络请求使用。
+     */
+    @Getter
+    private final URI endpoint;
 
-    /** 待处理工作队列，供异步消费者按接收顺序处理。 */
+    /**
+     * 待处理工作队列，供异步消费者按接收顺序处理。
+     */
     private final ArrayBlockingQueue<HorizenTraceBatch> queue;
 
-    /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+    /**
+     * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+     */
     private final AtomicBoolean closed = new AtomicBoolean();
 
-    /** 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。 */
+    /**
+     * 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。
+     */
     private final AtomicLong pending = new AtomicLong();
 
-    /** stopping的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * stopping的原子状态，供并发更新与统计读取使用。
+     */
     private final AtomicBoolean stopping = new AtomicBoolean();
 
-    /** 重试次数的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * 重试次数的原子状态，供并发更新与统计读取使用。
+     */
     private final AtomicLong retried = new AtomicLong();
 
-    /** 上报成功数的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * 上报成功数的原子状态，供并发更新与统计读取使用。
+     */
     private final AtomicLong uploaded = new AtomicLong();
 
-    /** 失败的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * 失败的原子状态，供并发更新与统计读取使用。
+     */
     private final AtomicLong failed = new AtomicLong();
 
-    /** 丢弃数的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * 丢弃数的原子状态，供并发更新与统计读取使用。
+     */
     private final AtomicLong dropped = new AtomicLong();
 
-    /** 最近一次失败的诊断摘要；未记录失败时为空。 */
+    /**
+     * 最近一次失败的诊断摘要；未记录失败时为空。
+     */
     private final AtomicReference<String> lastFailure = new AtomicReference<>();
 
-    /** 负责异步处理当前队列或执行段的工作线程。 */
+    /**
+     * 负责异步处理当前队列或执行段的工作线程。
+     */
     private final Thread worker;
 
     /**
@@ -192,12 +227,16 @@ public final class HorizenHttpBatchExporter implements HorizenTraceBatchSink, Au
         return dropped.get();
     }
 
-    /** 安全的诊断摘要，不包含请求头或响应体。 */
+    /**
+     * 安全的诊断摘要，不包含请求头或响应体。
+     */
     public String lastFailure() {
         return lastFailure.get();
     }
 
-    /** 消费队列并按 Trace 归并最新批次包，发送后归还在途计数；停止信号终止后台消费者。 */
+    /**
+     * 消费队列并按 Trace 归并最新批次包，发送后归还在途计数；停止信号终止后台消费者。
+     */
     private void run() {
         while (!stopping.get() && (!closed.get() || pending.get() != 0)) {
             try {
@@ -390,7 +429,7 @@ public final class HorizenHttpBatchExporter implements HorizenTraceBatchSink, Au
      * 读取接口地址的当前值。
      *
      * @param baseUrl 远端服务的基础地址，用于拼接接口路径。
-     * @param path 需要读取、写入或校验的路径。
+     * @param path    需要读取、写入或校验的路径。
      * @return {@link #endpoint} 中保存的值。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

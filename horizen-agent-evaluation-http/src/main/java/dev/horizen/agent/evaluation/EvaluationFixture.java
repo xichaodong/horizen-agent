@@ -21,38 +21,61 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-/** 按顺序回放 Provider 调用；重复的相同调用分别消耗独立记录。 */
+/**
+ * 按顺序回放 Provider 调用；重复的相同调用分别消耗独立记录。
+ */
 public final class EvaluationFixture {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 当前功能模式，控制所选适配器或处理策略。 */
-    @Getter private final String mode;
+    /**
+     * 当前功能模式，控制所选适配器或处理策略。
+     */
+    @Getter
+    private final String mode;
 
-    /** 条目集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 条目集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final List<Map<String, Object>> entries;
 
-    /** recorded的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * recorded的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final List<Map<String, Object>> recorded = new ArrayList<>();
 
-    /** 已被评测脚本匹配并消费的步骤或调用记录。 */
+    /**
+     * 已被评测脚本匹配并消费的步骤或调用记录。
+     */
     private final boolean[] consumed;
 
-    /** 用于EvaluationFixture内部处理的 failure 值；读写位置由该类型的方法限定。 */
+    /**
+     * 用于EvaluationFixture内部处理的 failure 值；读写位置由该类型的方法限定。
+     */
     private String failure;
 
-    /** 返回最近一次回放失败；与记录失败的写入方法共用实例锁，保证跨线程可见。 */
+    /**
+     * 返回最近一次回放失败；与记录失败的写入方法共用实例锁，保证跨线程可见。
+     */
     public synchronized String getFailure() {
         return failure;
     }
 
-    /** 回放Misses的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 回放Misses的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final List<Map<String, Object>> replayMisses = new ArrayList<>();
 
-    /** 存活限制集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 存活限制集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, Integer> liveLimits = new LinkedHashMap<>();
 
-    /** 存活调用集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 存活调用集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, Integer> liveCalls = new LinkedHashMap<>();
 
     /**
@@ -89,14 +112,21 @@ public final class EvaluationFixture {
         return true;
     }
 
-    /** faults的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * faults的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final List<Map<String, Object>> faults;
 
-    /** 当前评测故障注入所涉及的工具调用记录或次数。 */
+    /**
+     * 当前评测故障注入所涉及的工具调用记录或次数。
+     */
     private final int[] faultCalls;
 
-    /** 模型观察器的索引映射，供按键查找或归并当前组件的数据。 */
-    @Setter private Consumer<Map<String, Object>> modelObserver;
+    /**
+     * 模型观察器的索引映射，供按键查找或归并当前组件的数据。
+     */
+    @Setter
+    private Consumer<Map<String, Object>> modelObserver;
 
     /**
      * 完成当前操作的modelEvidence步骤，按实现更新相应状态或依赖。
@@ -120,7 +150,7 @@ public final class EvaluationFixture {
     /**
      * 创建评测样本，初始化该组件所需的状态、配置或依赖。
      *
-     * @param spec 规范的索引映射，供按键查找或归并当前组件的数据。
+     * @param spec   规范的索引映射，供按键查找或归并当前组件的数据。
      * @param faults faults的索引映射，供按键查找或归并当前组件的数据。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -131,9 +161,9 @@ public final class EvaluationFixture {
             if (!(fault.get("tool") instanceof String tool)
                     || tool.isBlank()
                     || !List.of("error", "result")
-                            .contains(String.valueOf(fault.getOrDefault("kind", "error")))
+                    .contains(String.valueOf(fault.getOrDefault("kind", "error")))
                     || (fault.containsKey("times")
-                            && (!(fault.get("times") instanceof Number n) || n.intValue() < 1)))
+                    && (!(fault.get("times") instanceof Number n) || n.intValue() < 1)))
                 throw new IllegalArgumentException("Invalid provider fault specification");
         }
         mode = String.valueOf(spec.getOrDefault("modeLabel", "LIVE"));
@@ -208,8 +238,8 @@ public final class EvaluationFixture {
     /**
      * 计算或取得本方法声明的结果，供当前EvaluationFixture处理步骤使用。
      *
-     * @param tool 当前评测样本使用的工具，供其处理与状态记录使用。
-     * @param args 参数集合的索引映射，供按键查找或归并当前组件的数据。
+     * @param tool     当前评测样本使用的工具，供其处理与状态记录使用。
+     * @param args     参数集合的索引映射，供按键查找或归并当前组件的数据。
      * @param readOnly 读取只读的状态标记，用于选择当前组件的处理路径。
      * @return 本次操作返回的工具结果块结果。
      */
@@ -226,8 +256,8 @@ public final class EvaluationFixture {
     /**
      * 计算或取得本方法声明的结果，供当前EvaluationFixture处理步骤使用。
      *
-     * @param tool 当前评测样本使用的工具，供其处理与状态记录使用。
-     * @param args 参数集合的索引映射，供按键查找或归并当前组件的数据。
+     * @param tool     当前评测样本使用的工具，供其处理与状态记录使用。
+     * @param args     参数集合的索引映射，供按键查找或归并当前组件的数据。
      * @param readOnly 读取只读的状态标记，用于选择当前组件的处理路径。
      * @return 本次操作返回的工具结果块结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -246,7 +276,7 @@ public final class EvaluationFixture {
                 boolean relaxed =
                         (entry.get("ignoredArgs") instanceof List<?> ignored && !ignored.isEmpty())
                                 || (entry.get("argumentDefaults") instanceof Map<?, ?> defaults
-                                        && !defaults.isEmpty());
+                                && !defaults.isEmpty());
                 if ((pass == 0 && relaxed) || (pass == 1 && (!relaxed || !readOnly))) continue;
                 if (!consumed[i]
                         && tool.equals(entry.get("tool"))
@@ -280,8 +310,8 @@ public final class EvaluationFixture {
     /**
      * 检查是否匹配评测样本。
      *
-     * @param args 参数集合的索引映射，供按键查找或归并当前组件的数据。
-     * @param entry 条目的索引映射，供按键查找或归并当前组件的数据。
+     * @param args     参数集合的索引映射，供按键查找或归并当前组件的数据。
+     * @param entry    条目的索引映射，供按键查找或归并当前组件的数据。
      * @param readOnly 读取只读的状态标记，用于选择当前组件的处理路径。
      * @return 本次检查是否通过或本次更新是否成功。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -343,8 +373,8 @@ public final class EvaluationFixture {
     /**
      * 记录评测样本。
      *
-     * @param tool 当前评测样本使用的工具，供其处理与状态记录使用。
-     * @param args 参数集合的索引映射，供按键查找或归并当前组件的数据。
+     * @param tool   当前评测样本使用的工具，供其处理与状态记录使用。
+     * @param args   参数集合的索引映射，供按键查找或归并当前组件的数据。
      * @param result 本次处理已有的结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

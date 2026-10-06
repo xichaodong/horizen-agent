@@ -158,11 +158,11 @@ class WorkspaceManagementControllerTest {
         String releaseHash =
                 WorkspaceManagementService.hash(
                         ("7\ntest-agent\nAGENTS.md\0"
-                                        + asset.path("sha256").asText()
-                                        + "\0"
-                                        + asset.path("size").asLong()
-                                        + "\n"
-                                        + skillHash)
+                                + asset.path("sha256").asText()
+                                + "\0"
+                                + asset.path("size").asLong()
+                                + "\n"
+                                + skillHash)
                                 .getBytes(StandardCharsets.UTF_8));
         var manifest =
                 Map.of(
@@ -214,11 +214,11 @@ class WorkspaceManagementControllerTest {
                 new HorizenAgentReleaseRepository(
                         null, cache, 100L * 1024 * 1024, catalog, objects);
         try (var snapshot =
-                        repository.acquire(
-                                repository
-                                        .findCurrent(new AgentCatalogKey(7, "test-agent"))
-                                        .orElseThrow());
-                var input = snapshot.open("AGENTS.md")) {
+                     repository.acquire(
+                             repository
+                                     .findCurrent(new AgentCatalogKey(7, "test-agent"))
+                                     .orElseThrow());
+             var input = snapshot.open("AGENTS.md")) {
             assertEquals("policy-v1", new String(input.readAllBytes(), StandardCharsets.UTF_8));
         } finally {
             HorizenAgentReleaseRepository.delete(cache);
@@ -228,7 +228,7 @@ class WorkspaceManagementControllerTest {
     @Test
     void completeSkillDirectoryUsesSameFilesSnapshotAndAuditIncludingBinaryResources()
             throws Exception {
-        byte[] binary = new byte[] {0, 1, 2, (byte) 255};
+        byte[] binary = new byte[]{0, 1, 2, (byte) 255};
         String markdown =
                 "---\n"
                         + "name: example\n"
@@ -287,10 +287,10 @@ class WorkspaceManagementControllerTest {
                 new HorizenAgentReleaseRepository(
                         client, cache, 100L * 1024 * 1024, catalog, objects);
         try (var snapshot =
-                repository.acquire(
-                        repository
-                                .findCurrent(new AgentCatalogKey(7, "test-agent"))
-                                .orElseThrow())) {
+                     repository.acquire(
+                             repository
+                                     .findCurrent(new AgentCatalogKey(7, "test-agent"))
+                                     .orElseThrow())) {
             assertEquals(List.of("example"), snapshot.getSkills().skillNames());
             assertEquals(markdown, snapshot.getSkills().markdown("example").orElseThrow());
             assertEquals(

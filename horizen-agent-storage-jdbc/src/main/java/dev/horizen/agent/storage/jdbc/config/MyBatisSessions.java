@@ -13,10 +13,15 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-/** Spring 配置、独立迁移和隔离测试共用的 MyBatis 组装逻辑。 */
+/**
+ * Spring 配置、独立迁移和隔离测试共用的 MyBatis 组装逻辑。
+ */
 public final class MyBatisSessions {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private MyBatisSessions() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private MyBatisSessions() {
+    }
 
     /**
      * 创建MyBatis会话集合。
@@ -31,7 +36,7 @@ public final class MyBatisSessions {
     /**
      * 创建MyBatis会话集合。
      *
-     * @param source 待解析或转换的来源对象。
+     * @param source       待解析或转换的来源对象。
      * @param queryTimeout 查询允许持续的最长等待时间。
      * @return 本次操作返回的SQL会话模板结果。
      */
@@ -42,7 +47,7 @@ public final class MyBatisSessions {
     /**
      * 计算或取得本方法声明的结果，供当前MyBatisSessions处理步骤使用。
      *
-     * @param source 待解析或转换的来源对象。
+     * @param source       待解析或转换的来源对象。
      * @param queryTimeout 查询允许持续的最长等待时间。
      * @return 本次操作返回的SQL会话工厂结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。

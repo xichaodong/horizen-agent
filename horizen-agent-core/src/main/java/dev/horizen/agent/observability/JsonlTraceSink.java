@@ -12,15 +12,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-/** 每行追加一个 JSON 对象，并在每个事件后刷新，便于本地调试。 */
+/**
+ * 每行追加一个 JSON 对象，并在每个事件后刷新，便于本地调试。
+ */
 public final class JsonlTraceSink implements TraceSink, AutoCloseable {
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final ObjectMapper mapper = JsonUtils.newMapper();
 
-    /** 按已知敏感字段名清理观测负载的脱敏器，不识别任意自由文本中的秘密。 */
+    /**
+     * 按已知敏感字段名清理观测负载的脱敏器，不识别任意自由文本中的秘密。
+     */
     private final TraceDataSanitizer sanitizer = new TraceDataSanitizer(mapper);
 
-    /** 将输出写入当前内容目标的写入器。 */
+    /**
+     * 将输出写入当前内容目标的写入器。
+     */
     private final BufferedWriter writer;
 
     /**
@@ -57,7 +65,9 @@ public final class JsonlTraceSink implements TraceSink, AutoCloseable {
         }
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
     public synchronized void close() throws IOException {
         writer.close();

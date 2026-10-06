@@ -31,7 +31,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class HorizenInvocationCorrelationTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void realConcurrentChildCallsLinkToTheirExactDelegationSpans() {
@@ -78,8 +79,8 @@ class HorizenInvocationCorrelationTest {
                         .disableTranscript()
                         .build();
         try (var runtime =
-                new HarnessAgentRuntime(
-                        agent, ctx -> ctx.put(AgentSpawnTool.CTX_FORCE_SYNC, true), null)) {
+                     new HarnessAgentRuntime(
+                             agent, ctx -> ctx.put(AgentSpawnTool.CTX_FORCE_SYNC, true), null)) {
             runtime.stream(
                             AgentTurnRequest.builder()
                                     .ownerKey("owner")

@@ -68,10 +68,11 @@ class ConstructorBindingTest {
 
     @Configuration(proxyBeanMethods = false)
     @EnableConfigurationProperties({
-        E2bSandboxProperties.class,
-        GatewayProperties.class,
-        HorizenProperties.class,
-        ArtifactProperties.class
+            E2bSandboxProperties.class,
+            GatewayProperties.class,
+            HorizenProperties.class,
+            ArtifactProperties.class
     })
-    static class PropertiesConfiguration {}
+    static class PropertiesConfiguration {
+    }
 }

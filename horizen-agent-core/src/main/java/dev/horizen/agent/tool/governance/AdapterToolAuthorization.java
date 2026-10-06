@@ -4,10 +4,14 @@ import lombok.Getter;
 
 import java.util.Set;
 
-/** 当前 Turn 内，动态适配器目录授权的业务工具并集。 */
+/**
+ * 当前 Turn 内，动态适配器目录授权的业务工具并集。
+ */
 @Getter
 public final class AdapterToolAuthorization {
-    /** 工具名称集合的去重集合，供成员查找或范围检查使用。 */
+    /**
+     * 工具名称集合的去重集合，供成员查找或范围检查使用。
+     */
     private final Set<String> toolNames;
 
     /**

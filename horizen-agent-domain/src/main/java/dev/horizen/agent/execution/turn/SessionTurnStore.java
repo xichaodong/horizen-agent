@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/** Session、Turn 与正式消息的持久化边界。 */
+/**
+ * Session、Turn 与正式消息的持久化边界。
+ */
 public interface SessionTurnStore {
 
     /**
@@ -30,11 +32,11 @@ public interface SessionTurnStore {
     /**
      * 仅为仍由指定执行实例持有的执行续期租约；不把其他实例的执行权转移给调用方。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
-     * @param executorId 持有当前执行段的执行实例标识，用于租约与跨实例控制。
+     * @param ownerKey       宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param turnId         单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param executorId     持有当前执行段的执行实例标识，用于租约与跨实例控制。
      * @param leaseExpiresAt 执行实例租约到期时间，用于判断执行权是否仍有效。
-     * @param updatedAt 当前记录最近一次更新的时间。
+     * @param updatedAt      当前记录最近一次更新的时间。
      * @return 是否仍持有原执行并成功完成本次续期。
      */
     boolean renewLease(
@@ -44,7 +46,9 @@ public interface SessionTurnStore {
             Instant leaseExpiresAt,
             Instant updatedAt);
 
-    /** 仅续租传入的本地所属 Turn，且其租约与执行截止时间必须仍有效。 */
+    /**
+     * 仅续租传入的本地所属 Turn，且其租约与执行截止时间必须仍有效。
+     */
     default int renewLeases(
             Map<String, List<String>> turnIdsByOwner,
             String executorId,
@@ -59,7 +63,7 @@ public interface SessionTurnStore {
                         && turn.getLeaseExpiresAt().isAfter(updatedAt)
                         && turn.getDeadlineAt().isAfter(updatedAt)
                         && renewLease(
-                                owner.getKey(), turnId, executorId, leaseExpiresAt, updatedAt)) {
+                        owner.getKey(), turnId, executorId, leaseExpiresAt, updatedAt)) {
                     renewed++;
                 }
             }
@@ -70,7 +74,7 @@ public interface SessionTurnStore {
     /**
      * 按 ownerKey 与 sessionId 查找会话，避免同名会话跨归属读取。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -80,7 +84,7 @@ public interface SessionTurnStore {
      * 在指定 ownerKey 范围内查找执行事实记录。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId   单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
     Optional<AgentTurn> findTurn(String ownerKey, String turnId);
@@ -88,7 +92,7 @@ public interface SessionTurnStore {
     /**
      * 查找指定隔离会话的最近一次执行，用于页面观察与恢复。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -98,8 +102,8 @@ public interface SessionTurnStore {
      * 分页读取指定归属的会话目录，使用 limit 和 offset 限定返回窗口。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param limit 本次处理或返回数量上限。
-     * @param offset 本次读取的起始偏移。
+     * @param limit    本次处理或返回数量上限。
+     * @param offset   本次读取的起始偏移。
      * @return 本次处理得到的结果集合。
      */
     List<AgentSession> listSessions(String ownerKey, int limit, int offset);
@@ -107,9 +111,9 @@ public interface SessionTurnStore {
     /**
      * 更新指定归属会话的可读标题，同时记录更新时间。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param title 当前会话执行存储的可读标题，供宿主界面展示。
+     * @param title     当前会话执行存储的可读标题，供宿主界面展示。
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -118,9 +122,9 @@ public interface SessionTurnStore {
     /**
      * 更新指定归属会话的置顶标记，不改变会话或执行身份。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param pinned 会话是否置顶，影响会话目录展示顺序。
+     * @param pinned    会话是否置顶，影响会话目录展示顺序。
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -129,7 +133,7 @@ public interface SessionTurnStore {
     /**
      * 将指定会话归档，使它不再作为可继续启动执行的活跃会话使用。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @param updatedAt 当前记录最近一次更新的时间。
      * @return 本次检查是否通过或本次更新是否成功。
@@ -139,7 +143,7 @@ public interface SessionTurnStore {
     /**
      * 读取指定会话已经提交的正式消息，不把临时文本增量当作正式消息。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次处理得到的结果集合。
      */
@@ -148,7 +152,7 @@ public interface SessionTurnStore {
     /**
      * 查询已经超过租约期限的执行，供执行权失联后的协调收敛使用。
      *
-     * @param now 用于本次更新或过期判断的当前时间。
+     * @param now   用于本次更新或过期判断的当前时间。
      * @param limit 本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      */
@@ -157,7 +161,7 @@ public interface SessionTurnStore {
     /**
      * 查询超过执行截止时间的执行，供超时收敛流程使用。
      *
-     * @param now 用于本次更新或过期判断的当前时间。
+     * @param now   用于本次更新或过期判断的当前时间。
      * @param limit 本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      */

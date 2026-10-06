@@ -44,7 +44,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 class PublishedSessionRecoveryLiveTest {
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final Duration WAIT = Duration.ofSeconds(10);
-    @TempDir Path root;
+    @TempDir
+    Path root;
 
     @Test
     void approvalResumesTheOriginalPublicationAfterRestartAndR2Publication() throws Exception {
@@ -139,8 +140,8 @@ class PublishedSessionRecoveryLiveTest {
                                 .anyMatch(
                                         e ->
                                                 (approval
-                                                                ? "approval_required"
-                                                                : "ask_user_required")
+                                                        ? "approval_required"
+                                                        : "ask_user_required")
                                                         .equals(e.getType())),
                         events.toString());
                 turnId = service.sessionExecution(identity, "old-session").getCurrentTurnId();
@@ -295,7 +296,7 @@ class PublishedSessionRecoveryLiveTest {
         props.put("horizen.agent.sandbox.snapshot.bos.enabled", false);
         props.put("horizen.agent.artifact.bos.enabled", false);
         return new SpringApplicationBuilder(
-                        AgentWebApplication.class, WorkspaceTestConfiguration.class)
+                AgentWebApplication.class, WorkspaceTestConfiguration.class)
                 .web(WebApplicationType.NONE)
                 .initializers(
                         c ->
@@ -318,11 +319,11 @@ class PublishedSessionRecoveryLiveTest {
         String workspace =
                 hash(
                         ("7\nhorizen-web-agent\nAGENTS.md\0"
-                                        + asset
-                                        + "\0"
-                                        + text.length
-                                        + "\n"
-                                        + skills)
+                                + asset
+                                + "\0"
+                                + text.length
+                                + "\n"
+                                + skills)
                                 .getBytes(StandardCharsets.UTF_8));
         return Map.of(
                 "projectId",

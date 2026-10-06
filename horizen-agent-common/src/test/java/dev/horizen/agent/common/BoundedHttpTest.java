@@ -18,10 +18,10 @@ class BoundedHttpTest {
         var subscriber = BoundedBodyHandlers.bytes(3).apply(null);
         AtomicBoolean cancelled = new AtomicBoolean();
         subscriber.onSubscribe(subscription(cancelled));
-        subscriber.onNext(List.of(ByteBuffer.wrap(new byte[] {1, 2})));
-        subscriber.onNext(List.of(ByteBuffer.wrap(new byte[] {3})));
+        subscriber.onNext(List.of(ByteBuffer.wrap(new byte[]{1, 2})));
+        subscriber.onNext(List.of(ByteBuffer.wrap(new byte[]{3})));
         subscriber.onComplete();
-        assertArrayEquals(new byte[] {1, 2, 3}, subscriber.getBody().toCompletableFuture().get());
+        assertArrayEquals(new byte[]{1, 2, 3}, subscriber.getBody().toCompletableFuture().get());
         assertFalse(cancelled.get());
     }
 
@@ -30,8 +30,8 @@ class BoundedHttpTest {
         var subscriber = BoundedBodyHandlers.bytes(3).apply(null);
         AtomicBoolean cancelled = new AtomicBoolean();
         subscriber.onSubscribe(subscription(cancelled));
-        subscriber.onNext(List.of(ByteBuffer.wrap(new byte[] {1, 2})));
-        subscriber.onNext(List.of(ByteBuffer.wrap(new byte[] {3, 4})));
+        subscriber.onNext(List.of(ByteBuffer.wrap(new byte[]{1, 2})));
+        subscriber.onNext(List.of(ByteBuffer.wrap(new byte[]{3, 4})));
         subscriber.onComplete();
         assertTrue(cancelled.get());
         assertThrows(
@@ -40,7 +40,8 @@ class BoundedHttpTest {
 
     private Flow.Subscription subscription(AtomicBoolean cancelled) {
         return new Flow.Subscription() {
-            public void request(long count) {}
+            public void request(long count) {
+            }
 
             public void cancel() {
                 cancelled.set(true);

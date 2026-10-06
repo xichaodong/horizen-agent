@@ -5,7 +5,9 @@ import dev.horizen.agent.storage.jdbc.model.SessionHistoryRow;
 import java.util.List;
 import java.util.Map;
 
-/** 会话历史检索的 MyBatis 映射端口，按归属与查询游标读取记录。 */
+/**
+ * 会话历史检索的 MyBatis 映射端口，按归属与查询游标读取记录。
+ */
 public interface SessionHistoryMapper {
     /**
      * 按映射语句的筛选与分页条件读取对应存储记录记录。

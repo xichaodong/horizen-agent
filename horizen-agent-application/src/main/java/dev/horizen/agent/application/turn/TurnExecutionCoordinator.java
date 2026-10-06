@@ -36,53 +36,77 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/** 不依赖传输协议的 Turn 创建、执行、交互恢复和失败处理。 */
+/**
+ * 不依赖传输协议的 Turn 创建、执行、交互恢复和失败处理。
+ */
 public final class TurnExecutionCoordinator {
-    /** 当前组件的诊断日志器。 */
+    /**
+     * 当前组件的诊断日志器。
+     */
     private static final Logger log = LoggerFactory.getLogger(TurnExecutionCoordinator.class);
 
-    /** 当前对象使用的处理策略，决定校验、权限或执行边界。 */
+    /**
+     * 当前对象使用的处理策略，决定校验、权限或执行边界。
+     */
     private final TurnExecutionPolicy policy;
 
-    /** 负责会话占用、执行事实与正式消息的持久化端口。 */
+    /**
+     * 负责会话占用、执行事实与正式消息的持久化端口。
+     */
     private final SessionTurnStore sessionTurns;
 
-    /** 共享执行增量与回放的事件通道。 */
+    /**
+     * 共享执行增量与回放的事件通道。
+     */
     private final TurnEventChannel distributedEvents;
 
-    /** 执行 Agent 模型与工具循环的运行时接口。 */
+    /**
+     * 执行 Agent 模型与工具循环的运行时接口。
+     */
     private final AgentRuntime runtime;
 
-    /** 持有本地运行订阅、观察与取消句柄的执行管理器。 */
+    /**
+     * 持有本地运行订阅、观察与取消句柄的执行管理器。
+     */
     private final TurnExecutionManager turnExecutions;
 
-    /** 把可信身份、输入资源与交互决定构造成运行时请求的工厂。 */
+    /**
+     * 把可信身份、输入资源与交互决定构造成运行时请求的工厂。
+     */
     private final TurnRequestFactory turnRequests;
 
-    /** 接收模型、工具与执行事件的观测回调。 */
+    /**
+     * 接收模型、工具与执行事件的观测回调。
+     */
     private final Consumer<AgentRuntimeEvent> eventObserver;
 
-    /** 把运行事件收敛为正式状态、交互记录与回放增量的持久化协调器。 */
+    /**
+     * 把运行事件收敛为正式状态、交互记录与回放增量的持久化协调器。
+     */
     private final TurnEventPersistence eventPersistence;
 
-    /** 重复请求命中原执行时生成观察结果的回放函数。 */
+    /**
+     * 重复请求命中原执行时生成观察结果的回放函数。
+     */
     private final Function<AgentTurn, Flux<AgentRuntimeEvent>> duplicateReplay;
 
-    /** Trace失败Logged的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * Trace失败Logged的原子状态，供并发更新与统计读取使用。
+     */
     private final AtomicBoolean traceFailureLogged = new AtomicBoolean();
 
     /**
      * 创建执行执行协调器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param policy 当前对象使用的处理策略，决定校验、权限或执行边界。
-     * @param sessionTurns 提供会话执行集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param policy            当前对象使用的处理策略，决定校验、权限或执行边界。
+     * @param sessionTurns      提供会话执行集合能力的依赖，具体实现由当前组件的组装方传入。
      * @param distributedEvents 当前执行执行协调器持有的分布式事件集合对象，供相应处理步骤使用。
-     * @param runtime 执行 Agent 模型与工具循环的运行时接口。
-     * @param executions 当前执行执行协调器持有的执行集合对象，供相应处理步骤使用。
-     * @param requests 提供请求集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param eventObserver 当前执行执行协调器持有的事件观察器对象，供相应处理步骤使用。
-     * @param persistence 当前执行执行协调器持有的持久化对象，供相应处理步骤使用。
-     * @param duplicateReplay 当前执行执行协调器持有的duplicate回放对象，供相应处理步骤使用。
+     * @param runtime           执行 Agent 模型与工具循环的运行时接口。
+     * @param executions        当前执行执行协调器持有的执行集合对象，供相应处理步骤使用。
+     * @param requests          提供请求集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param eventObserver     当前执行执行协调器持有的事件观察器对象，供相应处理步骤使用。
+     * @param persistence       当前执行执行协调器持有的持久化对象，供相应处理步骤使用。
+     * @param duplicateReplay   当前执行执行协调器持有的duplicate回放对象，供相应处理步骤使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public TurnExecutionCoordinator(
@@ -120,15 +144,20 @@ public final class TurnExecutionCoordinator {
      */
     private static Map<String, Object> jsonMap(String value) {
         try {
-            return JsonUtils.read(value, new TypeReference<Map<String, Object>>() {});
+            return JsonUtils.read(value, new TypeReference<Map<String, Object>>() {
+            });
         } catch (JsonProcessingException error) {
             throw new IllegalStateException("Invalid stored tool arguments", error);
         }
     }
 
-    /** 事件流空闲超时异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。 */
+    /**
+     * 事件流空闲超时异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。
+     */
     private static final class StreamIdleTimeoutException extends RuntimeException {
-        /** 创建事件流空闲超时异常，初始化该组件所需的状态、配置或依赖。 */
+        /**
+         * 创建事件流空闲超时异常，初始化该组件所需的状态、配置或依赖。
+         */
         StreamIdleTimeoutException() {
             super("Agent stream became idle");
         }
@@ -137,9 +166,9 @@ public final class TurnExecutionCoordinator {
     /**
      * 把已提交的澄清回答组装成原执行的恢复请求，复用原执行标识与会话发布。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param turn 当前执行执行协调器持有的执行对象，供相应处理步骤使用。
-     * @param ask 当前执行执行协调器持有的提问对象，供相应处理步骤使用。
+     * @param identity    可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param turn        当前执行执行协调器持有的执行对象，供相应处理步骤使用。
+     * @param ask         当前执行执行协调器持有的提问对象，供相应处理步骤使用。
      * @param answersJson 回答集合的 JSON 表示，供持久化或协议转换使用。
      */
     public void resumeAskUserTurn(
@@ -172,10 +201,10 @@ public final class TurnExecutionCoordinator {
     /**
      * 把已提交的审批决定转成运行时恢复输入，在原执行的剩余时间预算内继续执行。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param turn 当前执行执行协调器持有的执行对象，供相应处理步骤使用。
+     * @param identity    可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param turn        当前执行执行协调器持有的执行对象，供相应处理步骤使用。
      * @param resolutions 决定结果集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param remaining 剩余的时间配置，供等待、调度或失效判断使用。
+     * @param remaining   剩余的时间配置，供等待、调度或失效判断使用。
      */
     public void resumeApprovedTurn(
             ExecutionIdentity identity,
@@ -236,7 +265,7 @@ public final class TurnExecutionCoordinator {
      * 为用户输入创建或复用正式执行。重复请求回放原结果；会话忙或已归档时拒绝新执行。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
+     * @param request  当前操作的请求参数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     public Flux<AgentRuntimeEvent> start(ExecutionIdentity identity, ChatCommand request) {
@@ -289,7 +318,7 @@ public final class TurnExecutionCoordinator {
             return Flux.error(
                     error instanceof IllegalArgumentException
                             ? new ApplicationError(
-                                    ApplicationError.Code.INVALID_ARGUMENT, error.getMessage())
+                            ApplicationError.Code.INVALID_ARGUMENT, error.getMessage())
                             : error);
         }
         return executeTurn(identity, turn, policy.getStreamTimeout());
@@ -299,8 +328,8 @@ public final class TurnExecutionCoordinator {
      * 由宿主持有实际运行订阅，应用空闲与总时限，将运行时事件交给观测、持久化和回放通道。
      * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param turn 当前执行执行协调器持有的执行对象，供相应处理步骤使用。
+     * @param identity    可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param turn        当前执行执行协调器持有的执行对象，供相应处理步骤使用。
      * @param maxDuration 最大耗时的时间配置，供等待、调度或失效判断使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
@@ -349,9 +378,9 @@ public final class TurnExecutionCoordinator {
                                                     .type(
                                                             timeout
                                                                     ? AgentRuntimeEvent.Type
-                                                                            .TURN_TIMED_OUT
+                                                                    .TURN_TIMED_OUT
                                                                     : AgentRuntimeEvent.Type
-                                                                            .TURN_FAILED)
+                                                                    .TURN_FAILED)
                                                     .turnId(turn.getTurnId())
                                                     .sessionId(turn.getSessionId())
                                                     .id(turn.getTurnId())
@@ -359,10 +388,10 @@ public final class TurnExecutionCoordinator {
                                                     .text(
                                                             timeout
                                                                     ? "连续 "
-                                                                            + formatDuration(
-                                                                                    policy
-                                                                                            .getIdleTimeout())
-                                                                            + " 没有收到模型或工具事件，执行已停止。"
+                                                                    + formatDuration(
+                                                                    policy
+                                                                            .getIdleTimeout())
+                                                                    + " 没有收到模型或工具事件，执行已停止。"
                                                                     : "Agent 执行失败")
                                                     .status(timeout ? "timed_out" : "failed")
                                                     .details(Map.of("errorCode", errorCode))
@@ -406,9 +435,9 @@ public final class TurnExecutionCoordinator {
     /**
      * 通过宿主请求工厂绑定身份、输入资源与恢复决定，构造本次运行时请求。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param request 当前操作的请求参数。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param identity          可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param request           当前操作的请求参数。
+     * @param turnId            单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @param approvalDecisions 当前恢复请求提交的审批决定集合。
      * @return 本次操作返回的Agent执行请求结果。
      */
@@ -423,7 +452,7 @@ public final class TurnExecutionCoordinator {
     /**
      * 启动记录已经提交但后续准备失败时，将对应原执行收敛为失败状态。
      *
-     * @param turn 当前执行执行协调器持有的执行对象，供相应处理步骤使用。
+     * @param turn        当前执行执行协调器持有的执行对象，供相应处理步骤使用。
      * @param failureCode 机器可识别的失败分类，供状态恢复与错误展示使用。
      */
     private void failStartedTurn(AgentTurnRequest turn, String failureCode) {

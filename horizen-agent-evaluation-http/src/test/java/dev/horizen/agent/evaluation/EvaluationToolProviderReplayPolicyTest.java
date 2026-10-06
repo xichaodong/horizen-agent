@@ -122,7 +122,7 @@ class EvaluationToolProviderReplayPolicyTest {
                         return Mono.just(ToolResultBlock.text("live"));
                     }
                 };
-        for (boolean authorizedRead : new boolean[] {true, false}) {
+        for (boolean authorizedRead : new boolean[]{true, false}) {
             var fixture =
                     new EvaluationFixture(
                             Map.of(

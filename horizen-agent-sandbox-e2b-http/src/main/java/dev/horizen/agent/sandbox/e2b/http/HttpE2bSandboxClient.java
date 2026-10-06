@@ -17,18 +17,24 @@ import io.agentscope.harness.agent.sandbox.snapshot.SandboxSnapshotSpec;
 
 import java.util.UUID;
 
-/** AgentScope 的 JSON/HTTP E2B 沙箱客户端实现。 */
+/**
+ * AgentScope 的 JSON/HTTP E2B 沙箱客户端实现。
+ */
 public final class HttpE2bSandboxClient implements SandboxClient<HttpE2bSandboxClientOptions> {
-    /** 创建当前模型或沙箱对象时使用的默认策略配置。 */
+    /**
+     * 创建当前模型或沙箱对象时使用的默认策略配置。
+     */
     private final HttpE2bSandboxClientOptions defaults;
 
-    /** 当前沙箱状态协议独立使用的 JSON 编解码器。 */
+    /**
+     * 当前沙箱状态协议独立使用的 JSON 编解码器。
+     */
     private final ObjectMapper objectMapper;
 
     /**
      * 创建HTTP2B沙箱客户端，初始化该组件所需的状态、配置或依赖。
      *
-     * @param defaults 当前HTTP2B沙箱客户端持有的默认值对象，供相应处理步骤使用。
+     * @param defaults     当前HTTP2B沙箱客户端持有的默认值对象，供相应处理步骤使用。
      * @param objectMapper 提供对象映射器能力的依赖，具体实现由当前组件的组装方传入。
      */
     public HttpE2bSandboxClient(HttpE2bSandboxClientOptions defaults, ObjectMapper objectMapper) {
@@ -53,8 +59,8 @@ public final class HttpE2bSandboxClient implements SandboxClient<HttpE2bSandboxC
      * 创建HTTP2B沙箱客户端。
      *
      * @param workspaceSpec 当前HTTP2B沙箱客户端持有的工作区规范对象，供相应处理步骤使用。
-     * @param snapshotSpec 当前HTTP2B沙箱客户端持有的快照规范对象，供相应处理步骤使用。
-     * @param callOptions 当前HTTP2B沙箱客户端持有的调用选项集合对象，供相应处理步骤使用。
+     * @param snapshotSpec  当前HTTP2B沙箱客户端持有的快照规范对象，供相应处理步骤使用。
+     * @param callOptions   当前HTTP2B沙箱客户端持有的调用选项集合对象，供相应处理步骤使用。
      * @return 本次操作返回的沙箱结果。
      */
     @Override
@@ -141,7 +147,7 @@ public final class HttpE2bSandboxClient implements SandboxClient<HttpE2bSandboxC
     /**
      * 计算或取得本方法声明的结果，供当前HttpE2bSandboxClient处理步骤使用。
      *
-     * @param json 当前HTTP2B沙箱客户端使用的JSON，供其处理与状态记录使用。
+     * @param json         当前HTTP2B沙箱客户端使用的JSON，供其处理与状态记录使用。
      * @param snapshotSpec 当前HTTP2B沙箱客户端持有的快照规范对象，供相应处理步骤使用。
      * @return 本次操作返回的沙箱工作状态结果。
      */

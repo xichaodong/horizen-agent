@@ -51,7 +51,7 @@ class ArtifactCompensationTest {
         store.loseReadyReply = true;
         assertThrows(
                 IllegalStateException.class,
-                () -> service.uploadUserFile("owner", "file", "text/plain", new byte[] {1}, now));
+                () -> service.uploadUserFile("owner", "file", "text/plain", new byte[]{1}, now));
         assertEquals(ArtifactState.READY, store.saved.getState());
         assertTrue(content.values.contains(store.saved.getContentRef()));
         assertEquals(0, content.deletes);
@@ -76,7 +76,7 @@ class ArtifactCompensationTest {
                 "source",
                 "file",
                 "text/plain",
-                new byte[] {1},
+                new byte[]{1},
                 null,
                 null,
                 now);
@@ -155,7 +155,7 @@ class ArtifactCompensationTest {
         }
 
         public byte[] get(String ref) {
-            return new byte[] {1};
+            return new byte[]{1};
         }
 
         public URI createDownloadUrl(String ref, int seconds) {

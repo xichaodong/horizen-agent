@@ -14,12 +14,18 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/** SDK 解析和共享连接，取消仅影响单个流式请求。 */
+/**
+ * SDK 解析和共享连接，取消仅影响单个流式请求。
+ */
 public final class CancellableModelHttpTransport extends OkHttpTransport implements AutoCloseable {
-    /** streams的去重集合，供成员查找或范围检查使用。 */
+    /**
+     * streams的去重集合，供成员查找或范围检查使用。
+     */
     private final Set<Dispatcher> streams = ConcurrentHashMap.newKeySet();
 
-    /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+    /**
+     * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+     */
     private final AtomicBoolean closed = new AtomicBoolean();
 
     /**
@@ -67,13 +73,13 @@ public final class CancellableModelHttpTransport extends OkHttpTransport impleme
                                     .build();
                     return new OkHttpTransport(client, getConfig())
                             .stream(request)
-                                    // 在 SDK 释放阻塞读取器前，先取消 Socket 连接。
-                                    .doOnCancel(
-                                            () -> {
-                                                cancelled.set(true);
-                                                dispatcher.cancelAll();
-                                            })
-                                    .doFinally(signal -> streams.remove(dispatcher));
+                            // 在 SDK 释放阻塞读取器前，先取消 Socket 连接。
+                            .doOnCancel(
+                                    () -> {
+                                        cancelled.set(true);
+                                        dispatcher.cancelAll();
+                                    })
+                            .doFinally(signal -> streams.remove(dispatcher));
                 });
     }
 

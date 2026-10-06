@@ -39,7 +39,8 @@ import java.util.concurrent.atomic.*;
 import java.util.stream.Collectors;
 
 class SubagentLifecycleAcceptanceTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void childAllowlistFiltersSchemasAndBlocksForgedCalls() {
@@ -382,32 +383,32 @@ class SubagentLifecycleAcceptanceTest {
                 if (hasResult) return text("child-result");
                 return "clarification".equals(mode)
                         ? call(
-                                "child-call",
-                                "ask_user",
-                                Map.of(
-                                        "questions",
-                                        List.of(
-                                                Map.of(
-                                                        "questionId",
-                                                        "scope",
-                                                        "title",
-                                                        "请选择范围",
-                                                        "type",
-                                                        "single",
-                                                        "required",
-                                                        true,
-                                                        "options",
-                                                        List.of(
-                                                                Map.of(
-                                                                        "optionId",
-                                                                        "week",
-                                                                        "label",
-                                                                        "一周"),
-                                                                Map.of(
-                                                                        "optionId",
-                                                                        "month",
-                                                                        "label",
-                                                                        "一月"))))))
+                        "child-call",
+                        "ask_user",
+                        Map.of(
+                                "questions",
+                                List.of(
+                                        Map.of(
+                                                "questionId",
+                                                "scope",
+                                                "title",
+                                                "请选择范围",
+                                                "type",
+                                                "single",
+                                                "required",
+                                                true,
+                                                "options",
+                                                List.of(
+                                                        Map.of(
+                                                                "optionId",
+                                                                "week",
+                                                                "label",
+                                                                "一周"),
+                                                        Map.of(
+                                                                "optionId",
+                                                                "month",
+                                                                "label",
+                                                                "一月"))))))
                         : call("child-call", "dangerous_action", Map.of("value", "frozen"));
             }
             boolean hasSpawn =
@@ -451,15 +452,15 @@ class SubagentLifecycleAcceptanceTest {
             return hasSpawn
                     ? text("parent-result:" + spawnResults)
                     : call(
-                            "spawn-call",
-                            "agent_spawn",
-                            Map.of(
-                                    "agent_id",
-                                    "worker",
-                                    "task",
-                                    "child-" + mode,
-                                    "timeout_seconds",
-                                    30));
+                    "spawn-call",
+                    "agent_spawn",
+                    Map.of(
+                            "agent_id",
+                            "worker",
+                            "task",
+                            "child-" + mode,
+                            "timeout_seconds",
+                            30));
         }
     }
 

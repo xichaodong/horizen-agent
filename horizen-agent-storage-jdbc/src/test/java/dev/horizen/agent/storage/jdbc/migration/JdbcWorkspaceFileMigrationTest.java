@@ -31,16 +31,16 @@ class JdbcWorkspaceFileMigrationTest {
         var jdbc = new JdbcTemplate(source);
         jdbc.execute(
                 """
-CREATE TABLE ha_workspace_document(owner_key VARCHAR(191),agent_key VARCHAR(128),scope_key VARCHAR(160),
-    path_hash CHAR(64),document_path VARCHAR(512),content MEDIUMTEXT,size_bytes BIGINT,version BIGINT,
-    created_at TIMESTAMP(6),updated_at TIMESTAMP(6),PRIMARY KEY(owner_key,agent_key,scope_key,path_hash))
-""");
+                        CREATE TABLE ha_workspace_document(owner_key VARCHAR(191),agent_key VARCHAR(128),scope_key VARCHAR(160),
+                            path_hash CHAR(64),document_path VARCHAR(512),content MEDIUMTEXT,size_bytes BIGINT,version BIGINT,
+                            created_at TIMESTAMP(6),updated_at TIMESTAMP(6),PRIMARY KEY(owner_key,agent_key,scope_key,path_hash))
+                        """);
         jdbc.execute(
                 """
-CREATE TABLE ha_workspace_document_append(owner_key VARCHAR(191),agent_key VARCHAR(128),scope_key VARCHAR(160),
-    path_hash CHAR(64),document_path VARCHAR(512),operation_id VARCHAR(191),applied_version BIGINT,
-    created_at TIMESTAMP(6),PRIMARY KEY(owner_key,agent_key,scope_key,path_hash,operation_id))
-""");
+                        CREATE TABLE ha_workspace_document_append(owner_key VARCHAR(191),agent_key VARCHAR(128),scope_key VARCHAR(160),
+                            path_hash CHAR(64),document_path VARCHAR(512),operation_id VARCHAR(191),applied_version BIGINT,
+                            created_at TIMESTAMP(6),PRIMARY KEY(owner_key,agent_key,scope_key,path_hash,operation_id))
+                        """);
         Instant now = Instant.parse("2026-10-03T00:00:00Z");
         insert(jdbc, "MEMORY.md", "- remembered\n", 2, now);
         insert(jdbc, "memory/2026-10-03.md", "## Memory Save\n- remembered\n", 1, now);

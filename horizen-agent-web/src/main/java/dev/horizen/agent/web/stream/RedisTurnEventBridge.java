@@ -36,37 +36,59 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** 把 Runtime Event 顺序写入 Redis，并为任意实例提供可回放事件流。 */
+/**
+ * 把 Runtime Event 顺序写入 Redis，并为任意实例提供可回放事件流。
+ */
 public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseable {
-    /** 写入重试的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 写入重试的固定取值，用于相应策略和边界判断。
+     */
     private static final Retry WRITE_RETRY =
             Retry.backoff(2, Duration.ofMillis(25)).maxBackoff(Duration.ofMillis(100));
 
-    /** 当前执行控制与事件读写使用的消息总线。 */
+    /**
+     * 当前执行控制与事件读写使用的消息总线。
+     */
     private final MessageBus bus;
 
-    /** 宿主绑定的配置对象，供组件组装与策略校验使用。 */
+    /**
+     * 宿主绑定的配置对象，供组件组装与策略校验使用。
+     */
     private final TurnEventProperties properties;
 
-    /** 当前仍在读取执行增量日志的轮询器数量。 */
+    /**
+     * 当前仍在读取执行增量日志的轮询器数量。
+     */
     private final AtomicInteger activePollers = new AtomicInteger();
 
-    /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+    /**
+     * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+     */
     private final AtomicBoolean closed = new AtomicBoolean();
 
-    /** 当前事件桥是否已进入关闭流程。 */
+    /**
+     * 当前事件桥是否已进入关闭流程。
+     */
     private final Sinks.Empty<Void> shutdown = Sinks.empty();
 
-    /** 读取的数量，供运行统计或容量控制使用。 */
+    /**
+     * 读取的数量，供运行统计或容量控制使用。
+     */
     private final AtomicLong readCount = new AtomicLong();
 
-    /** 空值读取的数量，供运行统计或容量控制使用。 */
+    /**
+     * 空值读取的数量，供运行统计或容量控制使用。
+     */
     private final AtomicLong emptyReadCount = new AtomicLong();
 
-    /** 读取失败的数量，供运行统计或容量控制使用。 */
+    /**
+     * 读取失败的数量，供运行统计或容量控制使用。
+     */
     private final AtomicLong readFailureCount = new AtomicLong();
 
-    /** 最大读取延迟纳秒的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * 最大读取延迟纳秒的原子状态，供并发更新与统计读取使用。
+     */
     private final AtomicLong maxReadLatencyNanos = new AtomicLong();
 
     /**
@@ -81,7 +103,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
     /**
      * 创建Redis执行事件桥接器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param bus 当前Redis执行事件桥接器持有的消息总线对象，供相应处理步骤使用。
+     * @param bus        当前Redis执行事件桥接器持有的消息总线对象，供相应处理步骤使用。
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
      */
     public RedisTurnEventBridge(MessageBus bus, TurnEventProperties properties) {
@@ -94,7 +116,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
      * 发布Redis执行事件桥接器。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param event 当前Redis执行事件桥接器持有的事件对象，供相应处理步骤使用。
+     * @param event    当前Redis执行事件桥接器持有的事件对象，供相应处理步骤使用。
      * @return 本次操作返回的长整型结果。
      */
     public long publish(String ownerKey, AgentRuntimeEvent event) {
@@ -104,11 +126,11 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
     /**
      * 发布Redis执行事件桥接器。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param event 当前Redis执行事件桥接器持有的事件对象，供相应处理步骤使用。
+     * @param ownerKey         宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param event            当前Redis执行事件桥接器持有的事件对象，供相应处理步骤使用。
      * @param timelineSequence 当前Redis执行事件桥接器使用的时间线序号，供其处理与状态记录使用。
      * @return 本次操作返回的长整型结果。
-     * @throws EventWriteException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws EventWriteException   当前输入或运行状态不满足本方法的处理条件时抛出。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public long publish(String ownerKey, AgentRuntimeEvent event, long timelineSequence) {
@@ -138,7 +160,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
     /**
      * 追加Redis执行事件桥接器。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param payload 负载的索引映射，供按键查找或归并当前组件的数据。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
@@ -159,14 +181,16 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
      * 计算或取得本方法声明的结果，供当前RedisTurnEventBridge处理步骤使用。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId   单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     public Flux<AgentRuntimeEvent> replay(String ownerKey, String turnId) {
         return replay(ownerKey, turnId, 0L);
     }
 
-    /** 从 Redis List 的 1-based 游标之后恢复，不能传 MySQL timeline 序号。 */
+    /**
+     * 从 Redis List 的 1-based 游标之后恢复，不能传 MySQL timeline 序号。
+     */
     public Flux<AgentRuntimeEvent> replay(String ownerKey, String turnId, long afterEventSequence) {
         String key = eventKey(ownerKey, turnId);
         return Flux.defer(
@@ -185,11 +209,11 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
                                     event ->
                                             terminal(event.getType())
                                                     || event.getType()
-                                                            == AgentRuntimeEvent.Type
-                                                                    .APPROVAL_REQUIRED
+                                                    == AgentRuntimeEvent.Type
+                                                    .APPROVAL_REQUIRED
                                                     || event.getType()
-                                                            == AgentRuntimeEvent.Type
-                                                                    .ASK_USER_REQUIRED)
+                                                    == AgentRuntimeEvent.Type
+                                                    .ASK_USER_REQUIRED)
                             .doFinally(ignored -> activePollers.decrementAndGet());
                 });
     }
@@ -198,7 +222,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
      * 读取快照中的Redis执行事件桥接器。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId   单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次操作返回的事件快照结果。
      */
     public EventSnapshot snapshot(String ownerKey, String turnId) {
@@ -208,7 +232,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
         boolean present =
                 bus instanceof RedisMessageBus redisBus
                         && Boolean.TRUE.equals(
-                                redisBus.logExists(key).block(properties.getWriteTimeout()));
+                        redisBus.logExists(key).block(properties.getWriteTimeout()));
         String cursor = null;
         while (true) {
             List<BusEntry> batch =
@@ -239,7 +263,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
      * 裁剪Redis执行事件桥接器。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId   单次用户输入触发的执行标识，用于关联状态、消息和事件。
      */
     public void trim(String ownerKey, String turnId) {
         bus.logTrim(eventKey(ownerKey, turnId)).block(Duration.ofSeconds(3));
@@ -249,8 +273,8 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
      * 轮询Redis执行事件桥接器。
      * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
      *
-     * @param key 当前对象的查找或写入键。
-     * @param cursor 当前分页或回放位置，用于继续读取而不是资源身份校验。
+     * @param key        当前对象的查找或写入键。
+     * @param cursor     当前分页或回放位置，用于继续读取而不是资源身份校验。
      * @param emptyReads 空值Reads的原子状态，供并发更新与统计读取使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
@@ -282,19 +306,19 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
                                                 nextPollDelay(emptyReads, advanced.isEmpty());
                                         if (advanced.isEmpty()
                                                 && emptyReads.get()
-                                                        >= properties.getMissingLogEmptyReads()
+                                                >= properties.getMissingLogEmptyReads()
                                                 && bus instanceof RedisMessageBus redisBus) {
                                             return redisBus.logExists(key)
                                                     .flatMapMany(
                                                             exists ->
                                                                     exists
                                                                             ? delayedPoll(
-                                                                                    key,
-                                                                                    cursor,
-                                                                                    emptyReads,
-                                                                                    delay)
+                                                                            key,
+                                                                            cursor,
+                                                                            emptyReads,
+                                                                            delay)
                                                                             : Flux.error(
-                                                                                    new EventLogUnavailableException()));
+                                                                            new EventLogUnavailableException()));
                                         }
                                         return Flux.fromIterable(advanced)
                                                 .map(entry -> fromEntry(entry))
@@ -322,10 +346,10 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
     /**
      * 计算或取得本方法声明的结果，供当前RedisTurnEventBridge处理步骤使用。
      *
-     * @param key 当前对象的查找或写入键。
-     * @param cursor 当前分页或回放位置，用于继续读取而不是资源身份校验。
+     * @param key        当前对象的查找或写入键。
+     * @param cursor     当前分页或回放位置，用于继续读取而不是资源身份校验。
      * @param emptyReads 空值Reads的原子状态，供并发更新与统计读取使用。
-     * @param delay 延迟的时间配置，供等待、调度或失效判断使用。
+     * @param delay      延迟的时间配置，供等待、调度或失效判断使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     private Flux<AgentRuntimeEvent> delayedPoll(
@@ -336,7 +360,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param cursor 当前分页或回放位置，用于继续读取而不是资源身份校验。
+     * @param cursor  当前分页或回放位置，用于继续读取而不是资源身份校验。
      * @param entries 条目集合的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @return 本次处理得到的结果集合。
      */
@@ -369,8 +393,8 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
                 event.getType() == AgentRuntimeEvent.Type.ASK_USER_REQUIRED
                         ? AskUserEventDetails.normalize(event.getDetails())
                         : event.getType() == AgentRuntimeEvent.Type.PRESENTATION_CREATED
-                                ? presentationDetails(event.getDetails())
-                                : event.getDetails());
+                        ? presentationDetails(event.getDetails())
+                        : event.getDetails());
         value.put("durationMs", event.getDurationMs());
         value.put("latencyMs", event.getLatencyMs());
         value.put("source", event.getSource());
@@ -441,7 +465,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
      * 生成当前操作所需的eventKey文本，供调用方继续处理。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId   单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次处理生成或读取的文本。
      */
     private static String eventKey(String ownerKey, String turnId) {
@@ -468,7 +492,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
      * 生成当前操作所需的text文本，供调用方继续处理。
      *
      * @param value 待校验、转换或保存的原始值。
-     * @param key 当前对象的查找或写入键。
+     * @param key   当前对象的查找或写入键。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -518,7 +542,7 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
      * 计算或取得本方法声明的结果，供当前RedisTurnEventBridge处理步骤使用。
      *
      * @param emptyReads 空值Reads的原子状态，供并发更新与统计读取使用。
-     * @param empty 空值的状态标记，用于选择当前组件的处理路径。
+     * @param empty      空值的状态标记，用于选择当前组件的处理路径。
      * @return 本次操作返回的耗时结果。
      */
     private Duration nextPollDelay(AtomicInteger emptyReads, boolean empty) {
@@ -553,44 +577,60 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
         if (closed.compareAndSet(false, true)) shutdown.tryEmitEmpty();
     }
 
-    /** 从事件通道读取的执行增量与当前游标快照。 */
+    /**
+     * 从事件通道读取的执行增量与当前游标快照。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class EventSnapshot {
-        /** 当前执行或历史事件集合，供持久化、回放与观测使用。 */
+        /**
+         * 当前执行或历史事件集合，供持久化、回放与观测使用。
+         */
         private List<AgentRuntimeEvent> events;
 
-        /** 本次事件快照中已经读取到的最后增量游标。 */
+        /**
+         * 本次事件快照中已经读取到的最后增量游标。
+         */
         private long lastSequence;
 
-        /** 存在的状态标记，用于选择当前组件的处理路径。 */
+        /**
+         * 存在的状态标记，用于选择当前组件的处理路径。
+         */
         private boolean present;
 
-        /** 时间线引用集合的索引映射，供按键查找或归并当前组件的数据。 */
+        /**
+         * 时间线引用集合的索引映射，供按键查找或归并当前组件的数据。
+         */
         private Map<Long, Long> timelineReferences = Map.of();
 
         /**
          * 创建事件快照，初始化该组件所需的状态、配置或依赖。
          *
-         * @param events 当前执行或历史事件集合，供持久化、回放与观测使用。
+         * @param events       当前执行或历史事件集合，供持久化、回放与观测使用。
          * @param lastSequence 当前事件快照使用的最近序号，供其处理与状态记录使用。
-         * @param present 存在的状态标记，用于选择当前组件的处理路径。
+         * @param present      存在的状态标记，用于选择当前组件的处理路径。
          */
         EventSnapshot(List<AgentRuntimeEvent> events, long lastSequence, boolean present) {
             this(events, lastSequence, present, Map.of());
         }
     }
 
-    /** 事件日志不可用异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。 */
+    /**
+     * 事件日志不可用异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。
+     */
     public static final class EventLogUnavailableException extends IllegalStateException {
-        /** 创建事件日志不可用异常，初始化该组件所需的状态、配置或依赖。 */
+        /**
+         * 创建事件日志不可用异常，初始化该组件所需的状态、配置或依赖。
+         */
         EventLogUnavailableException() {
             super("Redis Turn event log 不存在或已过期");
         }
     }
 
-    /** 事件写入异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。 */
+    /**
+     * 事件写入异常异常，明确当前流程不能继续或需要由调用方选择恢复路径。
+     */
     public static final class EventWriteException extends TurnEventChannel.EventWriteException {
         /**
          * 创建事件写入异常，初始化该组件所需的状态、配置或依赖。
@@ -602,24 +642,36 @@ public final class RedisTurnEventBridge implements TurnEventChannel, AutoCloseab
         }
     }
 
-    /** 执行事件回放桥的轮询、读取与异常统计。 */
+    /**
+     * 执行事件回放桥的轮询、读取与异常统计。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class EventBridgeStatus {
-        /** 当前仍在读取执行增量日志的轮询器数量。 */
+        /**
+         * 当前仍在读取执行增量日志的轮询器数量。
+         */
         private int activePollers;
 
-        /** 读取的数量，供运行统计或容量控制使用。 */
+        /**
+         * 读取的数量，供运行统计或容量控制使用。
+         */
         private long readCount;
 
-        /** 空值读取的数量，供运行统计或容量控制使用。 */
+        /**
+         * 空值读取的数量，供运行统计或容量控制使用。
+         */
         private long emptyReadCount;
 
-        /** 读取失败的数量，供运行统计或容量控制使用。 */
+        /**
+         * 读取失败的数量，供运行统计或容量控制使用。
+         */
         private long readFailureCount;
 
-        /** 最大读取延迟，单位为毫秒。 */
+        /**
+         * 最大读取延迟，单位为毫秒。
+         */
         private long maxReadLatencyMs;
     }
 }

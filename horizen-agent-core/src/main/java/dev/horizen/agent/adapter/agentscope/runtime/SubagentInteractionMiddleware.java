@@ -20,21 +20,33 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-/** 子 Agent 的人工交互转换为提案，仅根 Agent 调用宿主的 HITL 工具。 */
+/**
+ * 子 Agent 的人工交互转换为提案，仅根 Agent 调用宿主的 HITL 工具。
+ */
 public final class SubagentInteractionMiddleware implements MiddlewareBase {
-    /** 请求消息使用的固定标识或协议文本。 */
+    /**
+     * 请求消息使用的固定标识或协议文本。
+     */
     public static final String REQUEST_MESSAGE = "__subagent_parent_request__";
 
-    /** 事件名称使用的固定标识或协议文本。 */
+    /**
+     * 事件名称使用的固定标识或协议文本。
+     */
     public static final String EVENT_NAME = "subagent_parent_interaction";
 
-    /** 主执行用于发起用户澄清的工具入口。 */
+    /**
+     * 主执行用于发起用户澄清的工具入口。
+     */
     private final Supplier<AgentTool> questionTool;
 
-    /** 子级工具集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 子级工具集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, Set<String>> childTools;
 
-    /** 创建子Agent交互中间件，初始化该组件所需的状态、配置或依赖。 */
+    /**
+     * 创建子Agent交互中间件，初始化该组件所需的状态、配置或依赖。
+     */
     public SubagentInteractionMiddleware() {
         this(() -> null, Map.of());
     }
@@ -43,7 +55,7 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
      * 创建子Agent交互中间件，初始化该组件所需的状态、配置或依赖。
      *
      * @param questionTool 当前子Agent交互中间件持有的question工具对象，供相应处理步骤使用。
-     * @param childTools 子级工具集合的索引映射，供按键查找或归并当前组件的数据。
+     * @param childTools   子级工具集合的索引映射，供按键查找或归并当前组件的数据。
      */
     public SubagentInteractionMiddleware(
             Supplier<AgentTool> questionTool, Map<String, Set<String>> childTools) {
@@ -75,10 +87,10 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
     /**
      * 响应Agent。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -104,9 +116,9 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
     /**
      * 响应系统Prompt。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param prompt 传给模型的提示文本，供当前模型请求使用。
+     * @param prompt  传给模型的提示文本，供当前模型请求使用。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -123,10 +135,10 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
     /**
      * 响应Acting。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -178,60 +190,60 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
                                                                         .flatMap(
                                                                                 own -> {
                                                                                     if (own
-                                                                                                    .getBehavior()
+                                                                                            .getBehavior()
                                                                                             == PermissionBehavior
-                                                                                                    .DENY)
+                                                                                            .DENY)
                                                                                         return Mono
                                                                                                 .error(
                                                                                                         new IllegalStateException(
                                                                                                                 "Child tool denied"));
                                                                                     if ("ask_user"
-                                                                                                    .equals(
-                                                                                                            call
-                                                                                                                    .getName())
+                                                                                            .equals(
+                                                                                                    call
+                                                                                                            .getName())
                                                                                             || verdict
-                                                                                                            .getBehavior()
-                                                                                                    == PermissionBehavior
-                                                                                                            .ASK
+                                                                                            .getBehavior()
+                                                                                            == PermissionBehavior
+                                                                                            .ASK
                                                                                             || own
-                                                                                                            .getBehavior()
-                                                                                                    == PermissionBehavior
-                                                                                                            .ASK) {
+                                                                                            .getBehavior()
+                                                                                            == PermissionBehavior
+                                                                                            .ASK) {
                                                                                         String
                                                                                                 json =
-                                                                                                        JsonUtils
-                                                                                                                .getJsonCodec()
-                                                                                                                .toJson(
-                                                                                                                        arguments);
+                                                                                                JsonUtils
+                                                                                                        .getJsonCodec()
+                                                                                                        .toJson(
+                                                                                                                arguments);
                                                                                         Map<
-                                                                                                        String,
-                                                                                                        Object>
+                                                                                                String,
+                                                                                                Object>
                                                                                                 proposed =
-                                                                                                        Map
-                                                                                                                .of(
-                                                                                                                        "agentId",
-                                                                                                                        agent
-                                                                                                                                .getName(),
-                                                                                                                        "agentSessionId",
-                                                                                                                        context
-                                                                                                                                .getSessionId(),
-                                                                                                                        "type",
-                                                                                                                        "ask_user"
-                                                                                                                                        .equals(
-                                                                                                                                                call
-                                                                                                                                                        .getName())
-                                                                                                                                ? "clarification"
-                                                                                                                                : "approval",
-                                                                                                                        "toolName",
-                                                                                                                        call
-                                                                                                                                .getName(),
-                                                                                                                        "input",
-                                                                                                                        JsonUtils
-                                                                                                                                .getJsonCodec()
-                                                                                                                                .fromJson(
-                                                                                                                                        json,
-                                                                                                                                        Map
-                                                                                                                                                .class));
+                                                                                                Map
+                                                                                                        .of(
+                                                                                                                "agentId",
+                                                                                                                agent
+                                                                                                                        .getName(),
+                                                                                                                "agentSessionId",
+                                                                                                                context
+                                                                                                                        .getSessionId(),
+                                                                                                                "type",
+                                                                                                                "ask_user"
+                                                                                                                        .equals(
+                                                                                                                                call
+                                                                                                                                        .getName())
+                                                                                                                        ? "clarification"
+                                                                                                                        : "approval",
+                                                                                                                "toolName",
+                                                                                                                call
+                                                                                                                        .getName(),
+                                                                                                                "input",
+                                                                                                                JsonUtils
+                                                                                                                        .getJsonCodec()
+                                                                                                                        .fromJson(
+                                                                                                                                json,
+                                                                                                                                Map
+                                                                                                                                        .class));
                                                                                         return Mono
                                                                                                 .just(
                                                                                                         proposed);
@@ -289,8 +301,8 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
     /**
      * 收敛Unexecuted。
      *
-     * @param state 当前工作状态或状态存储对象，供执行与恢复流程使用。
-     * @param input 本次处理的输入。
+     * @param state   当前工作状态或状态存储对象，供执行与恢复流程使用。
+     * @param input   本次处理的输入。
      * @param emitter 当前子Agent交互中间件持有的发送器对象，供相应处理步骤使用。
      */
     private static void finishUnexecuted(
@@ -329,10 +341,10 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
     /**
      * 响应模型推理。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param input 本次处理的输入。
-     * @param next 将输入转换为目标结果的函数。
+     * @param input   本次处理的输入。
+     * @param next    将输入转换为目标结果的函数。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -371,7 +383,7 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
     /**
      * 计算或取得本方法声明的结果，供当前SubagentInteractionMiddleware处理步骤使用。
      *
-     * @param child 当前子Agent交互中间件持有的子级对象，供相应处理步骤使用。
+     * @param child  当前子Agent交互中间件持有的子级对象，供相应处理步骤使用。
      * @param parent 当前子Agent交互中间件持有的父级对象，供相应处理步骤使用。
      * @return 本次操作返回的权限上下文工作状态结果。
      */
@@ -399,12 +411,18 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
         return builder.build();
     }
 
-    /** 子Agent交互中间件内部的请求集合，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 子Agent交互中间件内部的请求集合，封装该步骤需要的状态或输入输出。
+     */
     private static final class Requests {
-        /** 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。 */
+        /**
+         * 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。
+         */
         private final List<Map<String, Object>> pending = new ArrayList<>();
 
-        /** 父执行传给委派流程的权限上下文，决定交互是否需要交回主执行。 */
+        /**
+         * 父执行传给委派流程的权限上下文，决定交互是否需要交回主执行。
+         */
         private volatile PermissionContextState parentPermissions;
 
         /**
@@ -418,7 +436,7 @@ public final class SubagentInteractionMiddleware implements MiddlewareBase {
             all.addAll(values);
             if (all.size() > 10
                     || JsonUtils.getJsonCodec().toJson(all).getBytes(StandardCharsets.UTF_8).length
-                            > 65_536) {
+                    > 65_536) {
                 throw new IllegalStateException("Subagent parent request limit exceeded");
             }
             pending.addAll(values);

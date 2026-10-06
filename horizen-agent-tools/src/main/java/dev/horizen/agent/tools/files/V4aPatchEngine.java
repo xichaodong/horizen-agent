@@ -22,17 +22,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** V4A 多文件补丁引擎：先解析并校验全部操作，再应用变更。 */
+/**
+ * V4A 多文件补丁引擎：先解析并校验全部操作，再应用变更。
+ */
 final class V4aPatchEngine {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private V4aPatchEngine() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private V4aPatchEngine() {
+    }
 
     /**
      * 应用4A补丁引擎。
      *
-     * @param fs 当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
+     * @param fs      当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param patch 当前4A补丁引擎使用的补丁，供其处理与状态记录使用。
+     * @param patch   当前4A补丁引擎使用的补丁，供其处理与状态记录使用。
      * @return 本次操作返回的结果结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -56,13 +61,12 @@ final class V4aPatchEngine {
         List<String> modified = new ArrayList<>();
         for (Operation operation : operations) {
             switch (operation.type) {
-                case ADD ->
-                        writeContent(
-                                fs,
-                                context,
-                                operation.target(),
-                                overlay.get(operation.target()),
-                                false);
+                case ADD -> writeContent(
+                        fs,
+                        context,
+                        operation.target(),
+                        overlay.get(operation.target()),
+                        false);
                 case UPDATE -> {
                     String current = read(fs, context, operation.path, Map.of(), Set.of());
                     writeContent(
@@ -82,11 +86,11 @@ final class V4aPatchEngine {
     /**
      * 完成当前操作的simulate步骤，按实现更新相应状态或依赖。
      *
-     * @param fs 当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param fs        当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
+     * @param context   当前执行上下文，提供关联标识和宿主绑定信息。
      * @param operation 当前4A补丁引擎持有的操作对象，供相应处理步骤使用。
-     * @param overlay overlay的索引映射，供按键查找或归并当前组件的数据。
-     * @param deleted 删除的去重集合，供成员查找或范围检查使用。
+     * @param overlay   overlay的索引映射，供按键查找或归并当前组件的数据。
+     * @param deleted   删除的去重集合，供成员查找或范围检查使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private static void simulate(
@@ -130,7 +134,7 @@ final class V4aPatchEngine {
      * 应用修改片段。
      *
      * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
-     * @param hunk 当前4A补丁引擎持有的修改片段对象，供相应处理步骤使用。
+     * @param hunk    当前4A补丁引擎持有的修改片段对象，供相应处理步骤使用。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -208,7 +212,7 @@ final class V4aPatchEngine {
     /**
      * 生成当前操作所需的reindent文本，供调用方继续处理。
      *
-     * @param region 当前4A补丁引擎使用的区域，供其处理与状态记录使用。
+     * @param region  当前4A补丁引擎使用的区域，供其处理与状态记录使用。
      * @param oldText 当前4A补丁引擎使用的old文本，供其处理与状态记录使用。
      * @param newText 当前4A补丁引擎使用的新建文本，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
@@ -230,7 +234,7 @@ final class V4aPatchEngine {
      * 计算或取得本方法声明的结果，供当前V4aPatchEngine处理步骤使用。
      *
      * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
-     * @param value 待校验、转换或保存的原始值。
+     * @param value   待校验、转换或保存的原始值。
      * @return 本次处理得到的结果集合。
      */
     private static List<Match> occurrences(String content, String value) {
@@ -247,9 +251,9 @@ final class V4aPatchEngine {
     /**
      * 检查是否存在4A补丁引擎。
      *
-     * @param fs 当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
+     * @param fs      当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param path 需要读取、写入或校验的路径。
+     * @param path    需要读取、写入或校验的路径。
      * @param overlay overlay的索引映射，供按键查找或归并当前组件的数据。
      * @param deleted 删除的去重集合，供成员查找或范围检查使用。
      * @return 本次检查是否通过或本次更新是否成功。
@@ -267,9 +271,9 @@ final class V4aPatchEngine {
     /**
      * 读取4A补丁引擎。
      *
-     * @param fs 当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
+     * @param fs      当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param path 需要读取、写入或校验的路径。
+     * @param path    需要读取、写入或校验的路径。
      * @param overlay overlay的索引映射，供按键查找或归并当前组件的数据。
      * @param deleted 删除的去重集合，供成员查找或范围检查使用。
      * @return 本次处理生成或读取的文本。
@@ -312,10 +316,10 @@ final class V4aPatchEngine {
     /**
      * 写入正文。
      *
-     * @param fs 当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param path 需要读取、写入或校验的路径。
-     * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+     * @param fs        当前4A补丁引擎持有的fs对象，供相应处理步骤使用。
+     * @param context   当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param path      需要读取、写入或校验的路径。
+     * @param content   当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @param overwrite overwrite的状态标记，用于选择当前组件的处理路径。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -476,31 +480,51 @@ final class V4aPatchEngine {
         return path.toString().replace('\\', '/');
     }
 
-    /** 4A补丁引擎使用的状态或策略分类，具体分支按枚举成员区分。 */
+    /**
+     * 4A补丁引擎使用的状态或策略分类，具体分支按枚举成员区分。
+     */
     enum Type {
-        /** 新增目标文件或内容。 */
+        /**
+         * 新增目标文件或内容。
+         */
         ADD,
-        /** 修改已有内容。 */
+        /**
+         * 修改已有内容。
+         */
         UPDATE,
-        /** 删除指定目标内容。 */
+        /**
+         * 删除指定目标内容。
+         */
         DELETE,
-        /** 移动目标文件并维护相应路径。 */
+        /**
+         * 移动目标文件并维护相应路径。
+         */
         MOVE
     }
 
-    /** 4A补丁引擎内部的操作，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 4A补丁引擎内部的操作，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     static final class Operation {
-        /** 本对象的协议类别，用于选择对应的解析或呈现规则。 */
+        /**
+         * 本对象的协议类别，用于选择对应的解析或呈现规则。
+         */
         final Type type;
 
-        /** 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。 */
+        /**
+         * 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。
+         */
         final String path;
 
-        /** 补丁移动或创建操作采用的目标相对路径。 */
+        /**
+         * 补丁移动或创建操作采用的目标相对路径。
+         */
         final String newPath;
 
-        /** hunks的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+        /**
+         * hunks的有序集合，保留当前组件处理或协议输出所需的顺序。
+         */
         final List<Hunk> hunks = new ArrayList<>();
 
         /**
@@ -527,40 +551,62 @@ final class V4aPatchEngine {
         }
     }
 
-    /** 4A补丁引擎内部的修改片段，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 4A补丁引擎内部的修改片段，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     static final class Hunk {
-        /** 定位补丁修改片段的上下文提示。 */
+        /**
+         * 定位补丁修改片段的上下文提示。
+         */
         final String hint;
 
-        /** 行集合的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+        /**
+         * 行集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+         */
         final List<HunkLine> lines = new ArrayList<>();
     }
 
-    /** 4A补丁引擎内部的修改片段行，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 4A补丁引擎内部的修改片段行，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     static final class HunkLine {
-        /** 当前补丁行的操作前缀，区分原文、增加与删除。 */
+        /**
+         * 当前补丁行的操作前缀，区分原文、增加与删除。
+         */
         final char prefix;
 
-        /** 当前记录或资源的正文内容；与资源标识和存储引用分开保存。 */
+        /**
+         * 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+         */
         final String content;
     }
 
-    /** 4A补丁引擎内部的匹配，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 4A补丁引擎内部的匹配，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     static final class Match {
-        /** 当前匹配片段在原内容中的起始位置。 */
+        /**
+         * 当前匹配片段在原内容中的起始位置。
+         */
         final int start;
 
-        /** 当前匹配片段在原内容中的结束位置。 */
+        /**
+         * 当前匹配片段在原内容中的结束位置。
+         */
         final int end;
     }
 
-    /** 的结果对象，供调用方判断实际处理结果。 */
+    /**
+     * 的结果对象，供调用方判断实际处理结果。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     static final class Result {
-        /** modified的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+        /**
+         * modified的有序集合，保留当前组件处理或协议输出所需的顺序。
+         */
         @Getter(AccessLevel.PACKAGE)
         final List<String> modified;
     }

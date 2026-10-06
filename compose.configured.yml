@@ -1,6 +1,6 @@
 services:
   agent:
-    command: ['configured']
+    command: [ 'configured' ]
     volumes:
       - type: bind
         source: ./.env.yml

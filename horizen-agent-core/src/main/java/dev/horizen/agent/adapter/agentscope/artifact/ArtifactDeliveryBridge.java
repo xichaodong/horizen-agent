@@ -17,9 +17,13 @@ import java.net.URLConnection;
 import java.time.Instant;
 import java.util.Objects;
 
-/** 将 AgentScope deliver_artifact 调用接入 Horizen 的 Artifact 生命周期。 */
+/**
+ * 将 AgentScope deliver_artifact 调用接入 Horizen 的 Artifact 生命周期。
+ */
 public final class ArtifactDeliveryBridge implements ArtifactDeliveryTarget {
-    /** 本组件调用的 {@code ArtifactLifecycleService} 依赖，负责 lifecycle 对应的处理步骤。 */
+    /**
+     * 本组件调用的 {@code ArtifactLifecycleService} 依赖，负责 lifecycle 对应的处理步骤。
+     */
     private final ArtifactLifecycleService lifecycle;
 
     /**

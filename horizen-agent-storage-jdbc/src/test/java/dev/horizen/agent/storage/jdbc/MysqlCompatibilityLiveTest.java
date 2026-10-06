@@ -16,7 +16,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import java.time.Instant;
 
-/** 真实 MySQL 协议兼容性测试；默认跳过。 */
+/**
+ * 真实 MySQL 协议兼容性测试；默认跳过。
+ */
 @EnabledIfSystemProperty(named = "horizen.mysql.live", matches = "true")
 class MysqlCompatibilityLiveTest {
 

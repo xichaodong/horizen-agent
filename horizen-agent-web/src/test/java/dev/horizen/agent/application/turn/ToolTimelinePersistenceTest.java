@@ -71,8 +71,10 @@ class ToolTimelinePersistenceTest {
                         new RedisTurnEventBridge(bus),
                         mock(AgentRuntime.class),
                         event -> mapper.json(mapper.streamEvent(event)),
-                        t -> {},
-                        t -> {});
+                        t -> {
+                        },
+                        t -> {
+                        });
         var projection = new ToolTimelineProjection(turn);
         var identity = new ExecutionIdentity("synthetic-owner", "synthetic-actor");
         persistence.observe(
@@ -170,8 +172,8 @@ class ToolTimelinePersistenceTest {
         assertEquals(
                 "parent",
                 snapshot(
-                                projection.complete(
-                                        event(AgentRuntimeEvent.Type.TOOL_COMPLETED, "call", null)))
+                        projection.complete(
+                                event(AgentRuntimeEvent.Type.TOOL_COMPLETED, "call", null)))
                         .get("input"));
         assertEquals(0, projection.getBytes());
     }
@@ -203,8 +205,8 @@ class ToolTimelinePersistenceTest {
         var projection = new ToolTimelineProjection(turn);
         assertFalse(
                 snapshot(
-                                projection.complete(
-                                        event(AgentRuntimeEvent.Type.TOOL_COMPLETED, "call", null)))
+                        projection.complete(
+                                event(AgentRuntimeEvent.Type.TOOL_COMPLETED, "call", null)))
                         .containsKey("input"));
     }
 

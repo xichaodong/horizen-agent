@@ -19,25 +19,26 @@ import java.nio.file.Path;
 import java.util.Map;
 
 class SandboxPatchToolTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void parsesV4aOperations() {
         var operations =
                 V4aPatchEngine.parse(
                         """
-            *** Begin Patch
-            *** Update File: src/a.txt
-            @@ heading @@
-             heading
-            -old
-            +new
-            *** Add File: src/new.txt
-            +hello
-            *** Move File: src/old.txt -> src/moved.txt
-            *** Delete File: src/delete.txt
-            *** End Patch
-            """);
+                                *** Begin Patch
+                                *** Update File: src/a.txt
+                                @@ heading @@
+                                 heading
+                                -old
+                                +new
+                                *** Add File: src/new.txt
+                                +hello
+                                *** Move File: src/old.txt -> src/moved.txt
+                                *** Delete File: src/delete.txt
+                                *** End Patch
+                                """);
         assertEquals(4, operations.size());
     }
 
@@ -109,18 +110,18 @@ class SandboxPatchToolTest {
 
         String patch =
                 """
-        *** Begin Patch
-        *** Update File: src/a.txt
-        @@ heading @@
-         heading
-        -older
-        +new
-        *** Add File: src/added.txt
-        +added
-        *** Move File: src/move.txt -> src/moved.txt
-        *** Delete File: src/delete.txt
-        *** End Patch
-        """;
+                        *** Begin Patch
+                        *** Update File: src/a.txt
+                        @@ heading @@
+                         heading
+                        -older
+                        +new
+                        *** Add File: src/added.txt
+                        +added
+                        *** Move File: src/move.txt -> src/moved.txt
+                        *** Delete File: src/delete.txt
+                        *** End Patch
+                        """;
         var patchResult =
                 tool.callAsync(
                                 ToolCallParam.builder()
@@ -143,14 +144,14 @@ class SandboxPatchToolTest {
         AbstractFilesystem filesystem = new LocalFilesystem(workspace, false, 10, null);
         String patch =
                 """
-        *** Begin Patch
-        *** Update File: src/a.txt
-        -missing
-        +changed
-        *** Add File: src/should-not-exist.txt
-        +bad
-        *** End Patch
-        """;
+                        *** Begin Patch
+                        *** Update File: src/a.txt
+                        -missing
+                        +changed
+                        *** Add File: src/should-not-exist.txt
+                        +bad
+                        *** End Patch
+                        """;
         new SandboxPatchTool()
                 .callAsync(
                         ToolCallParam.builder()

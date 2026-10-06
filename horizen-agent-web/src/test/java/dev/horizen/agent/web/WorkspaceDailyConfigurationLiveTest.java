@@ -16,7 +16,9 @@ import org.springframework.boot.test.context.ConfigDataApplicationContextInitial
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;
 
-/** 仅绑定配置，不实例化 AgentService，也不调用外部模型或 Provider。 */
+/**
+ * 仅绑定配置，不实例化 AgentService，也不调用外部模型或 Provider。
+ */
 @EnabledIfSystemProperty(named = "horizen.workspace.config.live", matches = "true")
 class WorkspaceDailyConfigurationLiveTest {
     @Test
@@ -55,10 +57,11 @@ class WorkspaceDailyConfigurationLiveTest {
 
     @Configuration(proxyBeanMethods = false)
     @EnableConfigurationProperties({
-        SandboxSnapshotProperties.class,
-        E2bSandboxProperties.class,
-        ArtifactProperties.class,
-        RuntimeStorageProperties.class
+            SandboxSnapshotProperties.class,
+            E2bSandboxProperties.class,
+            ArtifactProperties.class,
+            RuntimeStorageProperties.class
     })
-    static class ConfigurationOnly {}
+    static class ConfigurationOnly {
+    }
 }

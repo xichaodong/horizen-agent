@@ -18,9 +18,13 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-/** 共享历史的时间线视图，不将消息或卡片正文复制到另一行。 */
+/**
+ * 共享历史的时间线视图，不将消息或卡片正文复制到另一行。
+ */
 public class JdbcTurnTimelineStore implements TurnTimelineStore {
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final TurnTimelineMapper mapper;
 
     /**
@@ -32,7 +36,9 @@ public class JdbcTurnTimelineStore implements TurnTimelineStore {
         this.mapper = MyBatisSessions.create(dataSource).getMapper(TurnTimelineMapper.class);
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcTurnTimelineStore(TurnTimelineMapper mapper) {
         this.mapper = Objects.requireNonNull(mapper);
     }
@@ -40,11 +46,11 @@ public class JdbcTurnTimelineStore implements TurnTimelineStore {
     /**
      * 追加JDBC执行时间线存储。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param ownerKey    宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId   会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param turnId      单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @param payloadJson 历史或协议负载的 JSON 表示，供读取时恢复类型化数据。
-     * @param createdAt 当前记录的创建时间。
+     * @param createdAt   当前记录的创建时间。
      * @return 本次操作返回的执行时间线事件结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -101,13 +107,13 @@ public class JdbcTurnTimelineStore implements TurnTimelineStore {
     /**
      * 关联JDBC执行时间线存储。
      *
-     * @param owner 当前JDBC执行时间线存储使用的数据归属，供其处理与状态记录使用。
+     * @param owner   当前JDBC执行时间线存储使用的数据归属，供其处理与状态记录使用。
      * @param session 当前JDBC执行时间线存储使用的会话，供其处理与状态记录使用。
-     * @param turn 当前JDBC执行时间线存储使用的执行，供其处理与状态记录使用。
-     * @param type 当前操作使用的目标类型或类别。
-     * @param id 目标对象的标识。
-     * @param event 当前JDBC执行时间线存储持有的事件对象，供相应处理步骤使用。
-     * @param at 当前JDBC执行时间线存储持有的时间对象，供相应处理步骤使用。
+     * @param turn    当前JDBC执行时间线存储使用的执行，供其处理与状态记录使用。
+     * @param type    当前操作使用的目标类型或类别。
+     * @param id      目标对象的标识。
+     * @param event   当前JDBC执行时间线存储持有的事件对象，供相应处理步骤使用。
+     * @param at      当前JDBC执行时间线存储持有的时间对象，供相应处理步骤使用。
      * @return 本次操作返回的执行时间线事件结果。
      */
     private TurnTimelineEvent attach(
@@ -148,7 +154,7 @@ public class JdbcTurnTimelineStore implements TurnTimelineStore {
     /**
      * 查询列表中的目标范围会话。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次处理得到的结果集合。
      */

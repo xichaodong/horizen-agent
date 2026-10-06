@@ -30,26 +30,28 @@ import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
-/** 验证 Provider 结果 → 展示事件 → 按所有者隔离的持久化刷新恢复流程。 */
+/**
+ * 验证 Provider 结果 → 展示事件 → 按所有者隔离的持久化刷新恢复流程。
+ */
 @EnabledIfSystemProperty(named = "horizen.redis.live", matches = "true")
 @Import(WorkspaceTestConfiguration.class)
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = {
-            "horizen.agent.model-mode=SCRIPTED",
-            "horizen.agent.storage.mode=DISTRIBUTED",
-            "horizen.agent.storage.jdbc-username=sa",
-            "horizen.agent.storage.jdbc-password=",
-            "horizen.agent.storage.redis-url=redis://127.0.0.1:6379",
-            "horizen.agent.storage.redis-key-prefix=horizen-provider-presentation-test:",
-            "horizen.agent.storage.instance-id=provider-presentation-instance",
-            "horizen.agent.gateway.mode=mock",
-            "horizen.trace.enabled=false",
-            "horizen.agent.skill-release.enabled=false",
-            "horizen.agent.workspace-release.enabled=false",
-            "horizen.agent.sandbox.e2b.enabled=false",
-            "horizen.agent.sandbox.snapshot.bos.enabled=false",
-            "horizen.agent.artifact.bos.enabled=false"
+                "horizen.agent.model-mode=SCRIPTED",
+                "horizen.agent.storage.mode=DISTRIBUTED",
+                "horizen.agent.storage.jdbc-username=sa",
+                "horizen.agent.storage.jdbc-password=",
+                "horizen.agent.storage.redis-url=redis://127.0.0.1:6379",
+                "horizen.agent.storage.redis-key-prefix=horizen-provider-presentation-test:",
+                "horizen.agent.storage.instance-id=provider-presentation-instance",
+                "horizen.agent.gateway.mode=mock",
+                "horizen.trace.enabled=false",
+                "horizen.agent.skill-release.enabled=false",
+                "horizen.agent.workspace-release.enabled=false",
+                "horizen.agent.sandbox.e2b.enabled=false",
+                "horizen.agent.sandbox.snapshot.bos.enabled=false",
+                "horizen.agent.artifact.bos.enabled=false"
         })
 class ProviderPresentationDistributedFlowLiveTest {
     private static final String DATABASE =
@@ -62,7 +64,8 @@ class ProviderPresentationDistributedFlowLiveTest {
             "horizen-provider-presentation-test:" + UUID.randomUUID() + ":";
     private static final Path FIXTURE = fixture();
 
-    @Autowired private AgentService service;
+    @Autowired
+    private AgentService service;
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
@@ -139,7 +142,7 @@ class ProviderPresentationDistributedFlowLiveTest {
                                 item ->
                                         "reasoning_delta".equals(item.getEvent().getType())
                                                 || "thinking_delta"
-                                                        .equals(item.getEvent().getType())));
+                                                .equals(item.getEvent().getType())));
 
         var completedTool =
                 restored.getTimelineEvents().stream()
@@ -164,15 +167,15 @@ class ProviderPresentationDistributedFlowLiveTest {
             Files.writeString(
                     file,
                     """
-                    {"tools":[{"name":"acceptance_provider_tool",
-                      "description":"Deterministic Provider acceptance tool",
-                      "inputSchema":{"type":"object","properties":{"query":{"type":"string"}},
-                        "required":["query"],"additionalProperties":false},
-                      "readOnly":false,"riskLevel":"high","approvalPolicy":"required",
-                      "response":{"summary":"ok","presentation":{"schemaVersion":1,
-                        "blocks":[{"type":"conclusion","severity":"good",
-                          "title":"Provider 验收通过","summary":"结构化结果已持久化"}]}}}]}
-                    """);
+                            {"tools":[{"name":"acceptance_provider_tool",
+                              "description":"Deterministic Provider acceptance tool",
+                              "inputSchema":{"type":"object","properties":{"query":{"type":"string"}},
+                                "required":["query"],"additionalProperties":false},
+                              "readOnly":false,"riskLevel":"high","approvalPolicy":"required",
+                              "response":{"summary":"ok","presentation":{"schemaVersion":1,
+                                "blocks":[{"type":"conclusion","severity":"good",
+                                  "title":"Provider 验收通过","summary":"结构化结果已持久化"}]}}}]}
+                            """);
             file.toFile().deleteOnExit();
             return file;
         } catch (Exception error) {

@@ -24,15 +24,24 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
-/** 声明式展示块的 JDBC 持久化实现。 */
+/**
+ * 声明式展示块的 JDBC 持久化实现。
+ */
 public class JdbcPresentationStore implements PresentationStore {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 映射的固定取值，用于相应策略和边界判断。 */
-    private static final TypeReference<Map<String, Object>> MAP = new TypeReference<>() {};
+    /**
+     * 映射的固定取值，用于相应策略和边界判断。
+     */
+    private static final TypeReference<Map<String, Object>> MAP = new TypeReference<>() {
+    };
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final PresentationMapper mapper;
 
     /**
@@ -44,7 +53,9 @@ public class JdbcPresentationStore implements PresentationStore {
         this.mapper = MyBatisSessions.create(dataSource).getMapper(PresentationMapper.class);
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcPresentationStore(PresentationMapper mapper) {
         this.mapper = Objects.requireNonNull(mapper);
     }
@@ -93,7 +104,7 @@ public class JdbcPresentationStore implements PresentationStore {
      * 查找JDBC呈现存储。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param blockId 结构化呈现块的标识，客户端用它去重与更新同一张卡片。
+     * @param blockId  结构化呈现块的标识，客户端用它去重与更新同一张卡片。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
     @Override
@@ -106,7 +117,7 @@ public class JdbcPresentationStore implements PresentationStore {
     /**
      * 查询列表中的目标范围会话。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次处理得到的结果集合。
      */
@@ -153,7 +164,7 @@ public class JdbcPresentationStore implements PresentationStore {
     /**
      * 检查same对应的条件，供调用方选择后续处理分支。
      *
-     * @param left 当前JDBC呈现存储持有的left对象，供相应处理步骤使用。
+     * @param left  当前JDBC呈现存储持有的left对象，供相应处理步骤使用。
      * @param right 当前JDBC呈现存储持有的right对象，供相应处理步骤使用。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -173,7 +184,7 @@ public class JdbcPresentationStore implements PresentationStore {
     /**
      * 检查jsonEquivalent对应的条件，供调用方选择后续处理分支。
      *
-     * @param left left的索引映射，供按键查找或归并当前组件的数据。
+     * @param left  left的索引映射，供按键查找或归并当前组件的数据。
      * @param right right的索引映射，供按键查找或归并当前组件的数据。
      * @return 本次检查是否通过或本次更新是否成功。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。

@@ -27,40 +27,48 @@ import java.util.function.Function;
 
 import javax.sql.DataSource;
 
-/** MySQL 产品审批记录实现；AgentScope 的暂停状态仍由 AgentStateStore 保存。 */
+/**
+ * MySQL 产品审批记录实现；AgentScope 的暂停状态仍由 AgentStateStore 保存。
+ */
 public class JdbcApprovalStore implements ApprovalStore {
 
-    /** 映射器的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 映射器的固定取值，用于相应策略和边界判断。
+     */
     private static final Function<InteractionRow, ApprovalRequest> MAPPER =
             rs -> {
                 var request = JdbcInteractionJson.read(rs.getRequestJson());
                 var response = JdbcInteractionJson.read(rs.getResponseJson());
                 return new ApprovalRequest(
-                                rs.getOwnerKey(),
-                                rs.getSessionId(),
-                                rs.getTurnId(),
-                                rs.getInteractionId(),
-                                rs.getReplyId(),
-                                rs.getToolCallId(),
-                                JdbcInteractionJson.text(request, "toolName"),
-                                JdbcInteractionJson.text(request, "toolContent"),
-                                JdbcInteractionJson.text(request, "toolArgumentsJson"),
-                                ApprovalStatus.valueOf(rs.getStatus()),
-                                JdbcInteractionJson.text(request, "requestedBy"),
-                                RowValues.nullableInstant(rs.getExpiresAt()),
-                                JdbcInteractionJson.text(response, "decidedBy"),
-                                RowValues.nullableInstant(rs.getResolvedAt()),
-                                RowValues.instant(rs.getCreatedAt()),
-                                RowValues.instant(rs.getUpdatedAt()),
-                                rs.getVersion())
+                        rs.getOwnerKey(),
+                        rs.getSessionId(),
+                        rs.getTurnId(),
+                        rs.getInteractionId(),
+                        rs.getReplyId(),
+                        rs.getToolCallId(),
+                        JdbcInteractionJson.text(request, "toolName"),
+                        JdbcInteractionJson.text(request, "toolContent"),
+                        JdbcInteractionJson.text(request, "toolArgumentsJson"),
+                        ApprovalStatus.valueOf(rs.getStatus()),
+                        JdbcInteractionJson.text(request, "requestedBy"),
+                        RowValues.nullableInstant(rs.getExpiresAt()),
+                        JdbcInteractionJson.text(response, "decidedBy"),
+                        RowValues.nullableInstant(rs.getResolvedAt()),
+                        RowValues.instant(rs.getCreatedAt()),
+                        RowValues.instant(rs.getUpdatedAt()),
+                        rs.getVersion())
                         .withPresentationJson(
                                 JdbcInteractionJson.text(request, "presentationJson"));
             };
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final ApprovalMapper mapper;
 
-    /** 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。 */
+    /**
+     * 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     */
     private final UnitOfWork transactions;
 
     /**
@@ -73,7 +81,9 @@ public class JdbcApprovalStore implements ApprovalStore {
         this.transactions = new JdbcUnitOfWork(dataSource);
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcApprovalStore(ApprovalMapper mapper, UnitOfWork transactions) {
         this.mapper = Objects.requireNonNull(mapper);
         this.transactions = Objects.requireNonNull(transactions);
@@ -129,9 +139,9 @@ public class JdbcApprovalStore implements ApprovalStore {
             if (existing.size() != 1
                     || !existing.get(0).getSessionId().equals(approval.getSessionId())
                     || !Objects.equals(
-                            existing.get(0).getRequestReplyId(), approval.getRequestReplyId())
+                    existing.get(0).getRequestReplyId(), approval.getRequestReplyId())
                     || !JdbcInteractionJson.read(requestJson(existing.get(0)))
-                            .equals(JdbcInteractionJson.read(requestJson))) {
+                    .equals(JdbcInteractionJson.read(requestJson))) {
                 throw new IllegalStateException(
                         "approval identity was reused with a different request");
             }
@@ -157,9 +167,9 @@ public class JdbcApprovalStore implements ApprovalStore {
     /**
      * 查找待处理。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次处理得到的结果集合。
      */
     @Override
@@ -232,12 +242,12 @@ public class JdbcApprovalStore implements ApprovalStore {
         }
         ApprovalRequest updated =
                 first(
-                                mapper
-                                        .selectApprovalById(
-                                                command.getOwnerKey(), command.getApprovalId())
-                                        .stream()
-                                        .map(MAPPER)
-                                        .toList())
+                        mapper
+                                .selectApprovalById(
+                                        command.getOwnerKey(), command.getApprovalId())
+                                .stream()
+                                .map(MAPPER)
+                                .toList())
                         .orElseThrow();
         return new ApprovalDecisionResult(ApprovalDecisionResult.Outcome.UPDATED, updated);
     }

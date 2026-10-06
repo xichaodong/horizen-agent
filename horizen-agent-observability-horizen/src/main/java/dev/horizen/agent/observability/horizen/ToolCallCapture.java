@@ -13,34 +13,50 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/** 单一职责的追踪采集器，由单次调用独占。 */
+/**
+ * 单一职责的追踪采集器，由单次调用独占。
+ */
 final class ToolCallCapture {
-    /** 本组件使用的 {@code HorizenTraceRun} 状态或依赖，用于 run 的处理。 */
+    /**
+     * 本组件使用的 {@code HorizenTraceRun} 状态或依赖，用于 run 的处理。
+     */
     private final HorizenTraceRun run;
 
-    /** 当前模型或工具操作正在记录的 Span。 */
+    /**
+     * 当前模型或工具操作正在记录的 Span。
+     */
     final SpanDraft span;
 
-    /** 本次工具调用的原始调用信息。 */
+    /**
+     * 本次工具调用的原始调用信息。
+     */
     final ToolUseBlock call;
 
-    /** 面向消息或事件消费者的文本内容。 */
+    /**
+     * 面向消息或事件消费者的文本内容。
+     */
     final StringBuilder text = new StringBuilder();
 
-    /** 数据的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+    /**
+     * 数据的有序集合，保留当前组件处理或协议输出所需的顺序。
+     */
     final List<Object> data = new ArrayList<>();
 
-    /** 结束的原子状态，供并发更新与统计读取使用。 */
+    /**
+     * 结束的原子状态，供并发更新与统计读取使用。
+     */
     final AtomicBoolean finished = new AtomicBoolean();
 
-    /** 当前工具结果的状态分类，供观测终态写入使用。 */
+    /**
+     * 当前工具结果的状态分类，供观测终态写入使用。
+     */
     ToolResultState resultState;
 
     /**
      * 创建工具调用采集，初始化该组件所需的状态、配置或依赖。
      * 共享状态的关键更新在互斥区内完成。
      *
-     * @param run 当前工具调用采集持有的运行对象，供相应处理步骤使用。
+     * @param run  当前工具调用采集持有的运行对象，供相应处理步骤使用。
      * @param call 当前工具调用采集持有的调用对象，供相应处理步骤使用。
      */
     ToolCallCapture(HorizenTraceRun run, ToolUseBlock call) {
@@ -90,8 +106,8 @@ final class ToolCallCapture {
                 resultState == ToolResultState.RUNNING
                         ? "RUNNING"
                         : resultState == null || resultState == ToolResultState.SUCCESS
-                                ? "OK"
-                                : "ERROR";
+                        ? "OK"
+                        : "ERROR";
         Map<String, Object> output = new LinkedHashMap<>();
         output.put("status", toolStatus);
         if (run.config.isCaptureContent()) {

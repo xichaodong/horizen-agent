@@ -25,43 +25,63 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiFunction;
 
-/** 每次执行创建新的运行时对象图，避免残留声明和本地 Skill 覆盖。 */
+/**
+ * 每次执行创建新的运行时对象图，避免残留声明和本地 Skill 覆盖。
+ */
 public final class PublishedAgentRuntime implements AgentRuntime {
-    /** 日志的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 日志的固定取值，用于相应策略和边界判断。
+     */
     private static final Logger LOG = LoggerFactory.getLogger(PublishedAgentRuntime.class);
 
-    /** 准备会话原发布与不可变工作区内容的服务。 */
+    /**
+     * 准备会话原发布与不可变工作区内容的服务。
+     */
     private final AgentReleaseService releases;
 
-    /** 跨实例执行控制通道，将取消请求送到原执行持有方。 */
+    /**
+     * 跨实例执行控制通道，将取消请求送到原执行持有方。
+     */
     private final AgentRuntime controls;
 
-    /** 当前执行目录的根路径，承载恢复后的任务文件。 */
+    /**
+     * 当前执行目录的根路径，承载恢复后的任务文件。
+     */
     private final Path executionRoot;
 
-    /** 容量的并发准入许可，限制同时进行的处理数量。 */
+    /**
+     * 容量的并发准入许可，限制同时进行的处理数量。
+     */
     private final Semaphore capacity;
 
-    /** 构造当前版本运行对象的工厂。 */
+    /**
+     * 构造当前版本运行对象的工厂。
+     */
     private final BiFunction<AgentReleaseSnapshot, Path, HarnessAgentRuntime> factory;
 
-    /** 活跃的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 活跃的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final ConcurrentMap<String, HarnessAgentRuntime> active = new ConcurrentHashMap<>();
 
-    /** 保护本地执行目录准备与提交的锁。 */
+    /**
+     * 保护本地执行目录准备与提交的锁。
+     */
     private final FileChannel directoryLock;
 
-    /** 保护目录所有权相关共享状态的互斥控制对象。 */
+    /**
+     * 保护目录所有权相关共享状态的互斥控制对象。
+     */
     private final FileLock directoryOwnership;
 
     /**
      * 创建已发布Agent运行时，初始化该组件所需的状态、配置或依赖。
      *
-     * @param releases 提供发布集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param controls 当前已发布Agent运行时持有的控制集合对象，供相应处理步骤使用。
+     * @param releases      提供发布集合能力的依赖，具体实现由当前组件的组装方传入。
+     * @param controls      当前已发布Agent运行时持有的控制集合对象，供相应处理步骤使用。
      * @param executionRoot 当前已发布Agent运行时持有的执行根对象，供相应处理步骤使用。
-     * @param concurrency 当前已发布Agent运行时使用的并发，供其处理与状态记录使用。
-     * @param factory 当前已发布Agent运行时持有的工厂对象，供相应处理步骤使用。
+     * @param concurrency   当前已发布Agent运行时使用的并发，供其处理与状态记录使用。
+     * @param factory       当前已发布Agent运行时持有的工厂对象，供相应处理步骤使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public PublishedAgentRuntime(
@@ -90,7 +110,8 @@ public final class PublishedAgentRuntime implements AgentRuntime {
             try (var paths = Files.list(executionRoot)) {
                 for (Path old :
                         paths.filter(p -> p.getFileName().toString().startsWith("execution-"))
-                                .toList()) cleanup(null, null, old);
+                                .toList())
+                    cleanup(null, null, old);
             }
             directoryLock = channel;
             directoryOwnership = ownership;
@@ -212,9 +233,9 @@ public final class PublishedAgentRuntime implements AgentRuntime {
     /**
      * 完成当前操作的cleanup步骤，按实现更新相应状态或依赖。
      *
-     * @param runtime 执行 Agent 模型与工具循环的运行时接口。
+     * @param runtime  执行 Agent 模型与工具循环的运行时接口。
      * @param snapshot 当前已发布Agent运行时持有的快照对象，供相应处理步骤使用。
-     * @param root 当前操作允许使用的根路径。
+     * @param root     当前操作允许使用的根路径。
      */
     private static void cleanup(AgentRuntime runtime, AgentReleaseSnapshot snapshot, Path root) {
         try {
@@ -313,7 +334,9 @@ public final class PublishedAgentRuntime implements AgentRuntime {
         return control(o, s).failCurrentTurn(o, s, t, f);
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
     public void close() {
         try {

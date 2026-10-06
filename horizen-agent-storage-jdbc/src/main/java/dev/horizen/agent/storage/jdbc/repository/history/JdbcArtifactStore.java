@@ -30,9 +30,13 @@ import java.util.function.Function;
 
 import javax.sql.DataSource;
 
-/** JDBC Artifact 元数据存储；文件字节由外部内容存储 Provider 管理。 */
+/**
+ * JDBC Artifact 元数据存储；文件字节由外部内容存储 Provider 管理。
+ */
 public class JdbcArtifactStore implements ArtifactStore {
-    /** 产物映射器的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 产物映射器的固定取值，用于相应策略和边界判断。
+     */
     private static final Function<ArtifactRow, Artifact> ARTIFACT_MAPPER =
             rs ->
                     new Artifact(
@@ -54,7 +58,9 @@ public class JdbcArtifactStore implements ArtifactStore {
                             RowValues.nullableInstant(rs.getDeletedAt()),
                             rs.getVersion());
 
-    /** 引用映射器的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 引用映射器的固定取值，用于相应策略和边界判断。
+     */
     private static final Function<ConversationHistoryRow, ArtifactReference> REFERENCE_MAPPER =
             rs -> {
                 var payload = JdbcHistoryJson.object(rs.getPayloadJson());
@@ -70,10 +76,14 @@ public class JdbcArtifactStore implements ArtifactStore {
                         RowValues.instant(rs.getCreatedAt()));
             };
 
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final ArtifactMapper mapper;
 
-    /** 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。 */
+    /**
+     * 执行短数据库工作单元的事务边界；外部网络调用不属于该工作单元。
+     */
     private final UnitOfWork transactions;
 
     /**
@@ -86,7 +96,9 @@ public class JdbcArtifactStore implements ArtifactStore {
         this.transactions = new JdbcUnitOfWork(dataSource);
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcArtifactStore(ArtifactMapper mapper, UnitOfWork transactions) {
         this.mapper = Objects.requireNonNull(mapper);
         this.transactions = Objects.requireNonNull(transactions);
@@ -132,7 +144,7 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 查找JDBC产物存储。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey   宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param artifactId 产物资源标识；访问内容时仍需校验所属隔离范围。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -146,11 +158,11 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 更新JDBC产物存储。
      *
-     * @param artifact 当前JDBC产物存储持有的产物对象，供相应处理步骤使用。
+     * @param artifact        当前JDBC产物存储持有的产物对象，供相应处理步骤使用。
      * @param expectedVersion 调用方观察到的版本，更新时用于识别并发修改。
      * @return 本次操作返回的产物结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Transactional(
             transactionManager = "agentTransactionManager",
@@ -198,7 +210,7 @@ public class JdbcArtifactStore implements ArtifactStore {
      *
      * @param reference 当前JDBC产物存储持有的引用对象，供相应处理步骤使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Transactional(
             transactionManager = "agentTransactionManager",
@@ -275,7 +287,7 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 检查sameReference对应的条件，供调用方选择后续处理分支。
      *
-     * @param left 当前JDBC产物存储持有的left对象，供相应处理步骤使用。
+     * @param left  当前JDBC产物存储持有的left对象，供相应处理步骤使用。
      * @param right 当前JDBC产物存储持有的right对象，供相应处理步骤使用。
      * @return 本次检查是否通过或本次更新是否成功。
      */
@@ -290,7 +302,7 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 查询列表中的引用集合。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey   宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param artifactId 产物资源标识；访问内容时仍需校验所属隔离范围。
      * @return 本次处理得到的结果集合。
      */
@@ -304,7 +316,7 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 查询列表中的引用集合目标范围会话。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次处理得到的结果集合。
      */
@@ -318,9 +330,9 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 查询列表中的目标范围会话。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param limit 本次处理或返回数量上限。
+     * @param limit     本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      */
     @Override
@@ -331,10 +343,10 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 查询列表中的目标范围会话。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param limit 本次处理或返回数量上限。
-     * @param offset 本次读取的起始偏移。
+     * @param limit     本次处理或返回数量上限。
+     * @param offset    本次读取的起始偏移。
      * @return 本次处理得到的结果集合。
      */
     @Override
@@ -345,9 +357,9 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 查询列表中的RecentOutputs。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param limit 本次处理或返回数量上限。
+     * @param limit     本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      */
     @Override
@@ -358,9 +370,9 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 查询列表中的就绪。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param limit 本次处理或返回数量上限。
+     * @param ownerKey    宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId   会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param limit       本次处理或返回数量上限。
      * @param outputsOnly outputs只读的状态标记，用于选择当前组件的处理路径。
      * @return 本次处理得到的结果集合。
      */
@@ -372,11 +384,11 @@ public class JdbcArtifactStore implements ArtifactStore {
     /**
      * 查询列表中的就绪。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param limit 本次处理或返回数量上限。
+     * @param ownerKey    宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId   会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param limit       本次处理或返回数量上限。
      * @param outputsOnly outputs只读的状态标记，用于选择当前组件的处理路径。
-     * @param offset 本次读取的起始偏移。
+     * @param offset      本次读取的起始偏移。
      * @return 本次处理得到的结果集合。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

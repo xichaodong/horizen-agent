@@ -132,7 +132,8 @@ class VisionAnalyzeToolTest {
         }
 
         @Override
-        public void delete(String ref) {}
+        public void delete(String ref) {
+        }
     }
 
     private static final class SingleArtifactStore implements ArtifactStore {
@@ -160,7 +161,8 @@ class VisionAnalyzeToolTest {
         }
 
         @Override
-        public void addReference(ArtifactReference r) {}
+        public void addReference(ArtifactReference r) {
+        }
 
         @Override
         public List<ArtifactReference> listReferences(String owner, String id) {

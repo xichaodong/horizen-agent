@@ -23,30 +23,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** Turn 作用域的后台进程控制，完全在活跃沙箱内实现。 */
+/**
+ * Turn 作用域的后台进程控制，完全在活跃沙箱内实现。
+ */
 public final class SandboxProcessTool extends ToolBase {
-    /** 最大PROCESSES的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大PROCESSES的固定取值，用于相应策略和边界判断。
+     */
     static final int MAX_PROCESSES = 16;
 
-    /** 最大命令字符数的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大命令字符数的固定取值，用于相应策略和边界判断。
+     */
     static final int MAX_COMMAND_CHARS = 32_768;
 
-    /** 最大输入字节的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大输入字节的固定取值，用于相应策略和边界判断。
+     */
     static final int MAX_INPUT_BYTES = 16 * 1024;
 
-    /** 最大日志字节的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大日志字节的固定取值，用于相应策略和边界判断。
+     */
     static final int MAX_LOG_BYTES = 64 * 1024;
 
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 根使用的固定标识或协议文本。 */
+    /**
+     * 根使用的固定标识或协议文本。
+     */
     private static final String ROOT = ".horizen/processes";
 
-    /** 测试时替代真实沙箱命令的执行入口。 */
+    /**
+     * 测试时替代真实沙箱命令的执行入口。
+     */
     private final CommandExecutor testExecutor;
 
-    /** 创建沙箱进程工具，初始化该组件所需的状态、配置或依赖。 */
+    /**
+     * 创建沙箱进程工具，初始化该组件所需的状态、配置或依赖。
+     */
     public SandboxProcessTool() {
         this(null);
     }
@@ -70,55 +88,55 @@ public final class SandboxProcessTool extends ToolBase {
                                         "properties",
                                         Map.of(
                                                 "action",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "enum",
-                                                                List.of(
-                                                                        "start", "status", "list",
-                                                                        "logs", "stdin", "wait",
-                                                                        "kill")),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "enum",
+                                                        List.of(
+                                                                "start", "status", "list",
+                                                                "logs", "stdin", "wait",
+                                                                "kill")),
                                                 "command",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "description",
-                                                                "start 使用的 shell 命令"),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "description",
+                                                        "start 使用的 shell 命令"),
                                                 "process_id",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "description",
-                                                                "proc_ 开头的进程句柄"),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "description",
+                                                        "proc_ 开头的进程句柄"),
                                                 "stdout_offset",
-                                                        Map.of("type", "integer", "minimum", 0),
+                                                Map.of("type", "integer", "minimum", 0),
                                                 "stderr_offset",
-                                                        Map.of("type", "integer", "minimum", 0),
+                                                Map.of("type", "integer", "minimum", 0),
                                                 "limit",
-                                                        Map.of(
-                                                                "type",
-                                                                "integer",
-                                                                "minimum",
-                                                                1,
-                                                                "maximum",
-                                                                MAX_LOG_BYTES),
+                                                Map.of(
+                                                        "type",
+                                                        "integer",
+                                                        "minimum",
+                                                        1,
+                                                        "maximum",
+                                                        MAX_LOG_BYTES),
                                                 "data",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "description",
-                                                                "stdin 数据"),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "description",
+                                                        "stdin 数据"),
                                                 "append_newline", Map.of("type", "boolean"),
                                                 "timeout_seconds",
-                                                        Map.of(
-                                                                "type", "integer", "minimum", 1,
-                                                                "maximum", 120),
+                                                Map.of(
+                                                        "type", "integer", "minimum", 1,
+                                                        "maximum", 120),
                                                 "signal",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "enum",
-                                                                List.of("term", "kill"))),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "enum",
+                                                        List.of("term", "kill"))),
                                         "required",
                                         List.of("action"),
                                         "additionalProperties",
@@ -195,7 +213,7 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 计算或取得本方法声明的结果，供当前SandboxProcessTool处理步骤使用。
      *
-     * @param param 当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
+     * @param param     当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
      * @param processId 进程的标识，用于关联相应记录或执行。
      * @return 本次操作返回的工具结果块结果。
      */
@@ -235,7 +253,7 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 计算或取得本方法声明的结果，供当前SandboxProcessTool处理步骤使用。
      *
-     * @param param 当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
+     * @param param     当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
      * @param processId 进程的标识，用于关联相应记录或执行。
      * @return 本次操作返回的工具结果块结果。
      */
@@ -272,7 +290,7 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 计算或取得本方法声明的结果，供当前SandboxProcessTool处理步骤使用。
      *
-     * @param param 当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
+     * @param param     当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
      * @param processId 进程的标识，用于关联相应记录或执行。
      * @return 本次操作返回的工具结果块结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -293,7 +311,7 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 等待目标范围。
      *
-     * @param param 当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
+     * @param param     当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
      * @param processId 进程的标识，用于关联相应记录或执行。
      * @return 本次操作返回的工具结果块结果。
      */
@@ -309,7 +327,7 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 计算或取得本方法声明的结果，供当前SandboxProcessTool处理步骤使用。
      *
-     * @param param 当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
+     * @param param     当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
      * @param processId 进程的标识，用于关联相应记录或执行。
      * @return 本次操作返回的工具结果块结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -327,7 +345,7 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 执行沙箱进程工具。
      *
-     * @param param 当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
+     * @param param   当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
      * @param command 当前沙箱进程工具使用的命令，供其处理与状态记录使用。
      * @param timeout 本次等待允许持续的最长时间。
      * @return 本次操作返回的Execute响应结果。
@@ -350,7 +368,7 @@ public final class SandboxProcessTool extends ToolBase {
      * 解析状态。
      *
      * @param processId 进程的标识，用于关联相应记录或执行。
-     * @param raw 当前沙箱进程工具使用的原始，供其处理与状态记录使用。
+     * @param raw       当前沙箱进程工具使用的原始，供其处理与状态记录使用。
      * @return 本次操作返回的对象节点结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -369,7 +387,7 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 启动命令。
      *
-     * @param processId 进程的标识，用于关联相应记录或执行。
+     * @param processId      进程的标识，用于关联相应记录或执行。
      * @param encodedCommand 当前沙箱进程工具使用的编码结果命令，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */
@@ -424,10 +442,10 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 生成当前操作所需的logsCommand文本，供调用方继续处理。
      *
-     * @param processId 进程的标识，用于关联相应记录或执行。
+     * @param processId    进程的标识，用于关联相应记录或执行。
      * @param stdoutOffset 当前沙箱进程工具使用的stdout偏移，供其处理与状态记录使用。
      * @param stderrOffset 当前沙箱进程工具使用的stderr偏移，供其处理与状态记录使用。
-     * @param limit 本次处理或返回数量上限。
+     * @param limit        本次处理或返回数量上限。
      * @return 本次处理生成或读取的文本。
      */
     private static String logsCommand(
@@ -459,7 +477,7 @@ public final class SandboxProcessTool extends ToolBase {
      * 生成当前操作所需的inputCommand文本，供调用方继续处理。
      *
      * @param processId 进程的标识，用于关联相应记录或执行。
-     * @param encoded 当前沙箱进程工具使用的编码结果，供其处理与状态记录使用。
+     * @param encoded   当前沙箱进程工具使用的编码结果，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */
     private static String inputCommand(String processId, String encoded) {
@@ -480,7 +498,7 @@ public final class SandboxProcessTool extends ToolBase {
      * 等待命令。
      *
      * @param processId 进程的标识，用于关联相应记录或执行。
-     * @param timeout 本次等待允许持续的最长时间。
+     * @param timeout   本次等待允许持续的最长时间。
      * @return 本次处理生成或读取的文本。
      */
     private static String waitCommand(String processId, int timeout) {
@@ -499,7 +517,7 @@ public final class SandboxProcessTool extends ToolBase {
      * 生成当前操作所需的killCommand文本，供调用方继续处理。
      *
      * @param processId 进程的标识，用于关联相应记录或执行。
-     * @param signal 当前沙箱进程工具使用的信号，供其处理与状态记录使用。
+     * @param signal    当前沙箱进程工具使用的信号，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */
     private static String killCommand(String processId, String signal) {
@@ -569,8 +587,8 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 生成当前操作所需的text文本，供调用方继续处理。
      *
-     * @param param 当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
-     * @param key 当前对象的查找或写入键。
+     * @param param    当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
+     * @param key      当前对象的查找或写入键。
      * @param fallback 当前沙箱进程工具使用的回退，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */
@@ -582,11 +600,11 @@ public final class SandboxProcessTool extends ToolBase {
     /**
      * 计算或取得本方法声明的结果，供当前SandboxProcessTool处理步骤使用。
      *
-     * @param param 当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
-     * @param key 当前对象的查找或写入键。
+     * @param param    当前沙箱进程工具持有的参数对象，供相应处理步骤使用。
+     * @param key      当前对象的查找或写入键。
      * @param fallback 当前沙箱进程工具使用的回退，供其处理与状态记录使用。
-     * @param min 当前沙箱进程工具使用的最小，供其处理与状态记录使用。
-     * @param max 当前沙箱进程工具使用的最大，供其处理与状态记录使用。
+     * @param min      当前沙箱进程工具使用的最小，供其处理与状态记录使用。
+     * @param max      当前沙箱进程工具使用的最大，供其处理与状态记录使用。
      * @return 本次操作返回的长整型结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -641,14 +659,16 @@ public final class SandboxProcessTool extends ToolBase {
         return ShellQuoteUtils.quote(value);
     }
 
-    /** 沙箱进程工具内部的命令执行方，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 沙箱进程工具内部的命令执行方，封装该步骤需要的状态或输入输出。
+     */
     @FunctionalInterface
     interface CommandExecutor {
         /**
          * 执行命令执行方。
          *
-         * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-         * @param command 当前命令执行方使用的命令，供其处理与状态记录使用。
+         * @param context        当前执行上下文，提供关联标识和宿主绑定信息。
+         * @param command        当前命令执行方使用的命令，供其处理与状态记录使用。
          * @param timeoutSeconds 超时，单位为秒。
          * @return 本次操作返回的Execute响应结果。
          */

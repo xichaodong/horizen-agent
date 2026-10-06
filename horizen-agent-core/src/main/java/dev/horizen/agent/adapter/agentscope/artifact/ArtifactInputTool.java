@@ -9,9 +9,13 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-/** 让 Agent 在当前沙箱执行段中读取一个已授权 Artifact。 */
+/**
+ * 让 Agent 在当前沙箱执行段中读取一个已授权 Artifact。
+ */
 public final class ArtifactInputTool extends ToolBase {
-    /** 解析与准备输入产物内容的服务。 */
+    /**
+     * 解析与准备输入产物内容的服务。
+     */
     private final ArtifactInputService inputs;
 
     /**

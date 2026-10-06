@@ -13,12 +13,19 @@ import java.util.List;
 
 import javax.tools.ToolProvider;
 
-/** 检查 Java 生产源码的类、字段和方法是否提供 Javadoc，不解析项目依赖或修改源码。 */
+/**
+ * 检查 Java 生产源码的类、字段和方法是否提供 Javadoc，不解析项目依赖或修改源码。
+ */
 public final class CheckJavaDocs {
-    /** 仅通过静态入口运行，避免创建不持有独立状态的工具实例。 */
-    private CheckJavaDocs() {}
+    /**
+     * 仅通过静态入口运行，避免创建不持有独立状态的工具实例。
+     */
+    private CheckJavaDocs() {
+    }
 
-    /** 工具入口；从仓库根目录运行，缺少注释时以非零状态退出。 */
+    /**
+     * 工具入口；从仓库根目录运行，缺少注释时以非零状态退出。
+     */
     public static void main(String[] args) throws Exception {
         Path root = Path.of("").toAbsolutePath();
         List<Path> sources;
@@ -40,7 +47,8 @@ public final class CheckJavaDocs {
                             compiler.getTask(
                                     null,
                                     files,
-                                    diagnostic -> {},
+                                    diagnostic -> {
+                                    },
                                     List.of("-proc:none", "--release", "17"),
                                     null,
                                     files.getJavaFileObjectsFromPaths(sources));

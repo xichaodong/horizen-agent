@@ -48,7 +48,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 class PublishedAgentRuntimeTest {
-    @TempDir Path directory;
+    @TempDir
+    Path directory;
 
     @Test
     void productionFactoryUsesPublishedContextWithoutOldLocalOrSessionDefinitions()
@@ -88,8 +89,8 @@ class PublishedAgentRuntimeTest {
                     }
                     byte[] data =
                             ("data:"
-                                            + " {\"id\":\"test\",\"object\":\"chat.completion.chunk\",\"created\":0,\"model\":\"test\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"verified\"},\"finish_reason\":\"stop\"}]}\n\n"
-                                            + "data: [DONE]\n\n")
+                                    + " {\"id\":\"test\",\"object\":\"chat.completion.chunk\",\"created\":0,\"model\":\"test\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"verified\"},\"finish_reason\":\"stop\"}]}\n\n"
+                                    + "data: [DONE]\n\n")
                                     .getBytes(StandardCharsets.UTF_8);
                     e.getResponseHeaders().set("Content-Type", "text/event-stream");
                     e.sendResponseHeaders(200, data.length);
@@ -125,7 +126,8 @@ class PublishedAgentRuntimeTest {
                                 path ->
                                         new ByteArrayInputStream(
                                                 contents.get(m.getReleaseHash()).get(path)),
-                                () -> {});
+                                () -> {
+                                });
                     }
                 };
         Map<String, SessionWorkspaceRelease> versions = new ConcurrentHashMap<>();
@@ -160,35 +162,35 @@ class PublishedAgentRuntimeTest {
         var multimodal = new MultimodalProperties(null, null, null, null, null);
         List<Path> roots = new CopyOnWriteArrayList<>();
         try (var runtime =
-                new PublishedAgentRuntime(
-                        releases,
-                        request -> Flux.empty(),
-                        directory.resolve("executions"),
-                        2,
-                        (release, root) -> {
-                            roots.add(root);
-                            return AgentRuntimeFactory.create(
-                                    RuntimeAssembly.builder()
-                                            .properties(properties)
-                                            .contextProperties(context)
-                                            .gatewayProperties(gateway)
-                                            .sandboxProperties(sandbox)
-                                            .multimodalProperties(multimodal)
-                                            .traceConfig(null)
-                                            .horizenExporter(null)
-                                            .skillRepository(new AgentScopeSkillRepositoryAdapter())
-                                            .distributedStore(distributed)
-                                            .sessionTurns(null)
-                                            .artifactSupport(null)
-                                            .askUsers(null)
-                                            .workspaceDocuments(null)
-                                            .snapshots(null)
-                                            .snapshotProperties(new SandboxSnapshotProperties())
-                                            .snapshotPointers(null)
-                                            .publishedWorkspace(root)
-                                            .infrastructure(null)
-                                            .build());
-                        })) {
+                     new PublishedAgentRuntime(
+                             releases,
+                             request -> Flux.empty(),
+                             directory.resolve("executions"),
+                             2,
+                             (release, root) -> {
+                                 roots.add(root);
+                                 return AgentRuntimeFactory.create(
+                                         RuntimeAssembly.builder()
+                                                 .properties(properties)
+                                                 .contextProperties(context)
+                                                 .gatewayProperties(gateway)
+                                                 .sandboxProperties(sandbox)
+                                                 .multimodalProperties(multimodal)
+                                                 .traceConfig(null)
+                                                 .horizenExporter(null)
+                                                 .skillRepository(new AgentScopeSkillRepositoryAdapter())
+                                                 .distributedStore(distributed)
+                                                 .sessionTurns(null)
+                                                 .artifactSupport(null)
+                                                 .askUsers(null)
+                                                 .workspaceDocuments(null)
+                                                 .snapshots(null)
+                                                 .snapshotProperties(new SandboxSnapshotProperties())
+                                                 .snapshotPointers(null)
+                                                 .publishedWorkspace(root)
+                                                 .infrastructure(null)
+                                                 .build());
+                             })) {
             var first =
                     runtime.stream(request("turn-1", "session", "first"))
                             .subscribeOn(Schedulers.boundedElastic())

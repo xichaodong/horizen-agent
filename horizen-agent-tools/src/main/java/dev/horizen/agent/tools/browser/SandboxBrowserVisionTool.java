@@ -15,22 +15,30 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-/** 截取当前沙箱页面，并将生成的 Artifact 送入视觉分析。 */
+/**
+ * 截取当前沙箱页面，并将生成的 Artifact 送入视觉分析。
+ */
 public final class SandboxBrowserVisionTool extends ToolBase {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 当前浏览器截图产物或截图工具，供后续视觉解析使用。 */
+    /**
+     * 当前浏览器截图产物或截图工具，供后续视觉解析使用。
+     */
     private final SandboxBrowserTool screenshot;
 
-    /** 读取图片并生成视觉分析的执行依赖。 */
+    /**
+     * 读取图片并生成视觉分析的执行依赖。
+     */
     private final VisionAnalyzeTool vision;
 
     /**
      * 创建沙箱浏览器视觉工具，初始化该组件所需的状态、配置或依赖。
      *
      * @param screenshot 当前沙箱浏览器视觉工具持有的screenshot对象，供相应处理步骤使用。
-     * @param vision 当前沙箱浏览器视觉工具持有的视觉对象，供相应处理步骤使用。
+     * @param vision     当前沙箱浏览器视觉工具持有的视觉对象，供相应处理步骤使用。
      */
     public SandboxBrowserVisionTool(SandboxBrowserTool screenshot, VisionAnalyzeTool vision) {
         super(

@@ -5,7 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
-/** 本地 Web 宿主的 Spring Boot 启动入口，装配 Agent 执行、HTTP 与 SSE 接口。 */
+/**
+ * 本地 Web 宿主的 Spring Boot 启动入口，装配 Agent 执行、HTTP 与 SSE 接口。
+ */
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 @ConfigurationPropertiesScan
 public class AgentWebApplication {

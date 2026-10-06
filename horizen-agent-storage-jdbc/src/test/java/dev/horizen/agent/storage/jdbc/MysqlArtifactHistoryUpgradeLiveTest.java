@@ -35,10 +35,10 @@ class MysqlArtifactHistoryUpgradeLiveTest {
     void migratesReferencesAndAttachmentMetadataThenAcceptsConcurrentUses() throws Exception {
         Properties config = new Properties();
         try (var input =
-                Files.newBufferedReader(
-                        Path.of(
-                                System.getProperty(
-                                        "horizen.mysql.artifact.history.config", "../.env.yml")))) {
+                     Files.newBufferedReader(
+                             Path.of(
+                                     System.getProperty(
+                                             "horizen.mysql.artifact.history.config", "../.env.yml")))) {
             config.putAll(YamlConfigFiles.load(input));
         }
         URI uri = URI.create(config.getProperty("horizen.agent.storage.jdbc-url").substring(5));
@@ -59,8 +59,8 @@ class MysqlArtifactHistoryUpgradeLiveTest {
                     new DriverManagerDataSource(prefix + database + suffix, username, password);
             var jdbc = new JdbcTemplate(source);
             new ResourceDatabasePopulator(
-                            new ClassPathResource("schema/mysql.sql"),
-                            new ClassPathResource("schema/legacy-artifact-reference.sql"))
+                    new ClassPathResource("schema/mysql.sql"),
+                    new ClassPathResource("schema/legacy-artifact-reference.sql"))
                     .execute(source);
             Instant at = Instant.now();
             var stamp = Timestamp.from(at);
@@ -133,8 +133,8 @@ class MysqlArtifactHistoryUpgradeLiveTest {
                             + " idx_ha_history_artifact_session, DROP COLUMN artifact_id, DROP COLUMN"
                             + " artifact_role");
             new ResourceDatabasePopulator(
-                            new ClassPathResource("schema/mysql-artifact-history-columns.sql"),
-                            new ClassPathResource("schema/mysql-artifact-history-upgrade.sql"))
+                    new ClassPathResource("schema/mysql-artifact-history-columns.sql"),
+                    new ClassPathResource("schema/mysql-artifact-history-upgrade.sql"))
                     .execute(source);
             assertEquals(3, artifacts.listReferencesForSession("owner", "session").size());
             assertEquals(

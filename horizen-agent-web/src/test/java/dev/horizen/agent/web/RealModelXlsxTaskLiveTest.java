@@ -57,7 +57,9 @@ import java.util.zip.ZipInputStream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-/** 显式启用的真实模型验收：上传 XLSX → 沙箱编辑 → BOS Artifact → 持久化卡片和历史。 */
+/**
+ * 显式启用的真实模型验收：上传 XLSX → 沙箱编辑 → BOS Artifact → 持久化卡片和历史。
+ */
 @Tag("live-full-task")
 @EnabledIfSystemProperty(named = "horizen.real.xlsx.live", matches = "true")
 @SpringBootTest(
@@ -70,10 +72,14 @@ class RealModelXlsxTaskLiveTest {
     private static final String XLSX_MEDIA_TYPE =
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-    @Autowired private AgentService service;
-    @Autowired private RuntimeStorageProperties storageProperties;
-    @Autowired private ArtifactProperties artifactProperties;
-    @Autowired private E2bSandboxProperties sandboxProperties;
+    @Autowired
+    private AgentService service;
+    @Autowired
+    private RuntimeStorageProperties storageProperties;
+    @Autowired
+    private ArtifactProperties artifactProperties;
+    @Autowired
+    private E2bSandboxProperties sandboxProperties;
 
     @Test
     void realModelEditsUploadedWorkbookAndPublishesRecoverableArtifact() throws Exception {
@@ -185,11 +191,11 @@ class RealModelXlsxTaskLiveTest {
                                     message ->
                                             "user".equals(message.getRole())
                                                     && message.attachments().stream()
-                                                            .anyMatch(
-                                                                    artifact ->
-                                                                            inputId.equals(
-                                                                                    artifact
-                                                                                            .getArtifactId()))));
+                                                    .anyMatch(
+                                                            artifact ->
+                                                                    inputId.equals(
+                                                                            artifact
+                                                                                    .getArtifactId()))));
             assertTrue(
                     restored.getMessages().stream()
                             .anyMatch(
@@ -217,11 +223,11 @@ class RealModelXlsxTaskLiveTest {
                                             "user".equals(message.getRole())
                                                     && message.getContent().contains("继续处理")
                                                     && message.attachments().stream()
-                                                            .anyMatch(
-                                                                    artifact ->
-                                                                            outputId.equals(
-                                                                                    artifact
-                                                                                            .getArtifactId()))));
+                                                    .anyMatch(
+                                                            artifact ->
+                                                                    outputId.equals(
+                                                                            artifact
+                                                                                    .getArtifactId()))));
         } finally {
             cleanup(identity.getOwnerKey(), sessionId);
         }
@@ -343,8 +349,8 @@ class RealModelXlsxTaskLiveTest {
             while ((entry = input.getNextEntry()) != null) {
                 if (!entry.isDirectory()
                         && (entry.getName().endsWith(".xml")
-                                || entry.getName().endsWith(".rels")
-                                || "[Content_Types].xml".equals(entry.getName()))) {
+                        || entry.getName().endsWith(".rels")
+                        || "[Content_Types].xml".equals(entry.getName()))) {
                     byte[] content = input.readNBytes(5 * 1024 * 1024);
                     values.put(entry.getName(), new String(content, StandardCharsets.UTF_8));
                 }
@@ -476,13 +482,13 @@ class RealModelXlsxTaskLiveTest {
         clearAgentState(ownerKey, sessionId);
         List<String> contentRefs = new ArrayList<>();
         try (Connection connection =
-                DriverManager.getConnection(
-                        storageProperties.getJdbcUrl(),
-                        storageProperties.getJdbcUsername(),
-                        storageProperties.getJdbcPassword())) {
+                     DriverManager.getConnection(
+                             storageProperties.getJdbcUrl(),
+                             storageProperties.getJdbcUsername(),
+                             storageProperties.getJdbcPassword())) {
             try (PreparedStatement statement =
-                    connection.prepareStatement(
-                            "SELECT content_ref FROM ha_artifact WHERE owner_key = ? AND content_ref IS NOT NULL")) {
+                         connection.prepareStatement(
+                                 "SELECT content_ref FROM ha_artifact WHERE owner_key = ? AND content_ref IS NOT NULL")) {
                 statement.setString(1, ownerKey);
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) contentRefs.add(result.getString(1));
@@ -497,8 +503,8 @@ class RealModelXlsxTaskLiveTest {
                             "ha_session",
                             "ha_artifact")) {
                 try (PreparedStatement statement =
-                        connection.prepareStatement(
-                                "DELETE FROM " + table + " WHERE owner_key = ?")) {
+                             connection.prepareStatement(
+                                     "DELETE FROM " + table + " WHERE owner_key = ?")) {
                     statement.setString(1, ownerKey);
                     statement.executeUpdate();
                 }

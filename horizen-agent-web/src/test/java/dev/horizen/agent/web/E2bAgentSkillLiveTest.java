@@ -50,12 +50,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-/** 用真实沙箱验证 Skill 脚本、Shell 工具和产物交付组成的完整 Agent Loop。 */
+/**
+ * 用真实沙箱验证 Skill 脚本、Shell 工具和产物交付组成的完整 Agent Loop。
+ */
 @Tag("live-sandbox")
 class E2bAgentSkillLiveTest {
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    @TempDir Path temporaryDirectory;
+    @TempDir
+    Path temporaryDirectory;
 
     @Test
     void loadsSkillRunsProjectedScriptAndDeliversArtifact() throws Exception {

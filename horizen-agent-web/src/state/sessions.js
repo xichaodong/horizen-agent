@@ -14,15 +14,15 @@ export function sessionsReducer(sessions, action) {
             return sessions.map((session) =>
                 session.id === action.sessionId
                     ? {
-                          ...session,
-                          updatedAt: action.at,
-                          messages: [...session.messages, action.message],
-                      }
+                        ...session,
+                        updatedAt: action.at,
+                        messages: [...session.messages, action.message],
+                    }
                     : session
             );
         case 'session/observing':
             return sessions.map((session) =>
-                session.id === action.sessionId ? { ...session, observing: action.value } : session
+                session.id === action.sessionId ? {...session, observing: action.value} : session
             );
         default:
             return sessions;

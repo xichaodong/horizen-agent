@@ -22,22 +22,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-/** 在 AgentScope 压缩中间件前后采样，并发出不含对话正文的压缩事件。 */
+/**
+ * 在 AgentScope 压缩中间件前后采样，并发出不含对话正文的压缩事件。
+ */
 public final class ContextCompactionTelemetry {
-    /** 事件名称使用的固定标识或协议文本。 */
+    /**
+     * 事件名称使用的固定标识或协议文本。
+     */
     public static final String EVENT_NAME = "context_compacted";
 
-    /** 失败事件名称使用的固定标识或协议文本。 */
+    /**
+     * 失败事件名称使用的固定标识或协议文本。
+     */
     public static final String FAILURE_EVENT_NAME = "context_compaction_failed";
 
-    /** 快照键的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 快照键的固定取值，用于相应策略和边界判断。
+     */
     private static final String SNAPSHOT_KEY = ContextCompactionTelemetry.class.getName();
 
-    /** 数量键的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 数量键的固定取值，用于相应策略和边界判断。
+     */
     private static final String COUNT_KEY = ContextCompactionTelemetry.class.getName() + ".count";
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private ContextCompactionTelemetry() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private ContextCompactionTelemetry() {
+    }
 
     /**
      * 在处理前准备压缩。
@@ -67,7 +80,9 @@ public final class ContextCompactionTelemetry {
         return new AfterMiddleware(abortOnSummaryFailure);
     }
 
-    /** 上下文压缩观测执行前的中间件钩子，接入对应上下文与观测策略。 */
+    /**
+     * 上下文压缩观测执行前的中间件钩子，接入对应上下文与观测策略。
+     */
     private static final class BeforeMiddleware implements MiddlewareBase {
         /**
          * 返回本策略在中间件链中的执行顺序，供运行时排列处理步骤。
@@ -82,10 +97,10 @@ public final class ContextCompactionTelemetry {
         /**
          * 响应模型推理。
          *
-         * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+         * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
          * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-         * @param input 本次处理的输入。
-         * @param next 将输入转换为目标结果的函数。
+         * @param input   本次处理的输入。
+         * @param next    将输入转换为目标结果的函数。
          * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
          */
         @Override
@@ -101,10 +116,14 @@ public final class ContextCompactionTelemetry {
         }
     }
 
-    /** 上下文压缩观测执行后的中间件钩子，接入对应上下文与观测策略。 */
+    /**
+     * 上下文压缩观测执行后的中间件钩子，接入对应上下文与观测策略。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class AfterMiddleware implements MiddlewareBase {
-        /** abort响应摘要失败的状态标记，用于选择当前组件的处理路径。 */
+        /**
+         * abort响应摘要失败的状态标记，用于选择当前组件的处理路径。
+         */
         private final boolean abortOnSummaryFailure;
 
         /**
@@ -121,10 +140,10 @@ public final class ContextCompactionTelemetry {
          * 响应模型推理。
          * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
          *
-         * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+         * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
          * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-         * @param input 本次处理的输入。
-         * @param next 将输入转换为目标结果的函数。
+         * @param input   本次处理的输入。
+         * @param next    将输入转换为目标结果的函数。
          * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
          */
         @Override
@@ -192,10 +211,10 @@ public final class ContextCompactionTelemetry {
         /**
          * 恢复原始上下文。
          *
-         * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-         * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
+         * @param agent    当前配置的 Agent 实例，承担模型与工具循环执行。
+         * @param context  当前执行上下文，提供关联标识和宿主绑定信息。
          * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-         * @param input 本次处理的输入。
+         * @param input    本次处理的输入。
          * @return 本次操作返回的模型推理输入结果。
          */
         private static ReasoningInput restoreOriginalContext(
@@ -242,28 +261,44 @@ public final class ContextCompactionTelemetry {
         }
     }
 
-    /** 压缩前后消息与 token 估算的观测快照。 */
+    /**
+     * 压缩前后消息与 token 估算的观测快照。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class Snapshot {
-        /** 消息的数量，供运行统计或容量控制使用。 */
+        /**
+         * 消息的数量，供运行统计或容量控制使用。
+         */
         private final int messageCount;
 
-        /** estimated的 token 数量或预算。 */
+        /**
+         * estimated的 token 数量或预算。
+         */
         private final int estimatedTokens;
 
-        /** 本次上下文摘要的指纹，用于识别摘要是否已经改变。 */
+        /**
+         * 本次上下文摘要的指纹，用于识别摘要是否已经改变。
+         */
         private final int summaryFingerprint;
 
-        /** 是否存在摘要的状态标记，用于选择当前组件的处理路径。 */
+        /**
+         * 是否存在摘要的状态标记，用于选择当前组件的处理路径。
+         */
         private final boolean hasSummary;
 
-        /** 摘要失败的状态标记，用于选择当前组件的处理路径。 */
+        /**
+         * 摘要失败的状态标记，用于选择当前组件的处理路径。
+         */
         private final boolean summaryFailed;
 
-        /** 使用单调时钟记录的处理起点，单位为纳秒，仅用于计算耗时。 */
+        /**
+         * 使用单调时钟记录的处理起点，单位为纳秒，仅用于计算耗时。
+         */
         private final long startedAtNanos;
 
-        /** 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+        /**
+         * 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+         */
         private final List<Msg> messages;
 
         /**

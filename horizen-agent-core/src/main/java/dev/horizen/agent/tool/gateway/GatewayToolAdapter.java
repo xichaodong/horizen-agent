@@ -24,9 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/** 类型化 Provider 传输契约到 AgentScope 的唯一映射入口。 */
+/**
+ * 类型化 Provider 传输契约到 AgentScope 的唯一映射入口。
+ */
 public final class GatewayToolAdapter implements ToolProvider {
-    /** 外部工具目录与调用的网关适配器。 */
+    /**
+     * 外部工具目录与调用的网关适配器。
+     */
     private final GatewayBackend gateway;
 
     /**
@@ -58,9 +62,9 @@ public final class GatewayToolAdapter implements ToolProvider {
      * 调用网关工具适配器。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param id 目标对象的标识。
-     * @param name 需要定位或处理的名称。
-     * @param input 本次处理的输入。
+     * @param id      目标对象的标识。
+     * @param name    需要定位或处理的名称。
+     * @param input   本次处理的输入。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -73,9 +77,9 @@ public final class GatewayToolAdapter implements ToolProvider {
      * 使用宿主绑定的可信上下文调用外部 Provider，不从模型参数推断访问身份。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param id 目标对象的标识。
-     * @param name 需要定位或处理的名称。
-     * @param input 本次处理的输入。
+     * @param id      目标对象的标识。
+     * @param name    需要定位或处理的名称。
+     * @param input   本次处理的输入。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     public Mono<ToolResultBlock> invokeGateway(
@@ -85,7 +89,9 @@ public final class GatewayToolAdapter implements ToolProvider {
                 .onErrorResume(GatewayToolAdapter::failure);
     }
 
-    /** 兼容旧版的模型可见发现信封，仅在运行时边界生成。 */
+    /**
+     * 兼容旧版的模型可见发现信封，仅在运行时边界生成。
+     */
     public Mono<ToolResultBlock> catalogResult(GatewayContext context) {
         return Mono.fromCompletionStage(() -> gateway.catalog(context))
                 .map(
@@ -146,10 +152,10 @@ public final class GatewayToolAdapter implements ToolProvider {
         return result.getStatus() == ProviderResultStatus.ERROR
                 ? ToolResultBlock.error(text)
                 : ToolResultBlock.text(text)
-                        .withState(
-                                result.getStatus() == ProviderResultStatus.SUCCESS
-                                        ? ToolResultState.SUCCESS
-                                        : ToolResultState.DENIED);
+                .withState(
+                        result.getStatus() == ProviderResultStatus.SUCCESS
+                                ? ToolResultState.SUCCESS
+                                : ToolResultState.DENIED);
     }
 
     /**
@@ -165,13 +171,13 @@ public final class GatewayToolAdapter implements ToolProvider {
                 root instanceof GatewayException failure
                         ? runtimeResult(failure.getResult())
                         : ToolResultBlock.error(
-                                JsonUtils.toJson(
-                                        Map.of(
-                                                "status",
-                                                "failed",
-                                                "errorCode",
-                                                "gateway_request_failed",
-                                                "errorMessage",
-                                                "Gateway request could not complete; do not automatically retry"))));
+                        JsonUtils.toJson(
+                                Map.of(
+                                        "status",
+                                        "failed",
+                                        "errorCode",
+                                        "gateway_request_failed",
+                                        "errorMessage",
+                                        "Gateway request could not complete; do not automatically retry"))));
     }
 }

@@ -21,21 +21,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-/** Agent 专属交互逻辑在此实现，不放入评测服务器。 */
+/**
+ * Agent 专属交互逻辑在此实现，不放入评测服务器。
+ */
 @RequiredArgsConstructor
 public final class WebEvaluationHost implements EvaluationHost {
-    /** 当前配置的 Agent 实例，承担模型与工具循环执行。 */
+    /**
+     * 当前配置的 Agent 实例，承担模型与工具循环执行。
+     */
     private final AgentService agent;
 
     /**
      * 启动Web评测宿主。
      *
-     * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param session 当前Web评测宿主使用的会话，供其处理与状态记录使用。
+     * @param identity  可信宿主解析的执行身份，供访问范围与审计使用。
+     * @param session   当前Web评测宿主使用的会话，供其处理与状态记录使用。
      * @param requestId 调用方提供的请求标识，用于区分重复提交和关联幂等处理。
-     * @param step 当前Web评测宿主持有的步骤对象，供相应处理步骤使用。
-     * @param timeout 本次等待允许持续的最长时间。
-     * @param events 当前执行或历史事件集合，供持久化、回放与观测使用。
+     * @param step      当前Web评测宿主持有的步骤对象，供相应处理步骤使用。
+     * @param timeout   本次等待允许持续的最长时间。
+     * @param events    当前执行或历史事件集合，供持久化、回放与观测使用。
      */
     public void start(
             ExecutionIdentity identity,
@@ -59,11 +63,11 @@ public final class WebEvaluationHost implements EvaluationHost {
      * 恢复Web评测宿主。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param session 当前Web评测宿主使用的会话，供其处理与状态记录使用。
-     * @param pending 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。
-     * @param script 当前Web评测宿主持有的script对象，供相应处理步骤使用。
-     * @param timeout 本次等待允许持续的最长时间。
-     * @param events 当前执行或历史事件集合，供持久化、回放与观测使用。
+     * @param session  当前Web评测宿主使用的会话，供其处理与状态记录使用。
+     * @param pending  尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。
+     * @param script   当前Web评测宿主持有的script对象，供相应处理步骤使用。
+     * @param timeout  本次等待允许持续的最长时间。
+     * @param events   当前执行或历史事件集合，供持久化、回放与观测使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public void resume(
@@ -171,7 +175,7 @@ public final class WebEvaluationHost implements EvaluationHost {
      * 取消Web评测宿主。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param session 当前Web评测宿主使用的会话，供其处理与状态记录使用。
+     * @param session  当前Web评测宿主使用的会话，供其处理与状态记录使用。
      */
     public void cancel(ExecutionIdentity identity, String session) {
         var current = agent.sessionExecution(identity, session);
@@ -186,10 +190,10 @@ public final class WebEvaluationHost implements EvaluationHost {
      * 内部等待时限使用单调时钟计算，不依赖墙上时间的跳变。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param session 当前Web评测宿主使用的会话，供其处理与状态记录使用。
-     * @param stream 当前Web评测宿主持有的事件流对象，供相应处理步骤使用。
-     * @param timeout 本次等待允许持续的最长时间。
-     * @param events 当前执行或历史事件集合，供持久化、回放与观测使用。
+     * @param session  当前Web评测宿主使用的会话，供其处理与状态记录使用。
+     * @param stream   当前Web评测宿主持有的事件流对象，供相应处理步骤使用。
+     * @param timeout  本次等待允许持续的最长时间。
+     * @param events   当前执行或历史事件集合，供持久化、回放与观测使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void consume(
@@ -204,15 +208,14 @@ public final class WebEvaluationHost implements EvaluationHost {
                         e ->
                                 (e.getSource() == null || e.getSource().isBlank())
                                         && switch (e.getType()) {
-                                            case TURN_COMPLETED,
-                                                    TURN_FAILED,
-                                                    TURN_CANCELLED,
-                                                    TURN_TIMED_OUT,
-                                                    APPROVAL_REQUIRED,
-                                                    ASK_USER_REQUIRED ->
-                                                    true;
-                                            default -> false;
-                                        })
+                                    case TURN_COMPLETED,
+                                         TURN_FAILED,
+                                         TURN_CANCELLED,
+                                         TURN_TIMED_OUT,
+                                         APPROVAL_REQUIRED,
+                                         ASK_USER_REQUIRED -> true;
+                                    default -> false;
+                                })
                 .blockLast(timeout);
         // 结果发出时，Runtime 和托管执行尚未释放 Turn。创建下一轮 Turn 或恢复交互前，
         // 需要等待释放完成。

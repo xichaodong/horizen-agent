@@ -56,24 +56,24 @@ const renderTable = (lines, startIndex) => {
             <div className="horizen-console__table-wrap" key={`table_${startIndex}`}>
                 <table>
                     <thead>
-                        <tr>
-                            {headers.map((header, index) => (
-                                <th key={`${header}_${index}`}>
-                                    {renderInline(header, `head_${index}`)}
-                                </th>
-                            ))}
-                        </tr>
+                    <tr>
+                        {headers.map((header, index) => (
+                            <th key={`${header}_${index}`}>
+                                {renderInline(header, `head_${index}`)}
+                            </th>
+                        ))}
+                    </tr>
                     </thead>
                     <tbody>
-                        {rows.map((row, rowIndex) => (
-                            <tr key={`row_${rowIndex}`}>
-                                {row.map((cell, cellIndex) => (
-                                    <td key={`cell_${rowIndex}_${cellIndex}`}>
-                                        {renderInline(cell, `cell_${rowIndex}_${cellIndex}`)}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
+                    {rows.map((row, rowIndex) => (
+                        <tr key={`row_${rowIndex}`}>
+                            {row.map((cell, cellIndex) => (
+                                <td key={`cell_${rowIndex}_${cellIndex}`}>
+                                    {renderInline(cell, `cell_${rowIndex}_${cellIndex}`)}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
             </div>
@@ -81,7 +81,7 @@ const renderTable = (lines, startIndex) => {
     };
 };
 
-const MessageContent = ({ content = '' }) => {
+const MessageContent = ({content = ''}) => {
     const lines = String(content).replace(/\r\n/g, '\n').split('\n');
     const nodes = [];
     let cursor = 0;

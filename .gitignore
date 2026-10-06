@@ -7,7 +7,11 @@
 .env.*
 !.env.example
 !/.env.yml.example
-.idea/
+/.idea/*
+!/.idea/codeStyles/
+/.idea/codeStyles/*
+!/.idea/codeStyles/Project.xml
+!/.idea/codeStyles/codeStyleConfig.xml
 *.iml
 .vscode/
 .DS_Store

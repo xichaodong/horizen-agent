@@ -11,10 +11,15 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-/** 包含所有者、Agent 和 Session 的租约身份，不修改模型和工具的 RuntimeContext。 */
+/**
+ * 包含所有者、Agent 和 Session 的租约身份，不修改模型和工具的 RuntimeContext。
+ */
 public final class SessionWorkspaceIdentity {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private SessionWorkspaceIdentity() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private SessionWorkspaceIdentity() {
+    }
 
     /**
      * 组合可信归属、Agent 与会话定位工作区，避免不同使用者共享同名会话目录。
@@ -34,10 +39,10 @@ public final class SessionWorkspaceIdentity {
                                     DigestUtils.newSha256()
                                             .digest(
                                                     (workspace.getOwnerKey()
-                                                                    + "\0"
-                                                                    + agentId
-                                                                    + "\0"
-                                                                    + workspace.getSessionId())
+                                                            + "\0"
+                                                            + agentId
+                                                            + "\0"
+                                                            + workspace.getSessionId())
                                                             .getBytes(StandardCharsets.UTF_8)));
             return SandboxIsolationKey.resolve(
                             IsolationScope.SESSION,

@@ -11,70 +11,104 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 import java.net.URI;
 import java.time.Duration;
 
-/** Web 宿主的可选 Horizen 追踪导出配置。 */
+/**
+ * Web 宿主的可选 Horizen 追踪导出配置。
+ */
 @ConfigurationProperties(prefix = "horizen.trace")
 @Getter
 @EqualsAndHashCode
 public class HorizenProperties {
-    /** 是否启用Horizen对应的功能。 */
+    /**
+     * 是否启用Horizen对应的功能。
+     */
     private final boolean enabled;
 
-    /** 远端服务的基础地址，用于拼接接口路径。 */
+    /**
+     * 远端服务的基础地址，用于拼接接口路径。
+     */
     private final String baseUrl;
 
-    /** 工作区或发布所属 Project 的标识，参与资源归属校验。 */
+    /**
+     * 工作区或发布所属 Project 的标识，参与资源归属校验。
+     */
     private final Long projectId;
 
-    /** 服务访问令牌，由宿主配置提供，用于请求认证。 */
+    /**
+     * 服务访问令牌，由宿主配置提供，用于请求认证。
+     */
     private final String token;
 
-    /** 是否采集消息与工具正文；关闭时仅保留必要的运行元数据。 */
+    /**
+     * 是否采集消息与工具正文；关闭时仅保留必要的运行元数据。
+     */
     private final boolean captureContent;
 
-    /** 单次远端请求允许的最长等待时间。 */
+    /**
+     * 单次远端请求允许的最长等待时间。
+     */
     private final Duration requestTimeout;
 
-    /** 积累或上报一批数据前的刷新间隔。 */
+    /**
+     * 积累或上报一批数据前的刷新间隔。
+     */
     private final Duration flushInterval;
 
-    /** 待处理队列可容纳的项目数量上限。 */
+    /**
+     * 待处理队列可容纳的项目数量上限。
+     */
     private final Integer queueCapacity;
 
-    /** 关闭时等待在途任务收敛的最长时间。 */
+    /**
+     * 关闭时等待在途任务收敛的最长时间。
+     */
     private final Duration shutdownTimeout;
 
-    /** 当前事件、内容或执行的来源，供追踪生成关系与执行层级使用。 */
+    /**
+     * 当前事件、内容或执行的来源，供追踪生成关系与执行层级使用。
+     */
     private final String source;
 
-    /** 观测数据中的 Agent 展示名称。 */
+    /**
+     * 观测数据中的 Agent 展示名称。
+     */
     private final String agentName;
 
-    /** 观测数据中的执行方展示名称。 */
+    /**
+     * 观测数据中的执行方展示名称。
+     */
     private final String executorName;
 
-    /** 运行环境的标识，供远端按环境组织观测数据。 */
+    /**
+     * 运行环境的标识，供远端按环境组织观测数据。
+     */
     private final String environment;
 
-    /** 首次请求之后允许执行的额外重试次数上限。 */
+    /**
+     * 首次请求之后允许执行的额外重试次数上限。
+     */
     private final Integer maxRetries;
 
-    /** 重试初始延迟的时间配置，供等待、调度或失效判断使用。 */
+    /**
+     * 重试初始延迟的时间配置，供等待、调度或失效判断使用。
+     */
     private final Duration retryInitialDelay;
 
-    /** 重试最大延迟的时间配置，供等待、调度或失效判断使用。 */
+    /**
+     * 重试最大延迟的时间配置，供等待、调度或失效判断使用。
+     */
     private final Duration retryMaxDelay;
 
     /**
      * 创建Horizen配置，初始化该组件所需的状态、配置或依赖。
      *
-     * @param enabled 是否启用Horizen对应的功能。
-     * @param baseUrl 远端服务的基础地址，用于拼接接口路径。
-     * @param projectId 工作区或发布所属 Project 的标识，参与资源归属校验。
-     * @param token 服务访问令牌，由宿主配置提供，用于请求认证。
-     * @param captureContent 是否采集消息与工具正文；关闭时仅保留必要的运行元数据。
-     * @param requestTimeout 单次远端请求允许的最长等待时间。
-     * @param flushInterval 积累或上报一批数据前的刷新间隔。
-     * @param queueCapacity 待处理队列可容纳的项目数量上限。
+     * @param enabled         是否启用Horizen对应的功能。
+     * @param baseUrl         远端服务的基础地址，用于拼接接口路径。
+     * @param projectId       工作区或发布所属 Project 的标识，参与资源归属校验。
+     * @param token           服务访问令牌，由宿主配置提供，用于请求认证。
+     * @param captureContent  是否采集消息与工具正文；关闭时仅保留必要的运行元数据。
+     * @param requestTimeout  单次远端请求允许的最长等待时间。
+     * @param flushInterval   积累或上报一批数据前的刷新间隔。
+     * @param queueCapacity   待处理队列可容纳的项目数量上限。
      * @param shutdownTimeout 关闭时等待在途任务收敛的最长时间。
      */
     public HorizenProperties(
@@ -109,22 +143,22 @@ public class HorizenProperties {
     /**
      * 创建Horizen配置，初始化该组件所需的状态、配置或依赖。
      *
-     * @param enabled 是否启用Horizen对应的功能。
-     * @param baseUrl 远端服务的基础地址，用于拼接接口路径。
-     * @param projectId 工作区或发布所属 Project 的标识，参与资源归属校验。
-     * @param token 服务访问令牌，由宿主配置提供，用于请求认证。
-     * @param captureContent 是否采集消息与工具正文；关闭时仅保留必要的运行元数据。
-     * @param requestTimeout 单次远端请求允许的最长等待时间。
-     * @param flushInterval 积累或上报一批数据前的刷新间隔。
-     * @param queueCapacity 待处理队列可容纳的项目数量上限。
-     * @param shutdownTimeout 关闭时等待在途任务收敛的最长时间。
-     * @param source 待解析或转换的来源对象。
-     * @param agentName 当前Horizen配置使用的Agent名称，供其处理与状态记录使用。
-     * @param executorName 当前Horizen配置使用的执行方名称，供其处理与状态记录使用。
-     * @param environment 当前Horizen配置使用的环境，供其处理与状态记录使用。
-     * @param maxRetries 当前Horizen配置使用的最大重试，供其处理与状态记录使用。
+     * @param enabled           是否启用Horizen对应的功能。
+     * @param baseUrl           远端服务的基础地址，用于拼接接口路径。
+     * @param projectId         工作区或发布所属 Project 的标识，参与资源归属校验。
+     * @param token             服务访问令牌，由宿主配置提供，用于请求认证。
+     * @param captureContent    是否采集消息与工具正文；关闭时仅保留必要的运行元数据。
+     * @param requestTimeout    单次远端请求允许的最长等待时间。
+     * @param flushInterval     积累或上报一批数据前的刷新间隔。
+     * @param queueCapacity     待处理队列可容纳的项目数量上限。
+     * @param shutdownTimeout   关闭时等待在途任务收敛的最长时间。
+     * @param source            待解析或转换的来源对象。
+     * @param agentName         当前Horizen配置使用的Agent名称，供其处理与状态记录使用。
+     * @param executorName      当前Horizen配置使用的执行方名称，供其处理与状态记录使用。
+     * @param environment       当前Horizen配置使用的环境，供其处理与状态记录使用。
+     * @param maxRetries        当前Horizen配置使用的最大重试，供其处理与状态记录使用。
      * @param retryInitialDelay 重试初始延迟的时间配置，供等待、调度或失效判断使用。
-     * @param retryMaxDelay 重试最大延迟的时间配置，供等待、调度或失效判断使用。
+     * @param retryMaxDelay     重试最大延迟的时间配置，供等待、调度或失效判断使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @ConstructorBinding

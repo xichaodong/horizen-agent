@@ -2,44 +2,62 @@ package dev.horizen.agent.execution.session;
 
 import lombok.Value;
 
-/** 身份由宿主提供；未指定目标时，搜索其他可见 Session。 */
+/**
+ * 身份由宿主提供；未指定目标时，搜索其他可见 Session。
+ */
 @Value
 public class SessionHistoryQuery {
-    /** 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。 */
+    /**
+     * 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     */
     String ownerKey;
 
-    /** 本次操作所在的会话标识，用于限定当前会话查询范围。 */
+    /**
+     * 本次操作所在的会话标识，用于限定当前会话查询范围。
+     */
     String currentSessionId;
 
-    /** 目标会话的标识，用于关联相应记录或执行。 */
+    /**
+     * 目标会话的标识，用于关联相应记录或执行。
+     */
     String targetSessionId;
 
-    /** 当前历史或记忆检索使用的关键词。 */
+    /**
+     * 当前历史或记忆检索使用的关键词。
+     */
     String keyword;
 
-    /** 会话消息的标识，用于历史查询与过程事件关联。 */
+    /**
+     * 会话消息的标识，用于历史查询与过程事件关联。
+     */
     String messageId;
 
-    /** 正文读取的字符起点，用于分段返回长内容。 */
+    /**
+     * 正文读取的字符起点，用于分段返回长内容。
+     */
     int textOffset;
 
-    /** 本次查询或处理数量的上限。 */
+    /**
+     * 本次查询或处理数量的上限。
+     */
     int limit;
 
-    /** 查询或内容读取的起始偏移量。 */
+    /**
+     * 查询或内容读取的起始偏移量。
+     */
     int offset;
 
     /**
      * 创建会话历史查询，初始化该组件所需的状态、配置或依赖。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey         宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param currentSessionId 本次操作所在的会话标识，用于限定当前会话查询范围。
-     * @param targetSessionId 目标会话的标识，用于关联相应记录或执行。
-     * @param keyword 当前会话历史查询使用的keyword，供其处理与状态记录使用。
-     * @param messageId 会话消息的标识，用于历史查询与过程事件关联。
-     * @param textOffset 当前会话历史查询使用的文本偏移，供其处理与状态记录使用。
-     * @param limit 本次处理或返回数量上限。
-     * @param offset 本次读取的起始偏移。
+     * @param targetSessionId  目标会话的标识，用于关联相应记录或执行。
+     * @param keyword          当前会话历史查询使用的keyword，供其处理与状态记录使用。
+     * @param messageId        会话消息的标识，用于历史查询与过程事件关联。
+     * @param textOffset       当前会话历史查询使用的文本偏移，供其处理与状态记录使用。
+     * @param limit            本次处理或返回数量上限。
+     * @param offset           本次读取的起始偏移。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public SessionHistoryQuery(
@@ -90,7 +108,7 @@ public class SessionHistoryQuery {
     /**
      * 生成当前操作所需的required文本，供调用方继续处理。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value   待校验、转换或保存的原始值。
      * @param maximum 当前会话历史查询使用的最大，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。

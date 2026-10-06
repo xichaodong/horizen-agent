@@ -119,22 +119,22 @@ class EvaluationFixtureTest {
                         Map.of("modeLabel", "REPLAY", "entries", List.of(broad, exact)));
         assertTrue(
                 ((TextBlock)
-                                fixture.replay(
-                                                "search_docs",
-                                                Map.of("tenant", "test", "query", "exact"),
-                                                true)
-                                        .getOutput()
-                                        .get(0))
+                        fixture.replay(
+                                        "search_docs",
+                                        Map.of("tenant", "test", "query", "exact"),
+                                        true)
+                                .getOutput()
+                                .get(0))
                         .getText()
                         .contains("exact result"));
         assertTrue(
                 ((TextBlock)
-                                fixture.replay(
-                                                "search_docs",
-                                                Map.of("tenant", "test", "query", "other"),
-                                                true)
-                                        .getOutput()
-                                        .get(0))
+                        fixture.replay(
+                                        "search_docs",
+                                        Map.of("tenant", "test", "query", "other"),
+                                        true)
+                                .getOutput()
+                                .get(0))
                         .getText()
                         .contains("corpus"));
         fixture.replay("search_docs", Map.of("tenant", "another", "query", "other"), true);

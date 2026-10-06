@@ -11,15 +11,23 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
-/** 每次尝试生成不可变对象，限制传输量并在流式传输中检查大小。 */
+/**
+ * 每次尝试生成不可变对象，限制传输量并在流式传输中检查大小。
+ */
 public final class BosWorkspaceContentRepository implements WorkspaceContentRepository {
-    /** 当前组件的配置与策略参数。 */
+    /**
+     * 当前组件的配置与策略参数。
+     */
     private final BosArtifactContentStoreConfig config;
 
-    /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+    /**
+     * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     */
     private final BosSnapshotObjectClient client;
 
-    /** transfers的并发准入许可，限制同时进行的处理数量。 */
+    /**
+     * transfers的并发准入许可，限制同时进行的处理数量。
+     */
     private final Semaphore transfers = new Semaphore(2);
 
     /**
@@ -35,11 +43,11 @@ public final class BosWorkspaceContentRepository implements WorkspaceContentRepo
     /**
      * 上传BOS工作区正文仓储。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
     public String upload(WorkspaceDocumentKey key, byte[] content) {
@@ -69,11 +77,11 @@ public final class BosWorkspaceContentRepository implements WorkspaceContentRepo
     /**
      * 下载BOS工作区正文仓储。
      *
-     * @param reference 当前BOS工作区正文仓储使用的引用，供其处理与状态记录使用。
+     * @param reference    当前BOS工作区正文仓储使用的引用，供其处理与状态记录使用。
      * @param maximumBytes 最大的字节数，用于容量或传输限制。
      * @return 本次处理取得或生成的内容字节。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws SecurityException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws SecurityException     当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
     public byte[] download(String reference, long maximumBytes) {
@@ -93,11 +101,11 @@ public final class BosWorkspaceContentRepository implements WorkspaceContentRepo
     /**
      * 上传Derived。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @Override
     public String uploadDerived(WorkspaceDocumentKey key, byte[] content) {
@@ -155,6 +163,7 @@ public final class BosWorkspaceContentRepository implements WorkspaceContentRepo
 
     /**
      * 完成当前操作的enter步骤，按实现更新相应状态或依赖。
+     *
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void enter() {
@@ -162,7 +171,9 @@ public final class BosWorkspaceContentRepository implements WorkspaceContentRepo
             throw new IllegalStateException("Workspace transfer capacity exhausted");
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
     public void close() {
         client.close();

@@ -12,7 +12,9 @@ import io.agentscope.harness.agent.sandbox.SandboxException.ExecTimeoutException
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-/** 运行时失败分类边界：RuntimeFailureClassifier。 */
+/**
+ * 运行时失败分类边界：RuntimeFailureClassifier。
+ */
 final class RuntimeFailureClassifier {
     /**
      * 生成当前操作所需的stopFailureCode文本，供调用方继续处理。
@@ -26,10 +28,8 @@ final class RuntimeFailureClassifier {
             case MODEL_STOP, STRUCTURED_OUTPUT -> null;
             case MAX_ITERATIONS -> "MAX_ITERATIONS_REACHED";
             case INTERRUPTED -> "AGENT_INTERRUPTED";
-            case REASONING_STOP_REQUESTED, ACTING_STOP_REQUESTED, ALL_TOOLS_DENIED ->
-                    "AGENT_STOPPED";
-            case TOOL_CALLS, PERMISSION_ASKING, TOOL_SUSPENDED, MIDDLEWARE_STOP_REQUESTED ->
-                    "UNEXPECTED_STOP_REASON";
+            case REASONING_STOP_REQUESTED, ACTING_STOP_REQUESTED, ALL_TOOLS_DENIED -> "AGENT_STOPPED";
+            case TOOL_CALLS, PERMISSION_ASKING, TOOL_SUSPENDED, MIDDLEWARE_STOP_REQUESTED -> "UNEXPECTED_STOP_REASON";
         };
     }
 

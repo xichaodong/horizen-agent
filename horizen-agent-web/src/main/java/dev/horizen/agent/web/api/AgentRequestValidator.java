@@ -7,11 +7,16 @@ import dev.horizen.agent.web.api.chat.ChatApi;
 
 import org.springframework.http.HttpStatus;
 
-/** 在 HTTP 边界完成校验，领域和应用服务接收规范化值。 */
+/**
+ * 在 HTTP 边界完成校验，领域和应用服务接收规范化值。
+ */
 public final class AgentRequestValidator {
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private AgentRequestValidator() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private AgentRequestValidator() {
+    }
 
     /**
      * 校验对话。
@@ -98,7 +103,7 @@ public final class AgentRequestValidator {
      *
      * @param cursor 当前分页或回放位置，用于继续读取而不是资源身份校验。
      * @return 本次操作返回的整数结果。
-     * @throws ApiException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws ApiException          当前输入或运行状态不满足本方法的处理条件时抛出。
      * @throws NumberFormatException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     static int sessionCursor(String cursor) {

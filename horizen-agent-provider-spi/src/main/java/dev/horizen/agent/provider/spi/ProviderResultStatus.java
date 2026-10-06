@@ -8,19 +8,31 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-/** Provider 协议约定的工具执行状态，不等同于模型输出流是否结束。 */
+/**
+ * Provider 协议约定的工具执行状态，不等同于模型输出流是否结束。
+ */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum ProviderResultStatus implements WireValue {
-    /** Provider 报告当前工具调用成功。 */
+    /**
+     * Provider 报告当前工具调用成功。
+     */
     SUCCESS("success"),
-    /** Provider 或对应处理器报告失败。 */
+    /**
+     * Provider 或对应处理器报告失败。
+     */
     ERROR("error"),
-    /** 用户已拒绝执行原工具调用。 */
+    /**
+     * 用户已拒绝执行原工具调用。
+     */
     DENIED("denied"),
-    /** 执行或交互已取消，不再继续原处理。 */
+    /**
+     * 执行或交互已取消，不再继续原处理。
+     */
     CANCELLED("cancelled");
 
-    /** 对外协议使用的固定文本值，与 Java 枚举成员名称分开维护。 */
+    /**
+     * 对外协议使用的固定文本值，与 Java 枚举成员名称分开维护。
+     */
     @Getter(onMethod_ = {@Override, @JsonValue})
     @Accessors(fluent = true)
     private final String wireValue;

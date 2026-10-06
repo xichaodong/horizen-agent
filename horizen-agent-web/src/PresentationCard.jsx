@@ -11,7 +11,7 @@ const severityClass = (value) => {
     return 'is-neutral';
 };
 
-const Metrics = ({ values }) =>
+const Metrics = ({values}) =>
     list(values).length ? (
         <div className="horizen-console__presentation-metrics">
             {list(values).map((metric, index) => (
@@ -27,11 +27,11 @@ const Metrics = ({ values }) =>
         </div>
     ) : null;
 
-const Chips = ({ values }) =>
+const Chips = ({values}) =>
     list(values).length ? (
         <div className="horizen-console__presentation-chips">
             {list(values).map((chip, index) => {
-                const value = typeof chip === 'object' ? chip : { label: chip };
+                const value = typeof chip === 'object' ? chip : {label: chip};
                 return (
                     <span className={severityClass(value.status)} key={value.id || index}>
                         {text(value.label || value.name)}
@@ -42,7 +42,7 @@ const Chips = ({ values }) =>
         </div>
     ) : null;
 
-const KnownCard = ({ type, data, onOpenArtifact }) => {
+const KnownCard = ({type, data, onOpenArtifact}) => {
     if (type === 'external_report' || type === 'external_page') {
         let url;
         try {
@@ -78,8 +78,8 @@ const KnownCard = ({ type, data, onOpenArtifact }) => {
             data.variant === 'report'
                 ? '查看报告'
                 : data.variant === 'image'
-                  ? '查看图片'
-                  : '打开文件';
+                    ? '查看图片'
+                    : '打开文件';
         return (
             <button
                 type="button"
@@ -102,7 +102,7 @@ const KnownCard = ({ type, data, onOpenArtifact }) => {
                 {list(data.lines).map((line, index) => (
                     <p key={index}>{text(line)}</p>
                 ))}
-                <Chips values={data.keywords} />
+                <Chips values={data.keywords}/>
             </>
         );
     if (type === 'metric_overview')
@@ -110,14 +110,14 @@ const KnownCard = ({ type, data, onOpenArtifact }) => {
             <>
                 <h3>{text(data.title || '核心数据概览')}</h3>
                 {data.summary && <p>{text(data.summary)}</p>}
-                <Metrics values={data.metrics} />
+                <Metrics values={data.metrics}/>
             </>
         );
     if (type === 'metric')
         return (
             <>
                 <h3>{text(data.title || '指标')}</h3>
-                <Chips values={data.metrics || data.chips} />
+                <Chips values={data.metrics || data.chips}/>
                 {data.summary && <p>{text(data.summary)}</p>}
             </>
         );
@@ -129,8 +129,8 @@ const KnownCard = ({ type, data, onOpenArtifact }) => {
                     <span>{text(data.scoreLabel || '综合评分')}</span>
                 </div>
                 <h3>{text(data.title || '评分与结构')}</h3>
-                <Metrics values={data.items || data.dimensions} />
-                <Chips values={data.tags} />
+                <Metrics values={data.items || data.dimensions}/>
+                <Chips values={data.tags}/>
             </>
         );
     if (type === 'issue')
@@ -140,7 +140,7 @@ const KnownCard = ({ type, data, onOpenArtifact }) => {
                     <h3>{text(data.title || '发现问题')}</h3>
                     {data.severity && <span>{text(data.severity)}</span>}
                 </div>
-                <Chips values={data.metrics} />
+                <Chips values={data.metrics}/>
                 {data.summary && <p>{text(data.summary)}</p>}
             </>
         );
@@ -176,7 +176,7 @@ const KNOWN_TYPES = new Set([
     'action',
 ]);
 
-export default function PresentationCard({ presentation, onOpenArtifact }) {
+export default function PresentationCard({presentation, onOpenArtifact}) {
     const type = text(presentation?.type);
     const data =
         presentation?.data && typeof presentation.data === 'object' ? presentation.data : {};
@@ -186,7 +186,7 @@ export default function PresentationCard({ presentation, onOpenArtifact }) {
             className={`horizen-console__presentation horizen-console__presentation--${type || 'unknown'} ${severityClass(data.severity || data.status)}`}
         >
             {known ? (
-                <KnownCard type={type} data={data} onOpenArtifact={onOpenArtifact} />
+                <KnownCard type={type} data={data} onOpenArtifact={onOpenArtifact}/>
             ) : (
                 <>
                     <h3>{text(data.title || type || '结构化结果')}</h3>

@@ -5,10 +5,15 @@ import java.util.IdentityHashMap;
 import java.util.Objects;
 import java.util.Set;
 
-/** 不依赖框架的异常原因检查，可处理格式错误的循环原因链。 */
+/**
+ * 不依赖框架的异常原因检查，可处理格式错误的循环原因链。
+ */
 public final class Exceptions {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private Exceptions() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private Exceptions() {
+    }
 
     /**
      * 计算或取得本方法声明的结果，供当前Exceptions处理步骤使用。

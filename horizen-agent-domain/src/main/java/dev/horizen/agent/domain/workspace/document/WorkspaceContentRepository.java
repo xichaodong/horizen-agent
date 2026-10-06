@@ -3,12 +3,14 @@ package dev.horizen.agent.domain.workspace.document;
 import java.net.URI;
 import java.util.Optional;
 
-/** 不可变工作区文件内容；引用不透明且不包含访问凭据。 */
+/**
+ * 不可变工作区文件内容；引用不透明且不包含访问凭据。
+ */
 public interface WorkspaceContentRepository extends AutoCloseable {
     /**
      * 上传工作区正文仓储。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key     当前对象的查找或写入键。
      * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
      * @return 本次处理生成或读取的文本。
      */
@@ -17,7 +19,7 @@ public interface WorkspaceContentRepository extends AutoCloseable {
     /**
      * 下载工作区正文仓储。
      *
-     * @param reference 当前工作区正文仓储使用的引用，供其处理与状态记录使用。
+     * @param reference    当前工作区正文仓储使用的引用，供其处理与状态记录使用。
      * @param maximumBytes 最大的字节数，用于容量或传输限制。
      * @return 本次处理取得或生成的内容字节。
      */
@@ -47,7 +49,10 @@ public interface WorkspaceContentRepository extends AutoCloseable {
         return Optional.empty();
     }
 
-    /** 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。 */
+    /**
+     * 结束当前对象的使用，执行该实现持有资源或执行句柄的清理。
+     */
     @Override
-    default void close() {}
+    default void close() {
+    }
 }

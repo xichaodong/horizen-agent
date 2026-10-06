@@ -41,11 +41,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/** 两个 owner 共用同名 session 时的真实沙箱隔离测试。 */
+/**
+ * 两个 owner 共用同名 session 时的真实沙箱隔离测试。
+ */
 @Tag("live-sandbox")
 @EnabledIfSystemProperty(named = "horizen.e2b.browser.live", matches = "true")
 class E2bOwnerIsolationLiveTest {
-    @TempDir Path temporaryDirectory;
+    @TempDir
+    Path temporaryDirectory;
 
     @Test
     void ownersWithSameSessionIdCannotSeeEachOthersFiles() throws Exception {

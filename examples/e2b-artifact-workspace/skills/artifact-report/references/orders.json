@@ -1,5 +1,14 @@
 [
-  { "orderId": "sample-001", "amount": "12.50" },
-  { "orderId": "sample-002", "amount": "7.25" },
-  { "orderId": "sample-003", "amount": "20.25" }
+  {
+    "orderId": "sample-001",
+    "amount": "12.50"
+  },
+  {
+    "orderId": "sample-002",
+    "amount": "7.25"
+  },
+  {
+    "orderId": "sample-003",
+    "amount": "20.25"
+  }
 ]

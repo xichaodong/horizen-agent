@@ -22,34 +22,35 @@ import java.util.UUID;
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
-            "horizen.local-config=",
-            "horizen.agent.model-mode=SCRIPTED",
-            "AGENT_MODEL_MODE=SCRIPTED",
-            "horizen.agent.api-key=",
-            "horizen.agent.gateway.mode=remote",
-            "horizen.agent.gateway.url=",
-            "horizen.agent.gateway.token=",
-            "horizen.agent.skill-release.enabled=false",
-            "horizen.trace.enabled=false",
-            "horizen.agent.sandbox.e2b.enabled=false",
-            "AGENT_E2B_ENABLED=false",
-            "HORIZEN_SKILL_RELEASE_ENABLED=false",
-            "HORIZEN_TRACE_ENABLED=false",
-            "AGENT_STORAGE_MODE=LOCAL",
-            "horizen.agent.storage.mode=LOCAL",
-            "horizen.agent.workspace-release.enabled=false",
-            "horizen.agent.artifact.bos.enabled=false",
-            "HORIZEN_SNAPSHOT_ENABLED=false",
-            "horizen.agent.evaluation.enabled=true",
-            "horizen.agent.evaluation.token=offline-test-token"
+                "horizen.local-config=",
+                "horizen.agent.model-mode=SCRIPTED",
+                "AGENT_MODEL_MODE=SCRIPTED",
+                "horizen.agent.api-key=",
+                "horizen.agent.gateway.mode=remote",
+                "horizen.agent.gateway.url=",
+                "horizen.agent.gateway.token=",
+                "horizen.agent.skill-release.enabled=false",
+                "horizen.trace.enabled=false",
+                "horizen.agent.sandbox.e2b.enabled=false",
+                "AGENT_E2B_ENABLED=false",
+                "HORIZEN_SKILL_RELEASE_ENABLED=false",
+                "HORIZEN_TRACE_ENABLED=false",
+                "AGENT_STORAGE_MODE=LOCAL",
+                "horizen.agent.storage.mode=LOCAL",
+                "horizen.agent.workspace-release.enabled=false",
+                "horizen.agent.artifact.bos.enabled=false",
+                "HORIZEN_SNAPSHOT_ENABLED=false",
+                "horizen.agent.evaluation.enabled=true",
+                "horizen.agent.evaluation.token=offline-test-token"
         })
 class CloudEvaluationHttpTest {
-    @Autowired TestRestTemplate http;
+    @Autowired
+    TestRestTemplate http;
 
     @Test
     void
-            authenticatedHttpSubmissionCompletesThroughProductionRuntimeAndRejectsUnauthenticatedAccess()
-                    throws Exception {
+    authenticatedHttpSubmissionCompletesThroughProductionRuntimeAndRejectsUnauthenticatedAccess()
+            throws Exception {
         var request = new EvaluationProtocol.Start();
         String executionId = "http-" + UUID.randomUUID();
         request.setExecutionId(executionId);

@@ -89,7 +89,8 @@ class WebEvaluationHostTest {
                                 event(AgentRuntimeEvent.Type.APPROVAL_REQUIRED),
                                 script,
                                 Duration.ofSeconds(1),
-                                ignored -> {}));
+                                ignored -> {
+                                }));
         verify(agent, never()).decideApproval(any(), any());
         script.setToolNames(List.of("update"));
         host.resume(
@@ -98,7 +99,8 @@ class WebEvaluationHostTest {
                 event(AgentRuntimeEvent.Type.APPROVAL_REQUIRED),
                 script,
                 Duration.ofSeconds(1),
-                ignored -> {});
+                ignored -> {
+                });
         verify(agent)
                 .decideApproval(
                         eq(identity),
@@ -124,7 +126,8 @@ class WebEvaluationHostTest {
                 event(AgentRuntimeEvent.Type.ASK_USER_REQUIRED),
                 script,
                 Duration.ofSeconds(1),
-                ignored -> {});
+                ignored -> {
+                });
         verify(agent)
                 .answerAskUser(
                         eq(identity),
@@ -151,10 +154,12 @@ class WebEvaluationHostTest {
                                 pending,
                                 script,
                                 Duration.ofSeconds(1),
-                                ignored -> {}));
+                                ignored -> {
+                                }));
         verify(agent, never()).answerAskUser(any(), any());
         script.setSelectedOptionLabels(List.of("Confirm", "Confirm (submit)"));
-        host.resume(identity, "session", pending, script, Duration.ofSeconds(1), ignored -> {});
+        host.resume(identity, "session", pending, script, Duration.ofSeconds(1), ignored -> {
+        });
         verify(agent)
                 .answerAskUser(
                         eq(identity),

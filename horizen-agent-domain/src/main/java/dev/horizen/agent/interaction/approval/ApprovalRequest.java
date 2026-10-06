@@ -10,39 +10,61 @@ import java.beans.ConstructorProperties;
 import java.time.Instant;
 import java.util.Objects;
 
-/** AgentScope 请求人工确认时保存的产品审批记录。 */
+/**
+ * AgentScope 请求人工确认时保存的产品审批记录。
+ */
 @Getter
 @EqualsAndHashCode
 @ToString
 public class ApprovalRequest {
-    /** 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。 */
+    /**
+     * 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     */
     private final String ownerKey;
 
-    /** 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。 */
+    /**
+     * 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     */
     private final String sessionId;
 
-    /** 单次用户输入触发的执行标识，用于关联状态、消息和事件。 */
+    /**
+     * 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     */
     private final String turnId;
 
-    /** 待确认操作的记录标识，提交决定时用它定位原审批。 */
+    /**
+     * 待确认操作的记录标识，提交决定时用它定位原审批。
+     */
     private final String approvalId;
 
-    /** 请求回复的标识，用于关联相应记录或执行。 */
+    /**
+     * 请求回复的标识，用于关联相应记录或执行。
+     */
     private final String requestReplyId;
 
-    /** 一次工具调用的标识，用于配对参数、结果和审批事件。 */
+    /**
+     * 一次工具调用的标识，用于配对参数、结果和审批事件。
+     */
     private final String toolCallId;
 
-    /** 可调用工具的注册名称，须与目录中声明的名称一致。 */
+    /**
+     * 可调用工具的注册名称，须与目录中声明的名称一致。
+     */
     private final String toolName;
 
-    /** 原工具调用的序列化调用内容，供暂停后恢复使用。 */
+    /**
+     * 原工具调用的序列化调用内容，供暂停后恢复使用。
+     */
     private final String toolContent;
 
-    /** 工具参数的 JSON 表示，供持久化或协议转换使用。 */
+    /**
+     * 工具参数的 JSON 表示，供持久化或协议转换使用。
+     */
     private final String toolArgumentsJson;
 
-    /** 结构化呈现内容的持久化 JSON 表示。 */
+    /**
+     * 结构化呈现内容的持久化 JSON 表示。
+     */
     private final String presentationJson;
 
     /**
@@ -73,50 +95,66 @@ public class ApprovalRequest {
                 version);
     }
 
-    /** 当前记录或执行的状态，具体取值由所属领域或协议约定。 */
+    /**
+     * 当前记录或执行的状态，具体取值由所属领域或协议约定。
+     */
     private final ApprovalStatus status;
 
-    /** 发起原交互请求的操作方标识。 */
+    /**
+     * 发起原交互请求的操作方标识。
+     */
     private final String requestedBy;
 
-    /** 当前记录或授权的失效时间，用于过期检查。 */
+    /**
+     * 当前记录或授权的失效时间，用于过期检查。
+     */
     private final Instant expiresAt;
 
-    /** 提交当前交互决定的操作方标识。 */
+    /**
+     * 提交当前交互决定的操作方标识。
+     */
     private final String decidedBy;
 
-    /** 已决定的时间，用于记录对应生命周期节点。 */
+    /**
+     * 已决定的时间，用于记录对应生命周期节点。
+     */
     private final Instant decidedAt;
 
-    /** 当前记录的创建时间。 */
+    /**
+     * 当前记录的创建时间。
+     */
     private final Instant createdAt;
 
-    /** 当前记录最近一次更新的时间。 */
+    /**
+     * 当前记录最近一次更新的时间。
+     */
     private final Instant updatedAt;
 
-    /** 记录版本，用于乐观并发控制或区分协议版本。 */
+    /**
+     * 记录版本，用于乐观并发控制或区分协议版本。
+     */
     private final long version;
 
     /**
      * 创建审批请求，初始化该组件所需的状态、配置或依赖。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
-     * @param approvalId 待确认操作的记录标识，提交决定时用它定位原审批。
-     * @param requestReplyId 请求回复的标识，用于关联相应记录或执行。
-     * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
-     * @param toolName 可调用工具的注册名称，须与目录中声明的名称一致。
-     * @param toolContent 当前审批请求使用的工具正文，供其处理与状态记录使用。
+     * @param ownerKey          宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId         会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param turnId            单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param approvalId        待确认操作的记录标识，提交决定时用它定位原审批。
+     * @param requestReplyId    请求回复的标识，用于关联相应记录或执行。
+     * @param toolCallId        一次工具调用的标识，用于配对参数、结果和审批事件。
+     * @param toolName          可调用工具的注册名称，须与目录中声明的名称一致。
+     * @param toolContent       当前审批请求使用的工具正文，供其处理与状态记录使用。
      * @param toolArgumentsJson 工具参数的 JSON 表示，供持久化或协议转换使用。
-     * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param requestedBy 当前审批请求使用的请求的按条件，供其处理与状态记录使用。
-     * @param expiresAt 当前记录或授权的失效时间，用于过期检查。
-     * @param decidedBy 当前审批请求使用的已决定按条件，供其处理与状态记录使用。
-     * @param decidedAt 已决定的时间，用于记录对应生命周期节点。
-     * @param createdAt 当前记录的创建时间。
-     * @param updatedAt 当前记录最近一次更新的时间。
-     * @param version 记录版本，用于乐观并发控制或区分协议版本。
+     * @param status            当前记录或执行的状态，具体取值由所属领域或协议约定。
+     * @param requestedBy       当前审批请求使用的请求的按条件，供其处理与状态记录使用。
+     * @param expiresAt         当前记录或授权的失效时间，用于过期检查。
+     * @param decidedBy         当前审批请求使用的已决定按条件，供其处理与状态记录使用。
+     * @param decidedAt         已决定的时间，用于记录对应生命周期节点。
+     * @param createdAt         当前记录的创建时间。
+     * @param updatedAt         当前记录最近一次更新的时间。
+     * @param version           记录版本，用于乐观并发控制或区分协议版本。
      */
     public ApprovalRequest(
             String ownerKey,
@@ -160,45 +198,45 @@ public class ApprovalRequest {
     /**
      * 创建审批请求，初始化该组件所需的状态、配置或依赖。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
-     * @param approvalId 待确认操作的记录标识，提交决定时用它定位原审批。
-     * @param requestReplyId 请求回复的标识，用于关联相应记录或执行。
-     * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
-     * @param toolName 可调用工具的注册名称，须与目录中声明的名称一致。
-     * @param toolContent 当前审批请求使用的工具正文，供其处理与状态记录使用。
+     * @param ownerKey          宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId         会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param turnId            单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param approvalId        待确认操作的记录标识，提交决定时用它定位原审批。
+     * @param requestReplyId    请求回复的标识，用于关联相应记录或执行。
+     * @param toolCallId        一次工具调用的标识，用于配对参数、结果和审批事件。
+     * @param toolName          可调用工具的注册名称，须与目录中声明的名称一致。
+     * @param toolContent       当前审批请求使用的工具正文，供其处理与状态记录使用。
      * @param toolArgumentsJson 工具参数的 JSON 表示，供持久化或协议转换使用。
-     * @param presentationJson 结构化呈现内容的持久化 JSON 表示。
-     * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param requestedBy 当前审批请求使用的请求的按条件，供其处理与状态记录使用。
-     * @param expiresAt 当前记录或授权的失效时间，用于过期检查。
-     * @param decidedBy 当前审批请求使用的已决定按条件，供其处理与状态记录使用。
-     * @param decidedAt 已决定的时间，用于记录对应生命周期节点。
-     * @param createdAt 当前记录的创建时间。
-     * @param updatedAt 当前记录最近一次更新的时间。
-     * @param version 记录版本，用于乐观并发控制或区分协议版本。
+     * @param presentationJson  结构化呈现内容的持久化 JSON 表示。
+     * @param status            当前记录或执行的状态，具体取值由所属领域或协议约定。
+     * @param requestedBy       当前审批请求使用的请求的按条件，供其处理与状态记录使用。
+     * @param expiresAt         当前记录或授权的失效时间，用于过期检查。
+     * @param decidedBy         当前审批请求使用的已决定按条件，供其处理与状态记录使用。
+     * @param decidedAt         已决定的时间，用于记录对应生命周期节点。
+     * @param createdAt         当前记录的创建时间。
+     * @param updatedAt         当前记录最近一次更新的时间。
+     * @param version           记录版本，用于乐观并发控制或区分协议版本。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @ConstructorProperties({
-        "ownerKey",
-        "sessionId",
-        "turnId",
-        "approvalId",
-        "requestReplyId",
-        "toolCallId",
-        "toolName",
-        "toolContent",
-        "toolArgumentsJson",
-        "presentationJson",
-        "status",
-        "requestedBy",
-        "expiresAt",
-        "decidedBy",
-        "decidedAt",
-        "createdAt",
-        "updatedAt",
-        "version"
+            "ownerKey",
+            "sessionId",
+            "turnId",
+            "approvalId",
+            "requestReplyId",
+            "toolCallId",
+            "toolName",
+            "toolContent",
+            "toolArgumentsJson",
+            "presentationJson",
+            "status",
+            "requestedBy",
+            "expiresAt",
+            "decidedBy",
+            "decidedAt",
+            "createdAt",
+            "updatedAt",
+            "version"
     })
     public ApprovalRequest(
             String ownerKey,

@@ -15,10 +15,10 @@ public final class AgentScopeExecutionState extends SessionExecutionState implem
     /**
      * 创建Agent作用域执行工作状态，初始化该组件所需的状态、配置或依赖。
      *
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
-     * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param startedAt 当前执行或执行段的开始时间。
-     * @param finishedAt 执行结束时间；尚未结束的记录可以没有该时间。
+     * @param turnId      单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param status      当前记录或执行的状态，具体取值由所属领域或协议约定。
+     * @param startedAt   当前执行或执行段的开始时间。
+     * @param finishedAt  执行结束时间；尚未结束的记录可以没有该时间。
      * @param failureCode 机器可识别的失败分类，供状态恢复与错误展示使用。
      */
     @ConstructorProperties({"turnId", "status", "startedAt", "finishedAt", "failureCode"})

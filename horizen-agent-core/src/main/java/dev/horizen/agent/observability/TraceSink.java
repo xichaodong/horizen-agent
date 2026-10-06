@@ -1,6 +1,8 @@
 package dev.horizen.agent.observability;
 
-/** 接收 Trace 事件，具体实现负责决定存储或导出方式。 */
+/**
+ * 接收 Trace 事件，具体实现负责决定存储或导出方式。
+ */
 @FunctionalInterface
 public interface TraceSink {
     /**

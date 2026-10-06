@@ -5,10 +5,15 @@ import dev.horizen.agent.provider.spi.RiskLevel;
 import dev.horizen.agent.provider.spi.ToolContract;
 import dev.horizen.agent.provider.spi.ToolGroupContract;
 
-/** 轻量 Provider SPI 与运行时定义之间的唯一转换入口。 */
+/**
+ * 轻量 Provider SPI 与运行时定义之间的唯一转换入口。
+ */
 public final class ProviderContractMapper {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private ProviderContractMapper() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private ProviderContractMapper() {
+    }
 
     /**
      * 转换为定义。
@@ -46,21 +51,21 @@ public final class ProviderContractMapper {
     public static ToolContract toContract(ToolDefinition value) {
         ToolGroupDefinition group = value.getGroup();
         return new ToolContract(
-                        value.getName(),
-                        value.getDescription(),
-                        value.getInputSchema(),
-                        value.isReadOnly(),
-                        risk(value.getRiskLevel()),
-                        value.getTimeoutSeconds(),
-                        value.isIdempotent(),
-                        value.isConcurrencySafe(),
-                        value.isSupportsCancellation(),
-                        ApprovalPolicy.fromWireValue(value.getApprovalPolicy()),
-                        new ToolGroupContract(
-                                group.getId(),
-                                group.getDescription(),
-                                group.isActiveByDefault(),
-                                group.getActivateOnSkill()))
+                value.getName(),
+                value.getDescription(),
+                value.getInputSchema(),
+                value.isReadOnly(),
+                risk(value.getRiskLevel()),
+                value.getTimeoutSeconds(),
+                value.isIdempotent(),
+                value.isConcurrencySafe(),
+                value.isSupportsCancellation(),
+                ApprovalPolicy.fromWireValue(value.getApprovalPolicy()),
+                new ToolGroupContract(
+                        group.getId(),
+                        group.getDescription(),
+                        group.isActiveByDefault(),
+                        group.getActivateOnSkill()))
                 .validate();
     }
 

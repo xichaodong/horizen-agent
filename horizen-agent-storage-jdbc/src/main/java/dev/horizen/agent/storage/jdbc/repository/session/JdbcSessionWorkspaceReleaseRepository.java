@@ -12,9 +12,13 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
-/** 仅保存 Session 发布元数据，不持久化缓存路径、URL 或凭据。 */
+/**
+ * 仅保存 Session 发布元数据，不持久化缓存路径、URL 或凭据。
+ */
 public class JdbcSessionWorkspaceReleaseRepository implements SessionWorkspaceReleaseRepository {
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final SessionWorkspaceReleaseMapper mapper;
 
     /**
@@ -27,7 +31,9 @@ public class JdbcSessionWorkspaceReleaseRepository implements SessionWorkspaceRe
                 MyBatisSessions.create(dataSource).getMapper(SessionWorkspaceReleaseMapper.class);
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcSessionWorkspaceReleaseRepository(SessionWorkspaceReleaseMapper mapper) {
         this.mapper = Objects.requireNonNull(mapper);
     }
@@ -35,7 +41,7 @@ public class JdbcSessionWorkspaceReleaseRepository implements SessionWorkspaceRe
     /**
      * 查找JDBC会话工作区发布仓储。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -62,9 +68,9 @@ public class JdbcSessionWorkspaceReleaseRepository implements SessionWorkspaceRe
     /**
      * 绑定条件Absent。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param selected 当前JDBC会话工作区发布仓储持有的selected对象，供相应处理步骤使用。
+     * @param selected  当前JDBC会话工作区发布仓储持有的selected对象，供相应处理步骤使用。
      * @return 本次操作返回的会话工作区发布结果。
      * @throws SecurityException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

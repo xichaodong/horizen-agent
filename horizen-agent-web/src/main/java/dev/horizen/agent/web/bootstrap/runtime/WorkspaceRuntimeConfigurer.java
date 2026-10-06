@@ -28,21 +28,28 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/** 组装 AgentScope 云端记忆路由、分布式历史以及沙箱和文件系统。 */
+/**
+ * 组装 AgentScope 云端记忆路由、分布式历史以及沙箱和文件系统。
+ */
 public final class WorkspaceRuntimeConfigurer {
-    /** Agent键的固定取值，用于相应策略和边界判断。 */
+    /**
+     * Agent键的固定取值，用于相应策略和边界判断。
+     */
     private static final String AGENT_KEY = AgentProperties.AGENT_KEY;
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private WorkspaceRuntimeConfigurer() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private WorkspaceRuntimeConfigurer() {
+    }
 
     /**
      * 完成当前操作的configureDistributedWorkspace步骤，按实现更新相应状态或依赖。
      *
-     * @param builder 当前工作区运行时配置器持有的构造器对象，供相应处理步骤使用。
-     * @param distributedStore 共享的 Agent 工作状态存储，用于跨实例执行与恢复。
-     * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
-     * @param sandbox 当前工作区运行时配置器持有的沙箱对象，供相应处理步骤使用。
+     * @param builder            当前工作区运行时配置器持有的构造器对象，供相应处理步骤使用。
+     * @param distributedStore   共享的 Agent 工作状态存储，用于跨实例执行与恢复。
+     * @param sessions           会话对象或会话索引，按相应的归属键定位数据。
+     * @param sandbox            当前工作区运行时配置器持有的沙箱对象，供相应处理步骤使用。
      * @param workspaceDocuments 提供工作区文档集合能力的依赖，具体实现由当前组件的组装方传入。
      */
     public static void configureDistributedWorkspace(
@@ -58,7 +65,7 @@ public final class WorkspaceRuntimeConfigurer {
                     new HistoryRecoveringAgentStateStore(
                             sandbox.isEnabled()
                                     ? new NonCachedSandboxStateStore(
-                                            distributedStore.agentStateStore())
+                                    distributedStore.agentStateStore())
                                     : distributedStore.agentStateStore(),
                             sessions);
             builder.stateStore(recovering);
@@ -80,15 +87,15 @@ public final class WorkspaceRuntimeConfigurer {
     /**
      * 计算或取得本方法声明的结果，供当前WorkspaceRuntimeConfigurer处理步骤使用。
      *
-     * @param builder 当前工作区运行时配置器持有的构造器对象，供相应处理步骤使用。
-     * @param distributedStore 共享的 Agent 工作状态存储，用于跨实例执行与恢复。
-     * @param sandbox 当前工作区运行时配置器持有的沙箱对象，供相应处理步骤使用。
+     * @param builder            当前工作区运行时配置器持有的构造器对象，供相应处理步骤使用。
+     * @param distributedStore   共享的 Agent 工作状态存储，用于跨实例执行与恢复。
+     * @param sandbox            当前工作区运行时配置器持有的沙箱对象，供相应处理步骤使用。
      * @param workspaceDocuments 提供工作区文档集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param snapshots 当前工作区运行时配置器持有的快照集合对象，供相应处理步骤使用。
+     * @param snapshots          当前工作区运行时配置器持有的快照集合对象，供相应处理步骤使用。
      * @param snapshotProperties 当前工作区运行时配置器持有的快照配置对象，供相应处理步骤使用。
-     * @param workspaceRoot 执行工作区的根目录，用于解析任务文件与脚本路径。
-     * @param published 已发布的状态标记，用于选择当前组件的处理路径。
-     * @param http 提供HTTP能力的依赖，具体实现由当前组件的组装方传入。
+     * @param workspaceRoot      执行工作区的根目录，用于解析任务文件与脚本路径。
+     * @param published          已发布的状态标记，用于选择当前组件的处理路径。
+     * @param http               提供HTTP能力的依赖，具体实现由当前组件的组装方传入。
      * @return 本次操作返回的沙箱上下文结果。
      */
     public static SandboxContext configureSandbox(
@@ -142,7 +149,7 @@ public final class WorkspaceRuntimeConfigurer {
     /**
      * 完成当前操作的configureCloudMemoryRoutes步骤，按实现更新相应状态或依赖。
      *
-     * @param builder 当前工作区运行时配置器持有的构造器对象，供相应处理步骤使用。
+     * @param builder            当前工作区运行时配置器持有的构造器对象，供相应处理步骤使用。
      * @param workspaceDocuments 提供工作区文档集合能力的依赖，具体实现由当前组件的组装方传入。
      */
     public static void configureCloudMemoryRoutes(
@@ -150,7 +157,9 @@ public final class WorkspaceRuntimeConfigurer {
         builder.filesystemRoute("MEMORY.md", cloudMemoryFilesystem(workspaceDocuments, "root"));
     }
 
-    /** 记忆不存在本地覆盖层，云端缺失或故障不能导致本地所有者数据被暴露。 */
+    /**
+     * 记忆不存在本地覆盖层，云端缺失或故障不能导致本地所有者数据被暴露。
+     */
     public static AbstractFilesystem sessionPlansFilesystem(BaseStore store) {
         return new RemoteFilesystem(
                 store,
@@ -182,7 +191,7 @@ public final class WorkspaceRuntimeConfigurer {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param workspaceDocuments 提供工作区文档集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param segment 当前工作区运行时配置器使用的执行段，供其处理与状态记录使用。
+     * @param segment            当前工作区运行时配置器使用的执行段，供其处理与状态记录使用。
      * @return 本次操作返回的Abstract文件系统结果。
      */
     public static AbstractFilesystem cloudMemoryFilesystem(

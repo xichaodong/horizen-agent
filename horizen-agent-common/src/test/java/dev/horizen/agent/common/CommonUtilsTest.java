@@ -23,10 +23,10 @@ class CommonUtilsTest {
     @Test
     void byteLimitRejectsTheFirstByteOverCapacity() throws Exception {
         assertArrayEquals(
-                new byte[] {1, 2},
-                BoundedStreams.read(new ByteArrayInputStream(new byte[] {1, 2}), 2));
+                new byte[]{1, 2},
+                BoundedStreams.read(new ByteArrayInputStream(new byte[]{1, 2}), 2));
         assertThrows(
                 IOException.class,
-                () -> BoundedStreams.read(new ByteArrayInputStream(new byte[] {1, 2, 3}), 2));
+                () -> BoundedStreams.read(new ByteArrayInputStream(new byte[]{1, 2, 3}), 2));
     }
 }

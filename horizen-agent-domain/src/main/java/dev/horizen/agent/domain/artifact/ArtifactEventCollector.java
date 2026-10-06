@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/** 单次 Runtime 调用内收集已发布的 Artifact。 */
+/**
+ * 单次 Runtime 调用内收集已发布的 Artifact。
+ */
 public final class ArtifactEventCollector {
-    /** 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。 */
+    /**
+     * 尚未完成处理的工作或计数，供刷新、关闭与容量控制使用。
+     */
     private final ConcurrentLinkedQueue<ArtifactDescriptor> pending = new ConcurrentLinkedQueue<>();
 
     /**

@@ -43,7 +43,8 @@ class TurnExecutionControlConcurrencyTest {
                                     activeObservers.decrementAndGet();
                                 }
                             },
-                            (event, error) -> {},
+                            (event, error) -> {
+                            },
                             () -> {
                                 assertEquals(0, activeObservers.get());
                                 cleaned.set(true);
@@ -280,10 +281,9 @@ class TurnExecutionControlConcurrencyTest {
                         event ->
                                 switch (event.getType()) {
                                     case TURN_COMPLETED,
-                                            TURN_FAILED,
-                                            TURN_CANCELLED,
-                                            TURN_TIMED_OUT ->
-                                            true;
+                                         TURN_FAILED,
+                                         TURN_CANCELLED,
+                                         TURN_TIMED_OUT -> true;
                                     default -> false;
                                 })
                 .count();

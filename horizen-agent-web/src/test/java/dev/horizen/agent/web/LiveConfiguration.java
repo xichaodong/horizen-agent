@@ -8,9 +8,12 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Properties;
 
-/** 真实环境测试共用宿主 YAML 配置，不在 Shell 中导出秘密。 */
+/**
+ * 真实环境测试共用宿主 YAML 配置，不在 Shell 中导出秘密。
+ */
 public final class LiveConfiguration {
-    private LiveConfiguration() {}
+    private LiveConfiguration() {
+    }
 
     public static Properties aliases(Properties local) {
         local.stringPropertyNames().stream()
@@ -21,12 +24,12 @@ public final class LiveConfiguration {
                                 local.putIfAbsent(
                                         "AGENT_E2B_"
                                                 + key.substring(
-                                                                "horizen.agent.sandbox.e2b."
-                                                                        .length())
-                                                        .toUpperCase(Locale.ROOT)
-                                                        .replace('-', '_'),
+                                                        "horizen.agent.sandbox.e2b."
+                                                                .length())
+                                                .toUpperCase(Locale.ROOT)
+                                                .replace('-', '_'),
                                         local.getProperty(key)));
-        for (String name : new String[] {"ARK_API_KEY", "ARK_BASE_URL", "ARK_MODEL"}) {
+        for (String name : new String[]{"ARK_API_KEY", "ARK_BASE_URL", "ARK_MODEL"}) {
             String configured = local.getProperty(propertyName(name));
             if (configured != null) local.putIfAbsent(name, configured);
         }
@@ -58,8 +61,8 @@ public final class LiveConfiguration {
         if (name.startsWith("AGENT_E2B_")) {
             return "horizen.agent.sandbox.e2b."
                     + name.substring("AGENT_E2B_".length())
-                            .toLowerCase(Locale.ROOT)
-                            .replace('_', '-');
+                    .toLowerCase(Locale.ROOT)
+                    .replace('_', '-');
         }
         return switch (name) {
             case "ARK_API_KEY" -> "horizen.agent.api-key";

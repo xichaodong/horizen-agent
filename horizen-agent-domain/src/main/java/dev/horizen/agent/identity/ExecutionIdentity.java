@@ -7,20 +7,26 @@ import lombok.Value;
 
 import java.beans.ConstructorProperties;
 
-/** 宿主认证后提供的执行身份；ownerKey 只表示隔离边界，不承载具体业务语义。 */
+/**
+ * 宿主认证后提供的执行身份；ownerKey 只表示隔离边界，不承载具体业务语义。
+ */
 @Value
 public class ExecutionIdentity {
-    /** 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。 */
+    /**
+     * 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     */
     private String ownerKey;
 
-    /** 实际操作方的审计标识，与数据隔离使用的 ownerKey 分开保存。 */
+    /**
+     * 实际操作方的审计标识，与数据隔离使用的 ownerKey 分开保存。
+     */
     private String actorId;
 
     /**
      * 创建执行身份，初始化该组件所需的状态、配置或依赖。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param actorId 实际操作方的审计标识，与数据隔离使用的 ownerKey 分开保存。
+     * @param actorId  实际操作方的审计标识，与数据隔离使用的 ownerKey 分开保存。
      */
     @ConstructorProperties({"ownerKey", "actorId"})
     public ExecutionIdentity(String ownerKey, String actorId) {

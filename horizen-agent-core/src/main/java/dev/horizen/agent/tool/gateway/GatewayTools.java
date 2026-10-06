@@ -23,19 +23,26 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-/** 面向模型的工具；凭据和网关身份不会出现在模型可见的参数结构中。 */
+/**
+ * 面向模型的工具；凭据和网关身份不会出现在模型可见的参数结构中。
+ */
 public final class GatewayTools {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private GatewayTools() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private GatewayTools() {
+    }
 
     /**
      * 注册网关工具集合。
      *
      * @param toolkit 当前网关工具集合持有的工具集对象，供相应处理步骤使用。
-     * @param client 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     * @param client  当前适配器使用的远端客户端，供实际网络或服务请求使用。
      */
     public static void register(Toolkit toolkit, GatewayBackend client) {
         Objects.requireNonNull(toolkit, "toolkit");
@@ -44,15 +51,21 @@ public final class GatewayTools {
         toolkit.registerAgentTool(new GatewayTool(client, true));
     }
 
-    /** 将已声明外部工具注册为 AgentScope 工具的调用适配器。 */
+    /**
+     * 将已声明外部工具注册为 AgentScope 工具的调用适配器。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     private static class GatewayTool implements AgentTool {
-        /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+        /**
+         * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+         */
         private GatewayBackend client;
 
-        /** 调用的状态标记，用于选择当前组件的处理路径。 */
+        /**
+         * 调用的状态标记，用于选择当前组件的处理路径。
+         */
         private boolean invoke;
 
         /**
@@ -74,7 +87,7 @@ public final class GatewayTools {
         public String getDescription() {
             return invoke
                     ? "调用工具网关中的业务工具。先调用 tool_gateway_list 获取工具名称和参数结构。"
-                            + "只传业务参数，身份由运行环境提供。尊重 failed、approval_required 等状态，审批未完成代表尚未执行。"
+                    + "只传业务参数，身份由运行环境提供。尊重 failed、approval_required 等状态，审批未完成代表尚未执行。"
                     : "列出当前会话可使用的业务工具及 tool_input 参数结构。调用业务工具前先查询此目录。";
         }
 
@@ -124,15 +137,15 @@ public final class GatewayTools {
                     param.getRuntimeContext() == null
                             ? null
                             : GatewayToolAdapter.gatewayContext(
-                                    ToolAdapterContext.from(param.getRuntimeContext()));
+                            ToolAdapterContext.from(param.getRuntimeContext()));
             Map<String, Object> input = param.getInput();
             if (!invoke) {
                 return input.isEmpty()
                         ? new GatewayToolAdapter(client).catalogResult(context)
                         : Mono.just(
-                                error(
-                                        "invalid_tool_input",
-                                        "tool_gateway_list accepts no arguments"));
+                        error(
+                                "invalid_tool_input",
+                                "tool_gateway_list accepts no arguments"));
             }
             if (!input.keySet().equals(Set.of("tool_name", "tool_input"))
                     || !(input.get("tool_name") instanceof String name)
@@ -155,7 +168,7 @@ public final class GatewayTools {
     /**
      * 计算或取得本方法声明的结果，供当前GatewayTools处理步骤使用。
      *
-     * @param code 当前网关工具集合使用的代码，供其处理与状态记录使用。
+     * @param code    当前网关工具集合使用的代码，供其处理与状态记录使用。
      * @param message 用户输入、响应说明或诊断消息，含义由所属协议对象限定。
      * @return 本次操作返回的工具结果块结果。
      */

@@ -32,7 +32,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 
 class CloudMemoryWorkspaceLiveTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void cloudMemoryIsSharedAcrossSessionsAndAtomicAcrossInstances() throws Exception {

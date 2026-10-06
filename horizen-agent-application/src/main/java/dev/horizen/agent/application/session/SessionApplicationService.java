@@ -11,12 +11,18 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
-/** Session 用例，实现仅依赖领域仓储接口。 */
+/**
+ * Session 用例，实现仅依赖领域仓储接口。
+ */
 public final class SessionApplicationService {
-    /** 会话对象或会话索引，按相应的归属键定位数据。 */
+    /**
+     * 会话对象或会话索引，按相应的归属键定位数据。
+     */
     private final SessionTurnStore sessions;
 
-    /** 时间来源，用于计算更新时间、过期时间或执行时限。 */
+    /**
+     * 时间来源，用于计算更新时间、过期时间或执行时限。
+     */
     private final Clock clock;
 
     /**
@@ -32,7 +38,7 @@ public final class SessionApplicationService {
      * 创建会话应用服务，初始化该组件所需的状态、配置或依赖。
      *
      * @param sessions 会话对象或会话索引，按相应的归属键定位数据。
-     * @param clock 时间来源，用于计算更新时间、过期时间或执行时限。
+     * @param clock    时间来源，用于计算更新时间、过期时间或执行时限。
      */
     public SessionApplicationService(SessionTurnStore sessions, Clock clock) {
         this.sessions = Objects.requireNonNull(sessions, "sessions");
@@ -42,7 +48,7 @@ public final class SessionApplicationService {
     /**
      * 查询指定隔离会话当前或最近一次执行的状态。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次操作返回的会话执行视图结果。
      */
@@ -51,20 +57,20 @@ public final class SessionApplicationService {
         return turn == null
                 ? SessionExecutionView.idle(sessionId)
                 : new SessionExecutionView(
-                        sessionId,
-                        turn.getTurnId(),
-                        turn.getStatus(),
-                        turn.getStartedAt(),
-                        turn.getFinishedAt(),
-                        turn.getFailureCode());
+                sessionId,
+                turn.getTurnId(),
+                turn.getStatus(),
+                turn.getStartedAt(),
+                turn.getFinishedAt(),
+                turn.getFailureCode());
     }
 
     /**
      * 读取指定归属的会话目录页，并计算继续读取的游标。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param limit 本次处理或返回数量上限。
-     * @param offset 本次读取的起始偏移。
+     * @param limit    本次处理或返回数量上限。
+     * @param offset   本次读取的起始偏移。
      * @return 本次操作返回的会话页结果。
      * @throws ApplicationError 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -86,9 +92,9 @@ public final class SessionApplicationService {
     /**
      * 校验标题后更新原会话的展示名称。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param title 当前会话应用服务的可读标题，供宿主界面展示。
+     * @param title     当前会话应用服务的可读标题，供宿主界面展示。
      * @return 本次操作返回的会话摘要视图结果。
      * @throws ApplicationError 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -103,9 +109,9 @@ public final class SessionApplicationService {
     /**
      * 更新会话置顶状态，供会话目录排序使用。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param pinned 会话是否置顶，影响会话目录展示顺序。
+     * @param pinned    会话是否置顶，影响会话目录展示顺序。
      * @return 本次操作返回的会话摘要视图结果。
      * @throws ApplicationError 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -119,7 +125,7 @@ public final class SessionApplicationService {
     /**
      * 将原会话归档并保留对应的正式历史。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @throws ApplicationError 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -139,7 +145,7 @@ public final class SessionApplicationService {
     /**
      * 计算或取得本方法声明的结果，供当前SessionApplicationService处理步骤使用。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
      * @return 本次操作返回的Agent会话结果。
      */
@@ -153,7 +159,7 @@ public final class SessionApplicationService {
      * 把持久会话记录转换为目录展示所需的摘要。
      *
      * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param session 当前会话应用服务持有的会话对象，供相应处理步骤使用。
+     * @param session  当前会话应用服务持有的会话对象，供相应处理步骤使用。
      * @return 本次操作返回的会话摘要视图结果。
      */
     private SessionSummaryView summary(String ownerKey, AgentSession session) {

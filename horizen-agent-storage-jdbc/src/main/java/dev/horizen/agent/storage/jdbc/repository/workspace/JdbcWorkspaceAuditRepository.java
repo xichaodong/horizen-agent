@@ -13,9 +13,13 @@ import java.util.function.Function;
 
 import javax.sql.DataSource;
 
-/** 工作区审计记录的 JDBC 适配器，保存操作事实并提供分页查询。 */
+/**
+ * 工作区审计记录的 JDBC 适配器，保存操作事实并提供分页查询。
+ */
 public class JdbcWorkspaceAuditRepository implements WorkspaceAuditRepository {
-    /** 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。 */
+    /**
+     * 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     */
     private final WorkspaceAuditMapper mapper;
 
     /**
@@ -27,7 +31,9 @@ public class JdbcWorkspaceAuditRepository implements WorkspaceAuditRepository {
         this.mapper = MyBatisSessions.create(source).getMapper(WorkspaceAuditMapper.class);
     }
 
-    /** 供服务 IoC 容器注入依赖的构造方法。 */
+    /**
+     * 供服务 IoC 容器注入依赖的构造方法。
+     */
     public JdbcWorkspaceAuditRepository(WorkspaceAuditMapper mapper) {
         this.mapper = Objects.requireNonNull(mapper);
     }
@@ -35,10 +41,10 @@ public class JdbcWorkspaceAuditRepository implements WorkspaceAuditRepository {
     /**
      * 查询列表中的JDBC工作区审计仓储。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key      当前对象的查找或写入键。
      * @param allFiles 全部文件集合的状态标记，用于选择当前组件的处理路径。
-     * @param before 当前JDBC工作区审计仓储使用的处理前，供其处理与状态记录使用。
-     * @param limit 本次处理或返回数量上限。
+     * @param before   当前JDBC工作区审计仓储使用的处理前，供其处理与状态记录使用。
+     * @param limit    本次处理或返回数量上限。
      * @return 本次处理得到的结果集合。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -73,7 +79,7 @@ public class JdbcWorkspaceAuditRepository implements WorkspaceAuditRepository {
     /**
      * 查找JDBC工作区审计仓储。
      *
-     * @param key 当前对象的查找或写入键。
+     * @param key      当前对象的查找或写入键。
      * @param sequence 当前记录在对应序列中的位置，用于排序或继续读取。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -97,8 +103,8 @@ public class JdbcWorkspaceAuditRepository implements WorkspaceAuditRepository {
      * 检查ownsMemory对应的条件，供调用方选择后续处理分支。
      *
      * @param project 当前JDBC工作区审计仓储使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param owner 当前JDBC工作区审计仓储使用的数据归属，供其处理与状态记录使用。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param owner   当前JDBC工作区审计仓储使用的数据归属，供其处理与状态记录使用。
      * @return 本次检查是否通过或本次更新是否成功。
      */
     @Override
@@ -106,7 +112,9 @@ public class JdbcWorkspaceAuditRepository implements WorkspaceAuditRepository {
         return !mapper.selectOwnsMemory(owner, project, agent).isEmpty();
     }
 
-    /** 映射器的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 映射器的固定取值，用于相应策略和边界判断。
+     */
     private static final Function<WorkspaceOperationRow, Operation> MAPPER =
             r ->
                     new Operation(

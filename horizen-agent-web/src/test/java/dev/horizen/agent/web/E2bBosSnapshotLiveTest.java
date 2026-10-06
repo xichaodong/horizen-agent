@@ -62,11 +62,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-/** 显式启用的真实环境测试，使用已保存的配置、合成文件和唯一远程资源名称。 */
+/**
+ * 显式启用的真实环境测试，使用已保存的配置、合成文件和唯一远程资源名称。
+ */
 @EnabledIfSystemProperty(named = "horizen.snapshot.live", matches = "true")
 class E2bBosSnapshotLiveTest {
     private static final ObjectMapper JSON = new ObjectMapper();
-    @TempDir Path localWorkspace;
+    @TempDir
+    Path localWorkspace;
 
     @Test
     @Timeout(value = 5, unit = TimeUnit.MINUTES)
@@ -93,11 +96,11 @@ class E2bBosSnapshotLiveTest {
         LifecycleRecorder recorder = new LifecycleRecorder();
         URI redis = URI.create(required(storage, "horizen.agent.storage.redis-url"));
         try (JedisPooled commandsA = new JedisPooled(redis);
-                JedisPooled commandsB = new JedisPooled(redis);
-                JedisPool poolA = new JedisPool(redis);
-                JedisPool poolB = new JedisPool(redis);
-                var bosA = new BosWorkspaceSnapshotRepository(config, 2, 60);
-                var bosB = new BosWorkspaceSnapshotRepository(config, 2, 60)) {
+             JedisPooled commandsB = new JedisPooled(redis);
+             JedisPool poolA = new JedisPool(redis);
+             JedisPool poolB = new JedisPool(redis);
+             var bosA = new BosWorkspaceSnapshotRepository(config, 2, 60);
+             var bosB = new BosWorkspaceSnapshotRepository(config, 2, 60)) {
             SandboxAcquireResult acquiredA = null;
             SandboxAcquireResult acquiredB = null;
             try {
@@ -228,7 +231,7 @@ class E2bBosSnapshotLiveTest {
                 SandboxSnapshotCheckpoint.save(callB, b.agentStateStore(), agent);
                 assertEquals("turn-b-report", report(bosA.download(snapshotId)));
                 try (InputStream oversized =
-                        new ByteArrayInputStream(new byte[4 * 1024 * 1024 + 1])) {
+                             new ByteArrayInputStream(new byte[4 * 1024 * 1024 + 1])) {
                     assertThrows(IOException.class, () -> bosA.upload(snapshotId, oversized));
                 }
                 assertEquals("turn-b-report", report(bosA.download(snapshotId)));

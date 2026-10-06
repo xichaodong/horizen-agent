@@ -43,10 +43,10 @@ class ArtifactUploadLimitTest {
         var mapper = mock(AgentApiMapper.class);
         var expected = new ArtifactResponse();
         when(application.upload(
-                        eq("owner"),
-                        eq("report.bin"),
-                        eq("application/octet-stream"),
-                        any(byte[].class)))
+                eq("owner"),
+                eq("report.bin"),
+                eq("application/octet-stream"),
+                any(byte[].class)))
                 .thenReturn(artifact);
         when(mapper.artifact(artifact)).thenReturn(expected);
         var service =

@@ -5,66 +5,66 @@
     <update id="compareAndSetSnapshot">
         UPDATE ha_session
         SET
-            snapshot_id = #{snapshotId}
+        snapshot_id = #{snapshotId}
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND (
-                snapshot_id = #{expectedSnapshotId}
-                OR (
-                    snapshot_id IS NULL
-                    AND #{expectedSnapshotId} IS NULL
-                )
-            )
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND (
+        snapshot_id = #{expectedSnapshotId}
+        OR (
+        snapshot_id IS NULL
+        AND #{expectedSnapshotId} IS NULL
+        )
+        )
     </update>
 
     <update id="compareAndSetSnapshotForActiveTurn">
         UPDATE ha_session
         SET
-            snapshot_id = #{snapshotId}
+        snapshot_id = #{snapshotId}
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND active_turn_id = #{activeTurnId}
-            AND (
-                snapshot_id = #{expectedSnapshotId}
-                OR (
-                    snapshot_id IS NULL
-                    AND #{expectedSnapshotId} IS NULL
-                )
-            )
-            AND EXISTS (
-                SELECT
-                    1
-                FROM
-                    ha_turn t
-                WHERE
-                    t.owner_key = ha_session.owner_key
-                    AND t.turn_id = #{turnId}
-                    AND t.executor_id = #{executorId}
-                    AND t.status IN ('RUNNING', 'CANCELLING')
-                    AND t.lease_expires_at &gt; CURRENT_TIMESTAMP(6)
-            )
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND active_turn_id = #{activeTurnId}
+        AND (
+        snapshot_id = #{expectedSnapshotId}
+        OR (
+        snapshot_id IS NULL
+        AND #{expectedSnapshotId} IS NULL
+        )
+        )
+        AND EXISTS (
+        SELECT
+        1
+        FROM
+        ha_turn t
+        WHERE
+        t.owner_key = ha_session.owner_key
+        AND t.turn_id = #{turnId}
+        AND t.executor_id = #{executorId}
+        AND t.status IN ('RUNNING', 'CANCELLING')
+        AND t.lease_expires_at &gt; CURRENT_TIMESTAMP(6)
+        )
     </update>
 
     <update id="updateSnapshot">
         UPDATE ha_session
         SET
-            snapshot_id = #{snapshotId}
+        snapshot_id = #{snapshotId}
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
     </update>
     <select
         id="selectSnapshot"
         resultType="java.lang.String"
     >
         SELECT
-            snapshot_id
+        snapshot_id
         FROM
-            ha_session
+        ha_session
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
     </select>
 </mapper>

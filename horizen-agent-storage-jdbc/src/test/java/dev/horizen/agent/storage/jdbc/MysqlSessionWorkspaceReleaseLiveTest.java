@@ -29,10 +29,10 @@ class MysqlSessionWorkspaceReleaseLiveTest {
     void upgradesSessionColumnsAndAtomicallyBindsOneCompletePublication() throws Exception {
         Properties config = new Properties();
         try (var input =
-                Files.newBufferedReader(
-                        Path.of(
-                                System.getProperty(
-                                        "horizen.mysql.workspace.config", "../.env.yml")))) {
+                     Files.newBufferedReader(
+                             Path.of(
+                                     System.getProperty(
+                                             "horizen.mysql.workspace.config", "../.env.yml")))) {
             config.putAll(YamlConfigFiles.load(input));
         }
         URI uri = URI.create(config.getProperty("horizen.agent.storage.jdbc-url").substring(5));
@@ -71,7 +71,7 @@ class MysqlSessionWorkspaceReleaseLiveTest {
                     "ALTER TABLE ha_session DROP COLUMN project_id, DROP COLUMN agent_key, DROP COLUMN"
                             + " workspace_release_id, DROP COLUMN workspace_release_hash");
             new ResourceDatabasePopulator(
-                            new ClassPathResource("schema/mysql-session-workspace-release.sql"))
+                    new ClassPathResource("schema/mysql-session-workspace-release.sql"))
                     .execute(source);
             var versions = new JdbcSessionWorkspaceReleaseRepository(source);
             assertTrue(versions.find("owner", "session").isEmpty());

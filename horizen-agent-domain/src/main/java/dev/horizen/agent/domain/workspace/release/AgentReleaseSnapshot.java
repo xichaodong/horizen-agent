@@ -8,9 +8,13 @@ import java.io.*;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/** 单次执行的不可变内容视图；存储位置和传输细节由 Reader 隔离。 */
+/**
+ * 单次执行的不可变内容视图；存储位置和传输细节由 Reader 隔离。
+ */
 public final class AgentReleaseSnapshot implements AutoCloseable {
-    /** 发布快照内容的读取端口，避免把缓存目录或资源所有权暴露给调用方。 */
+    /**
+     * 发布快照内容的读取端口，避免把缓存目录或资源所有权暴露给调用方。
+     */
     @FunctionalInterface
     public interface Reader {
         /**
@@ -22,28 +26,40 @@ public final class AgentReleaseSnapshot implements AutoCloseable {
         InputStream open(String path) throws IOException;
     }
 
-    /** 已验证发布的描述清单，保存版本与制品完整性信息。 */
-    @Getter private final AgentReleaseManifest manifest;
+    /**
+     * 已验证发布的描述清单，保存版本与制品完整性信息。
+     */
+    @Getter
+    private final AgentReleaseManifest manifest;
 
-    /** 当前发布中可渐进读取的 Skill 正文与资源快照。 */
-    @Getter private final SkillReleaseSnapshot skills;
+    /**
+     * 当前发布中可渐进读取的 Skill 正文与资源快照。
+     */
+    @Getter
+    private final SkillReleaseSnapshot skills;
 
-    /** 在发布租约有效期间读取不可变内容的访问端口。 */
+    /**
+     * 在发布租约有效期间读取不可变内容的访问端口。
+     */
     private final Reader reader;
 
-    /** 使用结束时归还当前快照租约的回调。 */
+    /**
+     * 使用结束时归还当前快照租约的回调。
+     */
     private final Runnable release;
 
-    /** 组件是否已关闭，用于避免重复释放或继续接收新工作。 */
+    /**
+     * 组件是否已关闭，用于避免重复释放或继续接收新工作。
+     */
     private final AtomicBoolean closed = new AtomicBoolean();
 
     /**
      * 创建Agent发布快照，初始化该组件所需的状态、配置或依赖。
      *
      * @param manifest 当前Agent发布快照持有的清单对象，供相应处理步骤使用。
-     * @param skills 当前Agent发布快照持有的Skill集合对象，供相应处理步骤使用。
-     * @param reader 当前Agent发布快照持有的读取器对象，供相应处理步骤使用。
-     * @param release 当前Agent发布快照持有的发布对象，供相应处理步骤使用。
+     * @param skills   当前Agent发布快照持有的Skill集合对象，供相应处理步骤使用。
+     * @param reader   当前Agent发布快照持有的读取器对象，供相应处理步骤使用。
+     * @param release  当前Agent发布快照持有的发布对象，供相应处理步骤使用。
      */
     public AgentReleaseSnapshot(
             AgentReleaseManifest manifest,

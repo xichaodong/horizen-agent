@@ -26,7 +26,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/** 真实环境沙箱创建测速；默认跳过，仅在显式提供 E2B 配置时运行。 */
+/**
+ * 真实环境沙箱创建测速；默认跳过，仅在显式提供 E2B 配置时运行。
+ */
 @Tag("live-sandbox")
 class E2bCreationBenchmarkLiveTest {
 

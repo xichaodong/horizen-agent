@@ -1,27 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import React from 'react';
-import renderer, { act } from 'react-test-renderer';
-import { useTurnObservation } from './hooks/useTurnObservation.js';
-import { TurnStreamRegistry } from './stream/TurnStreamRegistry.js';
+import renderer, {act} from 'react-test-renderer';
+import {useTurnObservation} from './hooks/useTurnObservation.js';
+import {TurnStreamRegistry} from './stream/TurnStreamRegistry.js';
 
 function fixture(followSessionResponse) {
-    const session = { id: 'session-a', persisted: true, historyLoaded: true, messages: [] };
+    const session = {id: 'session-a', persisted: true, historyLoaded: true, messages: []};
     const observing = [];
     return {
         messages: [],
         activeSessionId: session.id,
-        status: { ready: true },
+        status: {ready: true},
         activeSession: session,
-        sessionsRef: { current: [session] },
+        sessionsRef: {current: [session]},
         streams: new TurnStreamRegistry((id, running) => observing.push([id, running])),
-        turnIdsRef: { current: new Map() },
-        streamSequencesRef: { current: new Map() },
-        loadSubtasks: () => {},
+        turnIdsRef: {current: new Map()},
+        streamSequencesRef: {current: new Map()},
+        loadSubtasks: () => {
+        },
         updateSession: (id, update) => {
             Object.assign(session, update(session));
         },
-        applyTurnEvent: () => {},
+        applyTurnEvent: () => {
+        },
         showConnectionNotice: () => {
             throw new Error('Unexpected recovery notice');
         },
@@ -29,7 +31,8 @@ function fixture(followSessionResponse) {
         observing,
     };
 }
-function HookHost({ options }) {
+
+function HookHost({options}) {
     useTurnObservation(options);
     return null;
 }
@@ -44,13 +47,13 @@ test('the real recovery hook registers the current turn and subscribes without m
         followed = args;
     });
     globalThis.fetch = async (url, init) => {
-        requests.push({ url, init });
-        return { ok: true, json: async () => ({ currentTurnId: 'turn-a', status: 'running' }) };
+        requests.push({url, init});
+        return {ok: true, json: async () => ({currentTurnId: 'turn-a', status: 'running'})};
     };
     let root;
     try {
         await act(async () => {
-            root = renderer.create(React.createElement(HookHost, { options }));
+            root = renderer.create(React.createElement(HookHost, {options}));
             await new Promise((resolve) => setImmediate(resolve));
         });
         assert.deepEqual(
@@ -80,19 +83,19 @@ test('unmounting the actual recovery hook aborts and releases its subscription',
         return new Promise((resolve, reject) =>
             currentSignal.addEventListener(
                 'abort',
-                () => reject(Object.assign(new Error('detached'), { name: 'AbortError' })),
-                { once: true }
+                () => reject(Object.assign(new Error('detached'), {name: 'AbortError'})),
+                {once: true}
             )
         );
     });
     globalThis.fetch = async () => ({
         ok: true,
-        json: async () => ({ currentTurnId: 'turn-a', status: 'running' }),
+        json: async () => ({currentTurnId: 'turn-a', status: 'running'}),
     });
     let root;
     try {
         await act(async () => {
-            root = renderer.create(React.createElement(HookHost, { options }));
+            root = renderer.create(React.createElement(HookHost, {options}));
             await new Promise((resolve) => setImmediate(resolve));
         });
         assert.equal(signal.aborted, false);

@@ -5,6 +5,7 @@ export class TurnStreamRegistry {
         this.controllers = new Map();
         this.onObserving = onObserving;
     }
+
     begin(sessionId, observing = true) {
         this.controllers.get(sessionId)?.abort();
         const controller = new AbortController();
@@ -12,19 +13,23 @@ export class TurnStreamRegistry {
         this.onObserving(sessionId, observing);
         return controller;
     }
+
     markRunning(sessionId, controller) {
         if (this.controllers.get(sessionId) === controller) this.onObserving(sessionId, true);
     }
+
     finish(sessionId, controller) {
         if (this.controllers.get(sessionId) !== controller) return;
         this.controllers.delete(sessionId);
         this.onObserving(sessionId, false);
     }
+
     stop(sessionId) {
         const controller = this.controllers.get(sessionId);
         controller?.abort();
         if (controller) this.finish(sessionId, controller);
     }
+
     close() {
         for (const sessionId of this.controllers.keys()) this.stop(sessionId);
     }

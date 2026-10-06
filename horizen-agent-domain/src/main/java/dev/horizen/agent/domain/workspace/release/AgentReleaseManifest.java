@@ -7,42 +7,60 @@ import lombok.Getter;
 
 import java.util.*;
 
-/** 完整发布内容；签名 URL 属于传输数据，不参与内容哈希。 */
+/**
+ * 完整发布内容；签名 URL 属于传输数据，不参与内容哈希。
+ */
 @Getter
 public final class AgentReleaseManifest {
-    /** 工作区或发布所属 Project 的标识，参与资源归属校验。 */
+    /**
+     * 工作区或发布所属 Project 的标识，参与资源归属校验。
+     */
     private final long projectId;
 
-    /** 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。 */
+    /**
+     * 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
+     */
     private final String agentKey;
 
-    /** 发布记录标识，用于取得会话绑定的具体发布快照。 */
+    /**
+     * 发布记录标识，用于取得会话绑定的具体发布快照。
+     */
     private final long releaseId;
 
-    /** 发布序号，用于版本展示；与发布记录标识、内容哈希分别保存。 */
+    /**
+     * 发布序号，用于版本展示；与发布记录标识、内容哈希分别保存。
+     */
     private final long releaseNo;
 
-    /** 发布内容哈希，用于完整性校验和锁定会话的发布内容。 */
+    /**
+     * 发布内容哈希，用于完整性校验和锁定会话的发布内容。
+     */
     private final String releaseHash;
 
-    /** assets的有序集合，保留当前组件处理或协议输出所需的顺序。 */
+    /**
+     * assets的有序集合，保留当前组件处理或协议输出所需的顺序。
+     */
     private final List<Asset> assets;
 
-    /** 完整工作区发布所包含的 Skill 发布视图。 */
+    /**
+     * 完整工作区发布所包含的 Skill 发布视图。
+     */
     private final SkillReleaseManifest skillRelease;
 
-    /** 工作区文件集合的状态标记，用于选择当前组件的处理路径。 */
+    /**
+     * 工作区文件集合的状态标记，用于选择当前组件的处理路径。
+     */
     private boolean workspaceFiles;
 
     /**
      * 创建Agent发布清单，初始化该组件所需的状态、配置或依赖。
      *
-     * @param projectId 工作区或发布所属 Project 的标识，参与资源归属校验。
-     * @param agentKey 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
-     * @param releaseId 发布记录标识，用于取得会话绑定的具体发布快照。
-     * @param releaseNo 发布序号，用于版本展示；与发布记录标识、内容哈希分别保存。
+     * @param projectId   工作区或发布所属 Project 的标识，参与资源归属校验。
+     * @param agentKey    宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
+     * @param releaseId   发布记录标识，用于取得会话绑定的具体发布快照。
+     * @param releaseNo   发布序号，用于版本展示；与发布记录标识、内容哈希分别保存。
      * @param releaseHash 发布内容哈希，用于完整性校验和锁定会话的发布内容。
-     * @param assets assets的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param assets      assets的有序集合，保留当前组件处理或协议输出所需的顺序。
      */
     public AgentReleaseManifest(
             long projectId,
@@ -66,13 +84,13 @@ public final class AgentReleaseManifest {
     /**
      * 创建Agent发布清单，初始化该组件所需的状态、配置或依赖。
      *
-     * @param projectId 工作区或发布所属 Project 的标识，参与资源归属校验。
-     * @param agentKey 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
-     * @param releaseId 发布记录标识，用于取得会话绑定的具体发布快照。
-     * @param releaseNo 发布序号，用于版本展示；与发布记录标识、内容哈希分别保存。
+     * @param projectId   工作区或发布所属 Project 的标识，参与资源归属校验。
+     * @param agentKey    宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
+     * @param releaseId   发布记录标识，用于取得会话绑定的具体发布快照。
+     * @param releaseNo   发布序号，用于版本展示；与发布记录标识、内容哈希分别保存。
      * @param releaseHash 发布内容哈希，用于完整性校验和锁定会话的发布内容。
-     * @param assets assets的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param skills 当前Agent发布清单持有的Skill集合对象，供相应处理步骤使用。
+     * @param assets      assets的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param skills      当前Agent发布清单持有的Skill集合对象，供相应处理步骤使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public AgentReleaseManifest(
@@ -110,7 +128,7 @@ public final class AgentReleaseManifest {
         if (total > 20L * 1024 * 1024
                 || agents > 32
                 || this.assets.stream()
-                        .noneMatch(a -> a.getPath().equals("AGENTS.md") && a.getSize() > 0))
+                .noneMatch(a -> a.getPath().equals("AGENTS.md") && a.getSize() > 0))
             throw new IllegalArgumentException("Publication exceeds limits or lacks AGENTS.md");
         for (String p : paths)
             for (String q : paths)
@@ -131,40 +149,46 @@ public final class AgentReleaseManifest {
                 || p.contains("\\")
                 || p.indexOf(0) >= 0
                 || Arrays.stream(p.split("/", -1))
-                        .anyMatch(v -> v.isEmpty() || v.equals(".") || v.equals(".."))
+                .anyMatch(v -> v.isEmpty() || v.equals(".") || v.equals(".."))
                 || !(p.equals("AGENTS.md")
-                        || p.equals("MEMORY.md")
-                        || p.equals("PLAN.md")
-                        || p.equals("tools.json")
-                        || p.startsWith("knowledge/")
-                        || p.startsWith("memory/")
-                        || p.startsWith("plans/")
-                        || p.startsWith("tasks/")
-                        || p.startsWith("skills/")
-                        || p.matches("subagents/[A-Za-z0-9][A-Za-z0-9_-]{0,63}\\.md")))
+                || p.equals("MEMORY.md")
+                || p.equals("PLAN.md")
+                || p.equals("tools.json")
+                || p.startsWith("knowledge/")
+                || p.startsWith("memory/")
+                || p.startsWith("plans/")
+                || p.startsWith("tasks/")
+                || p.startsWith("skills/")
+                || p.matches("subagents/[A-Za-z0-9][A-Za-z0-9_-]{0,63}\\.md")))
             throw new IllegalArgumentException("Invalid publication path");
         return p;
     }
 
-    /** 发布中一个制品的下载与校验描述；签名 URL 不计入发布内容哈希。 */
+    /**
+     * 发布中一个制品的下载与校验描述；签名 URL 不计入发布内容哈希。
+     */
     @Getter
     public static final class Asset {
         /** 内容的 MIME 媒体类型，供传输、展示与解析策略选择使用。 */
         /** 内容的 SHA-256 摘要，参与制品完整性验证。 */
         /** 资源或远端接口地址；具体访问范围由所属服务的配置校验。 */
-        /** 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。 */
+        /**
+         * 当前资源路径，路径解释和合法范围由所属文件系统适配器限定。
+         */
         private final String path, url, sha256, mediaType;
 
-        /** 当前内容或集合的大小，计量方式由所属资源协议定义。 */
+        /**
+         * 当前内容或集合的大小，计量方式由所属资源协议定义。
+         */
         private final long size;
 
         /**
          * 创建制品，初始化该组件所需的状态、配置或依赖。
          *
-         * @param path 需要读取、写入或校验的路径。
-         * @param url 资源或远端接口地址；具体访问范围由所属服务的配置校验。
-         * @param sha256 内容的 SHA-256 摘要，参与制品完整性验证。
-         * @param size 当前内容或集合的大小，计量方式由所属资源协议定义。
+         * @param path      需要读取、写入或校验的路径。
+         * @param url       资源或远端接口地址；具体访问范围由所属服务的配置校验。
+         * @param sha256    内容的 SHA-256 摘要，参与制品完整性验证。
+         * @param size      当前内容或集合的大小，计量方式由所属资源协议定义。
          * @param mediaType 当前制品使用的媒体类型，供其处理与状态记录使用。
          * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
          */

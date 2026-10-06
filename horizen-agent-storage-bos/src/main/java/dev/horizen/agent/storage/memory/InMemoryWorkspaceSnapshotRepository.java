@@ -6,9 +6,13 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** 供测试和开发显式选用的容量受限归档提供器。 */
+/**
+ * 供测试和开发显式选用的容量受限归档提供器。
+ */
 public final class InMemoryWorkspaceSnapshotRepository implements WorkspaceSnapshotRepository {
-    /** SHARED的固定取值，用于相应策略和边界判断。 */
+    /**
+     * SHARED的固定取值，用于相应策略和边界判断。
+     */
     private static final Map<String, InMemoryWorkspaceSnapshotRepository> SHARED =
             new LinkedHashMap<>();
 
@@ -24,13 +28,15 @@ public final class InMemoryWorkspaceSnapshotRepository implements WorkspaceSnaps
         return SHARED.computeIfAbsent(key, k -> new InMemoryWorkspaceSnapshotRepository());
     }
 
-    /** 保存或取得工作区归档内容的存储端口。 */
+    /**
+     * 保存或取得工作区归档内容的存储端口。
+     */
     private final Map<String, byte[]> archives = new ConcurrentHashMap<>();
 
     /**
      * 上传输入侧记忆工作区快照仓储。
      *
-     * @param id 目标对象的标识。
+     * @param id    目标对象的标识。
      * @param input 本次处理的输入。
      * @throws IOException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

@@ -6,10 +6,14 @@ import lombok.Getter;
 
 import java.util.List;
 
-/** 仅供 RuntimeContext 使用的图像输入，不属于持久化 AgentState。 */
+/**
+ * 仅供 RuntimeContext 使用的图像输入，不属于持久化 AgentState。
+ */
 @Getter
 public final class MultimodalTurnInput {
-    /** 本次消息附带的输入资源，内容解析由运行时适配器完成。 */
+    /**
+     * 本次消息附带的输入资源，内容解析由运行时适配器完成。
+     */
     private final List<AgentInputAttachment> attachments;
 
     /**

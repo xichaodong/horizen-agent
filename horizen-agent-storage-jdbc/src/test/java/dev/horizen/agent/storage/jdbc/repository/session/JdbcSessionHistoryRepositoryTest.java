@@ -21,7 +21,9 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-/** H2 执行真实的作用域 SQL；别名仅补充 MySQL 的 JSON 标量函数。 */
+/**
+ * H2 执行真实的作用域 SQL；别名仅补充 MySQL 的 JSON 标量函数。
+ */
 public class JdbcSessionHistoryRepositoryTest {
     private static final ObjectMapper JSON = new ObjectMapper();
     private JdbcTemplate jdbc;
@@ -104,7 +106,7 @@ public class JdbcSessionHistoryRepositoryTest {
     @Test
     void explicitSessionReadsHaveTheSameAuthorizationAsSearch() {
         for (String target :
-                new String[] {"other-project", "other-agent", "deleted", "legacy", "missing"}) {
+                new String[]{"other-project", "other-agent", "deleted", "legacy", "missing"}) {
             assertTrue(store.queryHistory(query(target, null, 10, 0)).isEmpty(), target);
         }
         var page = store.queryHistory(query("past", null, 10, 0)).orElseThrow();
@@ -120,7 +122,7 @@ public class JdbcSessionHistoryRepositoryTest {
     @Test
     void literalWildcardsAndEscapedJsonAreNotQuerySyntaxOrMetadataMatches() {
         message("owner-a", "past", "special", "USER", "FINAL", "折扣50%_!，引号\"中文\"，路径C:\\reports");
-        for (String keyword : new String[] {"50%_!", "\"中文\"", "C:\\reports"}) {
+        for (String keyword : new String[]{"50%_!", "\"中文\"", "C:\\reports"}) {
             var page = store.queryHistory(query(null, keyword, 20, 0)).orElseThrow();
             assertEquals(1, page.getEntries().size(), keyword);
             assertEquals("special", page.getEntries().get(0).getMessageId());

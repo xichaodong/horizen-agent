@@ -8,7 +8,9 @@ import org.springframework.context.annotation.*;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-/** 由容器管理的容量受限写入线程池和共享单线程心跳调度器。 */
+/**
+ * 由容器管理的容量受限写入线程池和共享单线程心跳调度器。
+ */
 @Configuration(proxyBeanMethods = false)
 public class SseConfiguration {
     /**
@@ -50,8 +52,8 @@ public class SseConfiguration {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
-     * @param writers 当前SSE组装持有的writers对象，供相应处理步骤使用。
-     * @param scheduler 周期任务的调度器，用于心跳、轮询或续租等定时工作。
+     * @param writers    当前SSE组装持有的writers对象，供相应处理步骤使用。
+     * @param scheduler  周期任务的调度器，用于心跳、轮询或续租等定时工作。
      * @return 本次操作返回的SSE连接管理器结果。
      */
     @Bean(destroyMethod = "close")

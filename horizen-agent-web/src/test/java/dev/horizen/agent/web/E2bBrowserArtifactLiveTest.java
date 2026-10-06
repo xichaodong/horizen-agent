@@ -45,7 +45,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-/** 显式启用的完整验收：浏览器截图 → JDBC 引用 → BOS 产物。 */
+/**
+ * 显式启用的完整验收：浏览器截图 → JDBC 引用 → BOS 产物。
+ */
 @Tag("live-sandbox")
 class E2bBrowserArtifactLiveTest {
     private static final ObjectMapper JSON = new ObjectMapper();
@@ -109,7 +111,7 @@ class E2bBrowserArtifactLiveTest {
             String visionText =
                     text(
                             new VisionAnalyzeTool(
-                                            model, new JdbcArtifactStore(dataSource), contents)
+                                    model, new JdbcArtifactStore(dataSource), contents)
                                     .callAsync(
                                             ToolCallParam.builder()
                                                     .runtimeContext(context)
@@ -187,12 +189,9 @@ class E2bBrowserArtifactLiveTest {
         return switch (name) {
             case "browser.live.model.apiKey" -> LiveConfiguration.environment("ARK_API_KEY");
             case "browser.live.e2b.apiKey" -> LiveConfiguration.environment("AGENT_E2B_API_KEY");
-            case "browser.live.e2b.apiBaseUrl" ->
-                    LiveConfiguration.environment("AGENT_E2B_API_BASE_URL");
-            case "browser.live.e2b.runtime" ->
-                    LiveConfiguration.environment("AGENT_E2B_RUNTIME_BASE_URL_PATTERN");
-            case "browser.live.e2b.template" ->
-                    LiveConfiguration.environment("AGENT_E2B_TEMPLATE_ID");
+            case "browser.live.e2b.apiBaseUrl" -> LiveConfiguration.environment("AGENT_E2B_API_BASE_URL");
+            case "browser.live.e2b.runtime" -> LiveConfiguration.environment("AGENT_E2B_RUNTIME_BASE_URL_PATTERN");
+            case "browser.live.e2b.template" -> LiveConfiguration.environment("AGENT_E2B_TEMPLATE_ID");
             default -> null;
         };
     }

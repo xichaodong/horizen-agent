@@ -36,10 +36,13 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/** 使用真实模型、已配置 MySQL 和生产 RuntimeFactory，每一步创建新的会话及 Agent。 */
+/**
+ * 使用真实模型、已配置 MySQL 和生产 RuntimeFactory，每一步创建新的会话及 Agent。
+ */
 @EnabledIfSystemProperty(named = "horizen.memory.quality.live", matches = "true")
 class MemoryQualityConfiguredLiveTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
     private final AtomicInteger sequence = new AtomicInteger();
     private final String redisPrefix = "horizen-memory-quality:" + UUID.randomUUID() + ":";
     private JedisPooled redis;
@@ -153,8 +156,8 @@ class MemoryQualityConfiguredLiveTest {
                                     e ->
                                             e.getType() == AgentRuntimeEvent.Type.TOOL_STARTED
                                                     && ("memory_save".equals(e.getToolName())
-                                                            || "memory_manage"
-                                                                    .equals(e.getToolName()))));
+                                                    || "memory_manage"
+                                                    .equals(e.getToolName()))));
             assertFalse(current(documents, owner).contains("lilac-99"));
             System.out.println(
                     "Memory quality live: temporary guesses and unknown outcomes were not persisted");
@@ -198,27 +201,27 @@ class MemoryQualityConfiguredLiveTest {
                 new E2bSandboxProperties(false, "", "", "", "", "", null, null, null, null, null);
         var multimodal = new MultimodalProperties(false, null, null, null, null);
         try (var runtime =
-                AgentRuntimeFactory.create(
-                        RuntimeAssembly.builder()
-                                .properties(properties)
-                                .contextProperties(context)
-                                .gatewayProperties(gateway)
-                                .sandboxProperties(sandbox)
-                                .multimodalProperties(multimodal)
-                                .traceConfig(null)
-                                .horizenExporter(null)
-                                .skillRepository(null)
-                                .distributedStore(state)
-                                .sessionTurns(null)
-                                .artifactSupport(null)
-                                .askUsers(null)
-                                .workspaceDocuments(documents)
-                                .snapshots(null)
-                                .snapshotProperties(new SandboxSnapshotProperties())
-                                .snapshotPointers(null)
-                                .publishedWorkspace(workspace)
-                                .infrastructure(null)
-                                .build())) {
+                     AgentRuntimeFactory.create(
+                             RuntimeAssembly.builder()
+                                     .properties(properties)
+                                     .contextProperties(context)
+                                     .gatewayProperties(gateway)
+                                     .sandboxProperties(sandbox)
+                                     .multimodalProperties(multimodal)
+                                     .traceConfig(null)
+                                     .horizenExporter(null)
+                                     .skillRepository(null)
+                                     .distributedStore(state)
+                                     .sessionTurns(null)
+                                     .artifactSupport(null)
+                                     .askUsers(null)
+                                     .workspaceDocuments(documents)
+                                     .snapshots(null)
+                                     .snapshotProperties(new SandboxSnapshotProperties())
+                                     .snapshotPointers(null)
+                                     .publishedWorkspace(workspace)
+                                     .infrastructure(null)
+                                     .build())) {
             var events =
                     runtime.stream(
                                     AgentTurnRequest.builder()

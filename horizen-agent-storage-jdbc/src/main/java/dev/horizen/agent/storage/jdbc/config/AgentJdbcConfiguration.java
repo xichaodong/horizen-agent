@@ -42,7 +42,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
-/** 按作用域显式配置持久化 Bean，不创建表结构，也不选择未命名的数据源。 */
+/**
+ * 按作用域显式配置持久化 Bean，不创建表结构，也不选择未命名的数据源。
+ */
 @Configuration(proxyBeanMethods = false)
 @EnableTransactionManagement(proxyTargetClass = true)
 @MapperScan(
@@ -63,7 +65,7 @@ public class AgentJdbcConfiguration {
     /**
      * 计算或取得本方法声明的结果，供当前AgentJdbcConfiguration处理步骤使用。
      *
-     * @param source 待解析或转换的来源对象。
+     * @param source  待解析或转换的来源对象。
      * @param options 可供当前请求选择的选项或策略集合。
      * @return 本次操作返回的SQL会话工厂结果。
      */
@@ -108,8 +110,8 @@ public class AgentJdbcConfiguration {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
-     * @param tx 当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
+     * @param mapper  本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param tx      当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
      * @param history 提供历史能力的依赖，具体实现由当前组件的组装方传入。
      * @return 本次操作返回的JDBC会话执行存储结果。
      */
@@ -125,7 +127,7 @@ public class AgentJdbcConfiguration {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
-     * @param tx 当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
+     * @param tx     当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
      * @return 本次操作返回的JDBC审批存储结果。
      */
     @Bean
@@ -149,7 +151,7 @@ public class AgentJdbcConfiguration {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
-     * @param tx 当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
+     * @param tx     当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
      * @return 本次操作返回的JDBC产物存储结果。
      */
     @Bean
@@ -194,7 +196,7 @@ public class AgentJdbcConfiguration {
     /**
      * 读取快照中的指针集合。
      *
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param mapper  本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
      * @param options 可供当前请求选择的选项或策略集合。
      * @return 本次操作返回的JDBC工作区快照指针仓储结果。
      */
@@ -207,8 +209,8 @@ public class AgentJdbcConfiguration {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
-     * @param tx 当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
+     * @param mapper   本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param tx       当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
      * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      * @return 本次操作返回的JDBC工作区文档仓储结果。
      */
@@ -225,7 +227,7 @@ public class AgentJdbcConfiguration {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
-     * @param tx 当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
+     * @param tx     当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
      * @return 本次操作返回的JDBC工作区目录仓储结果。
      */
     @Bean
@@ -248,8 +250,8 @@ public class AgentJdbcConfiguration {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param mapper 本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
-     * @param tx 当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
+     * @param mapper   本组件使用的映射器或编解码器，负责协议与存储表示之间的转换。
+     * @param tx       当前AgentJDBC组装持有的事务对象，供相应处理步骤使用。
      * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
      * @return 本次操作返回的JDBC工作区文件迁移结果。
      */

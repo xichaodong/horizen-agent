@@ -54,13 +54,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** 取消 Agent 调用后必须回收真实沙箱，避免长命令继续占用资源。 */
+/**
+ * 取消 Agent 调用后必须回收真实沙箱，避免长命令继续占用资源。
+ */
 @Tag("live-sandbox")
 @EnabledIfSystemProperty(named = "horizen.e2b.browser.live", matches = "true")
 class E2bCancellationLiveTest {
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    @TempDir Path temporaryDirectory;
+    @TempDir
+    Path temporaryDirectory;
 
     @Test
     void cancellationDeletesSandboxRunningLongCommand() throws Exception {
@@ -113,7 +116,7 @@ class E2bCancellationLiveTest {
 
         CountDownLatch toolStarted = new CountDownLatch(1);
         try (HarnessAgentRuntime runtime = new HarnessAgentRuntime(agent);
-                TurnExecutionManager manager = new TurnExecutionManager(runtime)) {
+             TurnExecutionManager manager = new TurnExecutionManager(runtime)) {
             AgentTurnRequest turn =
                     AgentTurnRequest.builder()
                             .turnId("cancel-live-turn")

@@ -7,18 +7,26 @@ import lombok.NoArgsConstructor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** 外部工具可返回的单个结构化呈现块。 */
+/**
+ * 外部工具可返回的单个结构化呈现块。
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PresentationBlockContract {
-    /** 本对象的协议类别，用于选择对应的解析或呈现规则。 */
+    /**
+     * 本对象的协议类别，用于选择对应的解析或呈现规则。
+     */
     private String type;
 
-    /** Schema的版本，供兼容或并发检查使用。 */
+    /**
+     * Schema的版本，供兼容或并发检查使用。
+     */
     private int schemaVersion = 1;
 
-    /** 数据的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 数据的索引映射，供按键查找或归并当前组件的数据。
+     */
     private Map<String, Object> data = new LinkedHashMap<>();
 
     /**

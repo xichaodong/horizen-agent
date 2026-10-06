@@ -15,10 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/** 将请求固定的领域发布版本适配为 AgentScope 的只读仓储契约。 */
+/**
+ * 将请求固定的领域发布版本适配为 AgentScope 的只读仓储契约。
+ */
 public final class AgentScopeSkillRepositoryAdapter
         implements RuntimeContextSkillRepository, LazyResourceCapable {
-    /** 来源使用的固定标识或协议文本。 */
+    /**
+     * 来源使用的固定标识或协议文本。
+     */
     private static final String SOURCE = "horizen";
 
     /**
@@ -68,7 +72,7 @@ public final class AgentScopeSkillRepositoryAdapter
      * 构造并返回当前操作所需的结果对象。
      *
      * @param skillName 当前Agent作用域Skill仓储适配器使用的Skill名称，供其处理与状态记录使用。
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param context   当前执行上下文，提供关联标识和宿主绑定信息。
      * @return 本次操作返回的Skill资源集合结果。
      */
     @Override
@@ -113,7 +117,7 @@ public final class AgentScopeSkillRepositoryAdapter
      * 保存Agent作用域Skill仓储适配器。
      *
      * @param skills Skill集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param force force的状态标记，用于选择当前组件的处理路径。
+     * @param force  force的状态标记，用于选择当前组件的处理路径。
      * @return 本次检查是否通过或本次更新是否成功。
      */
     @Override
@@ -206,7 +210,7 @@ public final class AgentScopeSkillRepositoryAdapter
      * 计算或取得本方法声明的结果，供当前AgentScopeSkillRepositoryAdapter处理步骤使用。
      *
      * @param snapshot 当前Agent作用域Skill仓储适配器持有的快照对象，供相应处理步骤使用。
-     * @param name 需要定位或处理的名称。
+     * @param name     需要定位或处理的名称。
      * @return 本次操作返回的AgentSkill结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

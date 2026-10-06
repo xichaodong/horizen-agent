@@ -19,25 +19,35 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/** E2B 管理面客户端，支持创建、恢复、详情和销毁。 */
+/**
+ * E2B 管理面客户端，支持创建、恢复、详情和销毁。
+ */
 final class E2bPlatformClient {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
-    /** 当前远端协议的 JSON 编解码器。 */
+    /**
+     * 当前远端协议的 JSON 编解码器。
+     */
     private final ObjectMapper json;
 
-    /** 用于实际网络请求的共享 HTTP 客户端。 */
+    /**
+     * 用于实际网络请求的共享 HTTP 客户端。
+     */
     private final OkHttpClient http;
 
-    /** 可供当前请求选择的选项或策略集合。 */
+    /**
+     * 可供当前请求选择的选项或策略集合。
+     */
     private final HttpE2bSandboxClientOptions options;
 
     /**
      * 创建2B平台客户端，初始化该组件所需的状态、配置或依赖。
      *
      * @param options 可供当前请求选择的选项或策略集合。
-     * @param json 提供JSON能力的依赖，具体实现由当前组件的组装方传入。
+     * @param json    提供JSON能力的依赖，具体实现由当前组件的组装方传入。
      */
     E2bPlatformClient(HttpE2bSandboxClientOptions options, ObjectMapper json) {
         this.options = options;
@@ -46,10 +56,10 @@ final class E2bPlatformClient {
                 options.getHttpClient() != null
                         ? options.getHttpClient()
                         : new OkHttpClient.Builder()
-                                .connectTimeout(
-                                        options.getConnectTimeoutSeconds(), TimeUnit.SECONDS)
-                                .readTimeout(options.getReadTimeoutSeconds(), TimeUnit.SECONDS)
-                                .build();
+                        .connectTimeout(
+                                options.getConnectTimeoutSeconds(), TimeUnit.SECONDS)
+                        .readTimeout(options.getReadTimeoutSeconds(), TimeUnit.SECONDS)
+                        .build();
     }
 
     /**
@@ -104,9 +114,9 @@ final class E2bPlatformClient {
     void delete(String sandboxId) throws IOException {
         Request request =
                 authenticated(
-                                new Request.Builder()
-                                        .url(base() + "/sandboxes/" + sandboxId)
-                                        .delete())
+                        new Request.Builder()
+                                .url(base() + "/sandboxes/" + sandboxId)
+                                .delete())
                         .build();
         try (Response response = http.newCall(request).execute()) {
             if (!response.isSuccessful() && response.code() != 404 && response.code() != 410) {
@@ -119,7 +129,7 @@ final class E2bPlatformClient {
      * 把宿主生成的隔离身份放入控制面请求的对应字段。
      *
      * @param state 当前工作状态或状态存储对象，供执行与恢复流程使用。
-     * @param node 当前2B平台客户端持有的节点对象，供相应处理步骤使用。
+     * @param node  当前2B平台客户端持有的节点对象，供相应处理步骤使用。
      */
     void applyIdentity(HttpE2bSandboxState state, JsonNode node) {
         String id = text(node, "sandboxID");
@@ -135,16 +145,16 @@ final class E2bPlatformClient {
     /**
      * 计算或取得本方法声明的结果，供当前E2bPlatformClient处理步骤使用。
      *
-     * @param url 资源或远端接口地址；具体访问范围由所属服务的配置校验。
+     * @param url  资源或远端接口地址；具体访问范围由所属服务的配置校验。
      * @param body 当前2B平台客户端持有的正文对象，供相应处理步骤使用。
      * @return 本次操作返回的JSON节点结果。
      */
     private JsonNode post(String url, ObjectNode body) throws IOException {
         Request request =
                 authenticated(
-                                new Request.Builder()
-                                        .url(url)
-                                        .post(RequestBody.create(body.toString(), JSON)))
+                        new Request.Builder()
+                                .url(url)
+                                .post(RequestBody.create(body.toString(), JSON)))
                         .build();
         return call(request);
     }
@@ -200,7 +210,7 @@ final class E2bPlatformClient {
      * 写入映射。
      *
      * @param target 本次转换、状态更新或内容写入的目标。
-     * @param name 需要定位或处理的名称。
+     * @param name   需要定位或处理的名称。
      * @param values 本次批量处理的值集合。
      */
     private static void putMap(ObjectNode target, String name, Map<String, String> values) {
@@ -212,7 +222,7 @@ final class E2bPlatformClient {
     /**
      * 生成当前操作所需的text文本，供调用方继续处理。
      *
-     * @param node 当前2B平台客户端持有的节点对象，供相应处理步骤使用。
+     * @param node  当前2B平台客户端持有的节点对象，供相应处理步骤使用。
      * @param field 当前2B平台客户端使用的字段，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */
@@ -228,7 +238,7 @@ final class E2bPlatformClient {
      * 生成当前操作所需的required文本，供调用方继续处理。
      *
      * @param value 待校验、转换或保存的原始值。
-     * @param name 需要定位或处理的名称。
+     * @param name  需要定位或处理的名称。
      * @return 本次处理生成或读取的文本。
      */
     private static String required(String value, String name) {
@@ -241,7 +251,7 @@ final class E2bPlatformClient {
     /**
      * 计算或取得本方法声明的结果，供当前E2bPlatformClient处理步骤使用。
      *
-     * @param message 用户输入、响应说明或诊断消息，含义由所属协议对象限定。
+     * @param message  用户输入、响应说明或诊断消息，含义由所属协议对象限定。
      * @param response 当前操作得到的响应。
      * @return 本次操作返回的沙箱运行时异常结果。
      */
@@ -255,8 +265,8 @@ final class E2bPlatformClient {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param message 用户输入、响应说明或诊断消息，含义由所属协议对象限定。
-     * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param body 当前2B平台客户端使用的正文，供其处理与状态记录使用。
+     * @param status  当前记录或执行的状态，具体取值由所属领域或协议约定。
+     * @param body    当前2B平台客户端使用的正文，供其处理与状态记录使用。
      * @return 本次操作返回的沙箱运行时异常结果。
      */
     private static SandboxException.SandboxRuntimeException failure(

@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import {useRef, useEffect} from 'react';
 
 /** 把文本增量聚合为会话级显示更新，结束或卸载时清理计时器与待输出片段。 */
 export function useTypewriter(setSessions, sessionsRef, updateSession) {
@@ -29,7 +29,7 @@ export function useTypewriter(setSessions, sessionsRef, updateSession) {
                                 : Math.min(remaining, Math.max(2, Math.ceil(remaining / 8)));
                         const content = target.slice(0, visible + count);
                         if (content.length === target.length) pendingTextRef.current.delete(key);
-                        return { ...message, content };
+                        return {...message, content};
                     }),
                 }))
             );
@@ -66,7 +66,7 @@ export function useTypewriter(setSessions, sessionsRef, updateSession) {
         updateSession(sessionId, (session) => ({
             ...session,
             messages: session.messages.map((message) =>
-                message.id === messageId ? { ...message, content: target } : message
+                message.id === messageId ? {...message, content: target} : message
             ),
         }));
     };
@@ -80,5 +80,5 @@ export function useTypewriter(setSessions, sessionsRef, updateSession) {
         []
     );
 
-    return { queueTextDelta, clearQueuedText, flushQueuedText };
+    return {queueTextDelta, clearQueuedText, flushQueuedText};
 }

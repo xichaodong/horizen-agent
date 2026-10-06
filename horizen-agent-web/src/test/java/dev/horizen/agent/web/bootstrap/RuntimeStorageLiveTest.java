@@ -60,17 +60,17 @@ class RuntimeStorageLiveTest {
         RuntimeStorageProperties secondProperties = properties(jdbcUrl, "instance-b", redisPrefix);
 
         try (RuntimeStorage first =
-                        RuntimeStorage.open(
-                                firstProperties,
-                                InMemoryWorkspaceContentRepository.shared(
-                                        "runtime-storage-tests"));
-                RuntimeStorage second =
-                        RuntimeStorage.open(
-                                secondProperties,
-                                InMemoryWorkspaceContentRepository.shared(
-                                        "runtime-storage-tests"));
-                RedisTurnEventBridge firstEvents = new RedisTurnEventBridge(first.messageBus());
-                RedisTurnEventBridge secondEvents = new RedisTurnEventBridge(second.messageBus())) {
+                     RuntimeStorage.open(
+                             firstProperties,
+                             InMemoryWorkspaceContentRepository.shared(
+                                     "runtime-storage-tests"));
+             RuntimeStorage second =
+                     RuntimeStorage.open(
+                             secondProperties,
+                             InMemoryWorkspaceContentRepository.shared(
+                                     "runtime-storage-tests"));
+             RedisTurnEventBridge firstEvents = new RedisTurnEventBridge(first.messageBus());
+             RedisTurnEventBridge secondEvents = new RedisTurnEventBridge(second.messageBus())) {
             Instant now = Instant.parse("2026-09-24T01:00:00Z");
             first.getSessionTurns()
                     .startTurn(
@@ -156,17 +156,17 @@ class RuntimeStorageLiveTest {
                 .execute(new DriverManagerDataSource(jdbcUrl, "sa", ""));
 
         try (RuntimeStorage first =
-                        RuntimeStorage.open(
-                                properties(jdbcUrl, "stream-writer", redisPrefix),
-                                InMemoryWorkspaceContentRepository.shared(
-                                        "runtime-storage-tests"));
-                RuntimeStorage second =
-                        RuntimeStorage.open(
-                                properties(jdbcUrl, "stream-reader", redisPrefix),
-                                InMemoryWorkspaceContentRepository.shared(
-                                        "runtime-storage-tests"));
-                RedisTurnEventBridge firstEvents = new RedisTurnEventBridge(first.messageBus());
-                RedisTurnEventBridge secondEvents = new RedisTurnEventBridge(second.messageBus())) {
+                     RuntimeStorage.open(
+                             properties(jdbcUrl, "stream-writer", redisPrefix),
+                             InMemoryWorkspaceContentRepository.shared(
+                                     "runtime-storage-tests"));
+             RuntimeStorage second =
+                     RuntimeStorage.open(
+                             properties(jdbcUrl, "stream-reader", redisPrefix),
+                             InMemoryWorkspaceContentRepository.shared(
+                                     "runtime-storage-tests"));
+             RedisTurnEventBridge firstEvents = new RedisTurnEventBridge(first.messageBus());
+             RedisTurnEventBridge secondEvents = new RedisTurnEventBridge(second.messageBus())) {
             firstEvents.publish("owner", event(AgentRuntimeEvent.Type.TURN_STARTED, null));
             firstEvents.publish("owner", event(AgentRuntimeEvent.Type.TEXT_DELTA, "第一段，"));
 
@@ -211,12 +211,12 @@ class RuntimeStorageLiveTest {
         eventProperties.setMissingLogEmptyReads(1);
 
         try (RuntimeStorage storage =
-                        RuntimeStorage.open(
-                                properties(jdbcUrl, "reader", redisPrefix),
-                                InMemoryWorkspaceContentRepository.shared(
-                                        "runtime-storage-tests"));
-                RedisTurnEventBridge events =
-                        new RedisTurnEventBridge(storage.messageBus(), eventProperties)) {
+                     RuntimeStorage.open(
+                             properties(jdbcUrl, "reader", redisPrefix),
+                             InMemoryWorkspaceContentRepository.shared(
+                                     "runtime-storage-tests"));
+             RedisTurnEventBridge events =
+                     new RedisTurnEventBridge(storage.messageBus(), eventProperties)) {
             assertThrows(
                     RedisTurnEventBridge.EventLogUnavailableException.class,
                     () ->
@@ -238,15 +238,15 @@ class RuntimeStorageLiveTest {
         MemoryContentStore contents = new MemoryContentStore();
 
         try (RuntimeStorage writer =
-                        RuntimeStorage.open(
-                                properties(jdbcUrl, "writer", redisPrefix),
-                                InMemoryWorkspaceContentRepository.shared(
-                                        "runtime-storage-tests"));
-                RuntimeStorage reader =
-                        RuntimeStorage.open(
-                                properties(jdbcUrl, "reader", redisPrefix),
-                                InMemoryWorkspaceContentRepository.shared(
-                                        "runtime-storage-tests"))) {
+                     RuntimeStorage.open(
+                             properties(jdbcUrl, "writer", redisPrefix),
+                             InMemoryWorkspaceContentRepository.shared(
+                                     "runtime-storage-tests"));
+             RuntimeStorage reader =
+                     RuntimeStorage.open(
+                             properties(jdbcUrl, "reader", redisPrefix),
+                             InMemoryWorkspaceContentRepository.shared(
+                                     "runtime-storage-tests"))) {
             ArtifactLifecycleService artifacts =
                     new ArtifactLifecycleService(writer.getArtifacts(), contents);
             var uploaded =

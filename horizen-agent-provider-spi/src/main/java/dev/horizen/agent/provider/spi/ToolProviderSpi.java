@@ -1,6 +1,8 @@
 package dev.horizen.agent.provider.spi;
 
-/** 可选的进程内实现接口；HTTP 适配器通过 JSON 暴露相同 DTO。 */
+/**
+ * 可选的进程内实现接口；HTTP 适配器通过 JSON 暴露相同 DTO。
+ */
 public interface ToolProviderSpi {
     /**
      * 计算或取得本方法声明的结果，供当前ToolProviderSpi处理步骤使用。

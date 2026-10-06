@@ -1,11 +1,12 @@
-import { request as apiRequest } from '../api/client.js';
-import { useEffect, useMemo } from 'react';
-import { executionFailureEvent } from '../turnRecovery.js';
-import { createId } from '../utils/chat.js';
-import { useLatest } from './useLatest.js';
+import {request as apiRequest} from '../api/client.js';
+import {useEffect, useMemo} from 'react';
+import {executionFailureEvent} from '../turnRecovery.js';
+import {createId} from '../utils/chat.js';
+import {useLatest} from './useLatest.js';
+
 /** 在正式历史恢复完成后观察当前执行，重连时核对执行标识，并在切换会话或卸载时释放旧订阅。 */
 export function useTurnObservation(options) {
-    const { messages, activeSessionId, status, activeSession, streams } = options;
+    const {messages, activeSessionId, status, activeSession, streams} = options;
     const latest = useLatest(options);
     const hasRunningSubtask = useMemo(
         () =>
@@ -47,7 +48,7 @@ export function useTurnObservation(options) {
             try {
                 const queryResponse = await apiRequest('/api/session/query', {
                     method: 'POST',
-                    body: JSON.stringify({ sessionId: activeSessionId }),
+                    body: JSON.stringify({sessionId: activeSessionId}),
                     signal: controller.signal,
                 });
                 if (!queryResponse.ok) throw new Error('查询执行状态失败');
@@ -109,13 +110,13 @@ export function useTurnObservation(options) {
                         eventCursor > 0
                             ? current.messages
                             : current.messages.filter(
-                                  (message) => message.turnId !== assistantMessageId
-                              ),
+                                (message) => message.turnId !== assistantMessageId
+                            ),
                 }));
                 streams.markRunning(activeSessionId, controller);
                 const response = await apiRequest('/api/session/subscribe', {
                     method: 'POST',
-                    headers: { Accept: 'text/event-stream' },
+                    headers: {Accept: 'text/event-stream'},
                     body: JSON.stringify({
                         sessionId: activeSessionId,
                         expectedTurnId: execution.currentTurnId,

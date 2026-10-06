@@ -10,29 +10,41 @@ import dev.horizen.agent.domain.workspace.release.SessionWorkspaceReleaseReposit
 import java.util.Objects;
 import java.util.Optional;
 
-/** 每次执行和恢复均读取其 Session 拥有的完整发布版本。 */
+/**
+ * 每次执行和恢复均读取其 Session 拥有的完整发布版本。
+ */
 public final class AgentReleaseService {
-    /** 当前 Project 与 Agent 的发布目录定位键。 */
+    /**
+     * 当前 Project 与 Agent 的发布目录定位键。
+     */
     private final AgentCatalogKey catalog;
 
-    /** 获取发布描述并持有已校验工作区内容的仓储。 */
+    /**
+     * 获取发布描述并持有已校验工作区内容的仓储。
+     */
     private final AgentReleaseRepository repository;
 
-    /** 原子保存 owner 与 Session 的发布绑定，恢复必须复用该绑定。 */
+    /**
+     * 原子保存 owner 与 Session 的发布绑定，恢复必须复用该绑定。
+     */
     private final SessionWorkspaceReleaseRepository bindings;
 
-    /** 最近一次成功获取并校验的完整发布描述，供状态接口展示。 */
+    /**
+     * 最近一次成功获取并校验的完整发布描述，供状态接口展示。
+     */
     private volatile AgentReleaseManifest lastValidated;
 
-    /** 最近一次执行准备失败的异常类型名称；成功取得发布后清空。 */
+    /**
+     * 最近一次执行准备失败的异常类型名称；成功取得发布后清空。
+     */
     private volatile String lastFailure;
 
     /**
      * 创建Agent发布服务，初始化该组件所需的状态、配置或依赖。
      *
-     * @param catalog 当前 Project 与 Agent 的发布目录定位键。
+     * @param catalog    当前 Project 与 Agent 的发布目录定位键。
      * @param repository 获取发布描述并持有已校验工作区内容的仓储。
-     * @param bindings 原子保存 owner 与 Session 的发布绑定，恢复必须复用该绑定。
+     * @param bindings   原子保存 owner 与 Session 的发布绑定，恢复必须复用该绑定。
      */
     public AgentReleaseService(
             AgentCatalogKey catalog,
@@ -64,9 +76,9 @@ public final class AgentReleaseService {
     /**
      * 为本次执行取得会话绑定的发布。首次执行先准备内容再原子绑定；恢复不能回退到其他发布。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param resume 恢复执行的状态标记，用于选择当前组件的处理路径。
+     * @param resume    恢复执行的状态标记，用于选择当前组件的处理路径。
      * @return 本次操作返回的Agent发布快照结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -129,7 +141,7 @@ public final class AgentReleaseService {
      * 校验发布的 Project、Agent 与会话绑定是否一致，拒绝跨目录或变更身份的发布。
      *
      * @param manifest 当前Agent发布服务持有的清单对象，供相应处理步骤使用。
-     * @param bound 当前Agent发布服务持有的已绑定对象，供相应处理步骤使用。
+     * @param bound    当前Agent发布服务持有的已绑定对象，供相应处理步骤使用。
      * @throws SecurityException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void validate(AgentReleaseManifest manifest, SessionWorkspaceRelease bound) {
@@ -139,7 +151,7 @@ public final class AgentReleaseService {
         }
         if (bound != null
                 && (manifest.getReleaseId() != bound.getReleaseId()
-                        || !manifest.getReleaseHash().equals(bound.getReleaseHash()))) {
+                || !manifest.getReleaseHash().equals(bound.getReleaseHash()))) {
             throw new SecurityException("Bound Session publication identity changed");
         }
     }

@@ -40,14 +40,15 @@ class FixtureGatewayTest {
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final String FIXTURE =
             """
-      {"tools":[{"name":"inspect_sample","description":"Inspect a synthetic sample",
-        "inputSchema":{"type":"object","properties":{
-          "sample_id":{"type":"string","enum":["sample-1"]},
-          "limit":{"type":"integer","minimum":1}},
-          "required":["sample_id"],"additionalProperties":false},
-        "response":{"sample_id":"sample-1","count":3,"summary":"Synthetic sample"}}]}
-      """;
-    @TempDir Path directory;
+                    {"tools":[{"name":"inspect_sample","description":"Inspect a synthetic sample",
+                      "inputSchema":{"type":"object","properties":{
+                        "sample_id":{"type":"string","enum":["sample-1"]},
+                        "limit":{"type":"integer","minimum":1}},
+                        "required":["sample_id"],"additionalProperties":false},
+                      "response":{"sample_id":"sample-1","count":3,"summary":"Synthetic sample"}}]}
+                    """;
+    @TempDir
+    Path directory;
 
     @Test
     void listsAndInvokesWithoutAnyContextOrCredentialsAndAlwaysMarksMockData() throws Exception {
@@ -74,7 +75,7 @@ class FixtureGatewayTest {
                 List.<Map<String, Object>>of(
                         Map.of(), Map.of("sample_id", "sample-1", "limit", "three"),
                         Map.of("sample_id", "other-sample"),
-                                Map.of("sample_id", "sample-1", "limit", 0))) {
+                        Map.of("sample_id", "sample-1", "limit", 0))) {
             ToolResultBlock invalid =
                     new GatewayToolAdapter(gateway)
                             .invokeGateway(null, null, "inspect_sample", input)
@@ -92,9 +93,9 @@ class FixtureGatewayTest {
         assertEquals(
                 "invalid_tool_input",
                 markedOutput(
-                                new GatewayToolAdapter(gateway)
-                                        .invokeGateway(null, null, null, null)
-                                        .block())
+                        new GatewayToolAdapter(gateway)
+                                .invokeGateway(null, null, null, null)
+                                .block())
                         .path("errorCode")
                         .asText());
     }
@@ -113,13 +114,13 @@ class FixtureGatewayTest {
         assertEquals(
                 3,
                 markedOutput(
-                                new GatewayToolAdapter(gateway)
-                                        .invokeGateway(
-                                                null,
-                                                null,
-                                                "inspect_sample",
-                                                Map.of("sample_id", "sample-1"))
-                                        .block())
+                        new GatewayToolAdapter(gateway)
+                                .invokeGateway(
+                                        null,
+                                        null,
+                                        "inspect_sample",
+                                        Map.of("sample_id", "sample-1"))
+                                .block())
                         .at("/safeResult/count")
                         .asInt());
     }

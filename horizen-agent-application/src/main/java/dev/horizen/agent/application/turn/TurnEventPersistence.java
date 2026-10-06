@@ -35,37 +35,59 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/** 持久化运行时事件并推进 Turn 的持久化状态。 */
+/**
+ * 持久化运行时事件并推进 Turn 的持久化状态。
+ */
 @RequiredArgsConstructor
 public final class TurnEventPersistence {
-    /** 当前组件的诊断日志器。 */
+    /**
+     * 当前组件的诊断日志器。
+     */
     private static final Logger log = LoggerFactory.getLogger(TurnEventPersistence.class);
 
-    /** 会话对象或会话索引，按相应的归属键定位数据。 */
+    /**
+     * 会话对象或会话索引，按相应的归属键定位数据。
+     */
     private final SessionTurnStore sessions;
 
-    /** 审批存储或待处理审批集合，用于原执行的暂停与恢复。 */
+    /**
+     * 审批存储或待处理审批集合，用于原执行的暂停与恢复。
+     */
     private final ApprovalStore approvals;
 
-    /** 需要持久化或展示的结构化呈现块集合。 */
+    /**
+     * 需要持久化或展示的结构化呈现块集合。
+     */
     private final PresentationStore presentations;
 
-    /** 存储正式过程事件的时间线端口，供持久化与刷新恢复使用。 */
+    /**
+     * 存储正式过程事件的时间线端口，供持久化与刷新恢复使用。
+     */
     private final TurnTimelineStore timeline;
 
-    /** 当前执行或历史事件集合，供持久化、回放与观测使用。 */
+    /**
+     * 当前执行或历史事件集合，供持久化、回放与观测使用。
+     */
     private final TurnEventChannel events;
 
-    /** 执行 Agent 模型与工具循环的运行时接口。 */
+    /**
+     * 执行 Agent 模型与工具循环的运行时接口。
+     */
     private final AgentRuntime runtime;
 
-    /** 将运行时事件编码成正式时间线负载的转换函数。 */
+    /**
+     * 将运行时事件编码成正式时间线负载的转换函数。
+     */
     private final Function<AgentRuntimeEvent, String> timelineEncoder;
 
-    /** 在执行开始或准备期间登记续租跟踪的回调。 */
+    /**
+     * 在执行开始或准备期间登记续租跟踪的回调。
+     */
     private final Consumer<AgentTurnRequest> trackLease;
 
-    /** 在执行段结束或暂停后移除续租跟踪的回调。 */
+    /**
+     * 在执行段结束或暂停后移除续租跟踪的回调。
+     */
     private final Consumer<AgentTurnRequest> untrackLease;
 
     /**
@@ -90,9 +112,9 @@ public final class TurnEventPersistence {
      * 把运行时事件转换为正式执行事实、交互记录与分布式回放增量。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param turn 当前执行事件持久化持有的执行对象，供相应处理步骤使用。
-     * @param event 当前执行事件持久化持有的事件对象，供相应处理步骤使用。
-     * @param tools 当前执行事件持久化持有的工具集合对象，供相应处理步骤使用。
+     * @param turn     当前执行事件持久化持有的执行对象，供相应处理步骤使用。
+     * @param event    当前执行事件持久化持有的事件对象，供相应处理步骤使用。
+     * @param tools    当前执行事件持久化持有的工具集合对象，供相应处理步骤使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public void observe(
@@ -103,8 +125,8 @@ public final class TurnEventPersistence {
         if (events == null
                 || sessions == null
                 || (event.getType() == AgentRuntimeEvent.Type.THINKING_DELTA
-                        || event.getType() == AgentRuntimeEvent.Type.MODEL_STARTED
-                        || event.getType() == AgentRuntimeEvent.Type.MODEL_COMPLETED)) return;
+                || event.getType() == AgentRuntimeEvent.Type.MODEL_STARTED
+                || event.getType() == AgentRuntimeEvent.Type.MODEL_COMPLETED)) return;
         tools.accept(event);
         if (transientEvent(event)) {
             events.publish(turn.getOwnerKey(), event);
@@ -187,9 +209,9 @@ public final class TurnEventPersistence {
      * 持久化或回放写入失败时结束原执行，避免仅在浏览器侧显示失败而事实状态仍在运行。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param turn 当前执行事件持久化持有的执行对象，供相应处理步骤使用。
-     * @param event 当前执行事件持久化持有的事件对象，供相应处理步骤使用。
-     * @param error 本次失败的异常，用于分类、传播或诊断。
+     * @param turn     当前执行事件持久化持有的执行对象，供相应处理步骤使用。
+     * @param event    当前执行事件持久化持有的事件对象，供相应处理步骤使用。
+     * @param error    本次失败的异常，用于分类、传播或诊断。
      */
     public void failAfterWrite(
             ExecutionIdentity identity,
@@ -202,8 +224,8 @@ public final class TurnEventPersistence {
                 error instanceof ToolTimelineProjection.SnapshotLimitException
                         ? "TOOL_HISTORY_BUFFER_LIMIT"
                         : error instanceof TurnEventChannel.EventWriteException
-                                ? "REDIS_EVENT_WRITE_FAILED"
-                                : "EVENT_PERSISTENCE_FAILED";
+                        ? "REDIS_EVENT_WRITE_FAILED"
+                        : "EVENT_PERSISTENCE_FAILED";
         runtime.failCurrentTurn(
                 identity.getOwnerKey(), turn.getSessionId(), turn.getTurnId(), failureCode);
         sessions.transitionTurn(
@@ -230,7 +252,7 @@ public final class TurnEventPersistence {
     /**
      * 将当前执行事件写入分布式观察通道。
      *
-     * @param turn 当前执行事件持久化持有的执行对象，供相应处理步骤使用。
+     * @param turn  当前执行事件持久化持有的执行对象，供相应处理步骤使用。
      * @param event 当前执行事件持久化持有的事件对象，供相应处理步骤使用。
      * @return 本次操作返回的长整型结果。
      */
@@ -241,10 +263,10 @@ public final class TurnEventPersistence {
     /**
      * 将当前执行事件写入分布式观察通道。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
-     * @param event 当前执行事件持久化持有的事件对象，供相应处理步骤使用。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param event     当前执行事件持久化持有的事件对象，供相应处理步骤使用。
      * @return 本次操作返回的长整型结果。
      */
     public long publish(String ownerKey, String sessionId, String turnId, AgentRuntimeEvent event) {
@@ -254,10 +276,10 @@ public final class TurnEventPersistence {
     /**
      * 将当前执行事件写入分布式观察通道。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
-     * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
-     * @param event 当前执行事件持久化持有的事件对象，供相应处理步骤使用。
+     * @param ownerKey     宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param sessionId    会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
+     * @param turnId       单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param event        当前执行事件持久化持有的事件对象，供相应处理步骤使用。
      * @param durableEvent 当前执行事件持久化持有的持久事件对象，供相应处理步骤使用。
      * @return 本次操作返回的长整型结果。
      */
@@ -282,7 +304,7 @@ public final class TurnEventPersistence {
     /**
      * 记录执行的等待交互状态，并释放当前执行段的租约跟踪。
      *
-     * @param turn 当前执行事件持久化持有的执行对象，供相应处理步骤使用。
+     * @param turn   当前执行事件持久化持有的执行对象，供相应处理步骤使用。
      * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
      * @param reason 当前执行事件持久化使用的原因，供其处理与状态记录使用。
      */
@@ -313,7 +335,7 @@ public final class TurnEventPersistence {
     /**
      * 按执行与归属范围持久化结构化呈现块，支持刷新后的恢复。
      *
-     * @param turn 当前执行事件持久化持有的执行对象，供相应处理步骤使用。
+     * @param turn  当前执行事件持久化持有的执行对象，供相应处理步骤使用。
      * @param event 当前执行事件持久化持有的事件对象，供相应处理步骤使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -336,8 +358,8 @@ public final class TurnEventPersistence {
      * 保存原执行产生的待确认工具调用，使决定可以在其他实例提交。
      *
      * @param identity 可信宿主解析的执行身份，供访问范围与审计使用。
-     * @param turn 当前执行事件持久化持有的执行对象，供相应处理步骤使用。
-     * @param event 当前执行事件持久化持有的事件对象，供相应处理步骤使用。
+     * @param turn     当前执行事件持久化持有的执行对象，供相应处理步骤使用。
+     * @param event    当前执行事件持久化持有的事件对象，供相应处理步骤使用。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     private void persistApprovals(
@@ -355,34 +377,34 @@ public final class TurnEventPersistence {
                         .map(
                                 request ->
                                         new ApprovalRequest(
-                                                        turn.getOwnerKey(),
-                                                        turn.getSessionId(),
-                                                        turn.getTurnId(),
-                                                        UUID.nameUUIDFromBytes(
-                                                                        (turn.getOwnerKey()
-                                                                                        + '\0'
-                                                                                        + turn
-                                                                                                .getTurnId()
-                                                                                        + '\0'
-                                                                                        + request
-                                                                                                .getToolCallId())
-                                                                                .getBytes(
-                                                                                        StandardCharsets
-                                                                                                .UTF_8))
-                                                                .toString(),
-                                                        request.getReplyId(),
-                                                        request.getToolCallId(),
-                                                        request.getToolName(),
-                                                        request.getContent(),
-                                                        JsonUtils.toJson(request.getInput()),
-                                                        ApprovalStatus.PENDING,
-                                                        identity.getActorId(),
-                                                        productTurn.getDeadlineAt(),
-                                                        null,
-                                                        null,
-                                                        now,
-                                                        now,
-                                                        0)
+                                                turn.getOwnerKey(),
+                                                turn.getSessionId(),
+                                                turn.getTurnId(),
+                                                UUID.nameUUIDFromBytes(
+                                                                (turn.getOwnerKey()
+                                                                        + '\0'
+                                                                        + turn
+                                                                        .getTurnId()
+                                                                        + '\0'
+                                                                        + request
+                                                                        .getToolCallId())
+                                                                        .getBytes(
+                                                                                StandardCharsets
+                                                                                        .UTF_8))
+                                                        .toString(),
+                                                request.getReplyId(),
+                                                request.getToolCallId(),
+                                                request.getToolName(),
+                                                request.getContent(),
+                                                JsonUtils.toJson(request.getInput()),
+                                                ApprovalStatus.PENDING,
+                                                identity.getActorId(),
+                                                productTurn.getDeadlineAt(),
+                                                null,
+                                                null,
+                                                now,
+                                                now,
+                                                0)
                                                 .withPresentationJson(
                                                         JsonUtils.toJson(
                                                                 request.getPresentation())))

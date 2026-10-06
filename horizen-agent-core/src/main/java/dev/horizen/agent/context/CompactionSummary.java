@@ -3,10 +3,15 @@ package dev.horizen.agent.context;
 import io.agentscope.core.message.Msg;
 import io.agentscope.harness.agent.memory.compaction.ConversationCompactor;
 
-/** AgentScope 摘要失败或为空时的占位内容，绝不能替换对话历史。 */
+/**
+ * AgentScope 摘要失败或为空时的占位内容，绝不能替换对话历史。
+ */
 final class CompactionSummary {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private CompactionSummary() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private CompactionSummary() {
+    }
 
     /**
      * 检查failed对应的条件，供调用方选择后续处理分支。

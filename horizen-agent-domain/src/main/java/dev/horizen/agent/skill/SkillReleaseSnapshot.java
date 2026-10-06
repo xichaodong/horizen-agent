@@ -10,19 +10,26 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-/** 已校验 Skill 发布版本的不可变内容，不依赖具体运行时。 */
+/**
+ * 已校验 Skill 发布版本的不可变内容，不依赖具体运行时。
+ */
 public final class SkillReleaseSnapshot {
-    /** 已验证发布的描述清单，保存版本与制品完整性信息。 */
-    @Getter private final SkillReleaseManifest manifest;
+    /**
+     * 已验证发布的描述清单，保存版本与制品完整性信息。
+     */
+    @Getter
+    private final SkillReleaseManifest manifest;
 
-    /** 当前发布中可渐进读取的 Skill 正文与资源快照。 */
+    /**
+     * 当前发布中可渐进读取的 Skill 正文与资源快照。
+     */
     private final Map<String, SnapshotSkill> skills;
 
     /**
      * 创建Skill发布快照，初始化该组件所需的状态、配置或依赖。
      *
      * @param manifest 当前Skill发布快照持有的清单对象，供相应处理步骤使用。
-     * @param skills Skill集合的索引映射，供按键查找或归并当前组件的数据。
+     * @param skills   Skill集合的索引映射，供按键查找或归并当前组件的数据。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public SkillReleaseSnapshot(SkillReleaseManifest manifest, Map<String, SnapshotSkill> skills) {
@@ -73,7 +80,7 @@ public final class SkillReleaseSnapshot {
     /**
      * 读取Skill发布快照。
      *
-     * @param name 需要定位或处理的名称。
+     * @param name         需要定位或处理的名称。
      * @param relativePath 相对于工作区根目录的资源路径，不能借此越过根目录。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -86,7 +93,7 @@ public final class SkillReleaseSnapshot {
      * 读取二进制。
      * 处理数组时使用副本，避免直接共享原数组内容。
      *
-     * @param name 需要定位或处理的名称。
+     * @param name         需要定位或处理的名称。
      * @param relativePath 相对于工作区根目录的资源路径，不能借此越过根目录。
      * @return 可用结果；没有可用对象时以空 Optional 表示。
      */
@@ -111,7 +118,7 @@ public final class SkillReleaseSnapshot {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param markdown 当前Skill发布快照使用的markdown，供其处理与状态记录使用。
+     * @param markdown  当前Skill发布快照使用的markdown，供其处理与状态记录使用。
      * @param resources 资源集合的索引映射，供按键查找或归并当前组件的数据。
      * @return 本次操作返回的快照Skill结果。
      */
@@ -145,18 +152,25 @@ public final class SkillReleaseSnapshot {
         return normalized;
     }
 
-    /** 发布快照中的不可变 Skill 视图，供渐进读取正文与资源。 */
+    /**
+     * 发布快照中的不可变 Skill 视图，供渐进读取正文与资源。
+     */
     public static final class SnapshotSkill {
-        /** 当前 Skill 的 Markdown 正文，供运行时按需读取。 */
-        @Getter private final String markdown;
+        /**
+         * 当前 Skill 的 Markdown 正文，供运行时按需读取。
+         */
+        @Getter
+        private final String markdown;
 
-        /** 当前宿主依赖的资源状态投影。 */
+        /**
+         * 当前宿主依赖的资源状态投影。
+         */
         private final Map<String, byte[]> resources;
 
         /**
          * 创建快照Skill，初始化该组件所需的状态、配置或依赖。
          *
-         * @param markdown 当前快照Skill使用的markdown，供其处理与状态记录使用。
+         * @param markdown  当前快照Skill使用的markdown，供其处理与状态记录使用。
          * @param resources 资源集合的索引映射，供按键查找或归并当前组件的数据。
          * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
          */

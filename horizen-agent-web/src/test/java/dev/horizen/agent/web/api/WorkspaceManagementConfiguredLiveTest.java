@@ -44,7 +44,9 @@ import java.util.function.BiConsumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/** 显式本地验收，使用独立 Agent 表结构、真实 BOS、实际 Server 和 Vite 代理。 */
+/**
+ * 显式本地验收，使用独立 Agent 表结构、真实 BOS、实际 Server 和 Vite 代理。
+ */
 @EnabledIfSystemProperty(named = "horizen.workspace.management.live", matches = "true")
 class WorkspaceManagementConfiguredLiveTest {
     private final ObjectMapper json = new ObjectMapper();
@@ -110,10 +112,10 @@ class WorkspaceManagementConfiguredLiveTest {
                                 "--horizen.agent.storage.jdbc-url=" + base + database + jdbcSuffix,
                                 "--horizen.agent.storage.jdbc-username="
                                         + storage.getProperty(
-                                                "horizen.agent.storage.jdbc-username"),
+                                        "horizen.agent.storage.jdbc-username"),
                                 "--horizen.agent.storage.jdbc-password="
                                         + storage.getProperty(
-                                                "horizen.agent.storage.jdbc-password"),
+                                        "horizen.agent.storage.jdbc-password"),
                                 "--horizen.agent.workspace-management.enabled=true",
                                 "--horizen.agent.workspace-management.token=" + token,
                                 "--horizen.agent.workspace-management.project-ids=7",
@@ -172,9 +174,9 @@ class WorkspaceManagementConfiguredLiveTest {
                                 + field
                                 + "="
                                 + sandbox.getProperty(
-                                        "AGENT_E2B_"
-                                                + field.toUpperCase(Locale.ROOT)
-                                                        .replace('-', '_')));
+                                "AGENT_E2B_"
+                                        + field.toUpperCase(Locale.ROOT)
+                                        .replace('-', '_')));
             if (model.containsKey("ARK_BASE_URL"))
                 args.add("--horizen.agent.base-url=" + model.getProperty("ARK_BASE_URL"));
             if (model.containsKey("ARK_MODEL"))
@@ -273,12 +275,12 @@ class WorkspaceManagementConfiguredLiveTest {
             assertEquals(
                     409,
                     request(
-                                    "PUT",
-                                    url + "/draft",
-                                    Map.of("version", 0, "skills", List.of(), "assets", List.of()))
+                            "PUT",
+                            url + "/draft",
+                            Map.of("version", 0, "skills", List.of(), "assets", List.of()))
                             .path("code")
                             .asInt());
-            byte[] template = new byte[] {0, 1, 2, (byte) 255};
+            byte[] template = new byte[]{0, 1, 2, (byte) 255};
             String script =
                     "from pathlib import Path\n"
                             + "import hashlib\n"
@@ -633,8 +635,8 @@ class WorkspaceManagementConfiguredLiveTest {
         assertEquals(200, response.statusCode());
         List<JsonNode> events = new ArrayList<>();
         try (var reader =
-                new BufferedReader(
-                        new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
+                     new BufferedReader(
+                             new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
             for (String line; (line = reader.readLine()) != null; )
                 if (line.startsWith("data:") && !line.substring(5).isBlank()) {
                     JsonNode event = json.readTree(line.substring(5).trim());
@@ -655,12 +657,12 @@ class WorkspaceManagementConfiguredLiveTest {
                 () ->
                         "Agent did not complete: "
                                 + events.stream()
-                                        .filter(
-                                                e ->
-                                                        Set.of("error", "approval_required")
-                                                                .contains(e.path("type").asText()))
-                                        .map(e -> e.toString())
-                                        .toList());
+                                .filter(
+                                        e ->
+                                                Set.of("error", "approval_required")
+                                                        .contains(e.path("type").asText()))
+                                .map(e -> e.toString())
+                                .toList());
         return events;
     }
 
@@ -673,12 +675,12 @@ class WorkspaceManagementConfiguredLiveTest {
                     try {
                         output.write(
                                 ("--"
-                                                + boundary
-                                                + "\r\nContent-Disposition: form-data; name=\""
-                                                + name
-                                                + "\"\r\n\r\n"
-                                                + value
-                                                + "\r\n")
+                                        + boundary
+                                        + "\r\nContent-Disposition: form-data; name=\""
+                                        + name
+                                        + "\"\r\n\r\n"
+                                        + value
+                                        + "\r\n")
                                         .getBytes(StandardCharsets.UTF_8));
                     } catch (IOException e) {
                         throw new IllegalStateException(e);
@@ -690,10 +692,10 @@ class WorkspaceManagementConfiguredLiveTest {
             field.accept("paths", file.getKey());
             output.write(
                     ("--"
-                                    + boundary
-                                    + "\r\nContent-Disposition: form-data; name=\"files\"; filename=\""
-                                    + file.getKey().substring(file.getKey().lastIndexOf('/') + 1)
-                                    + "\"\r\nContent-Type: application/octet-stream\r\n\r\n")
+                            + boundary
+                            + "\r\nContent-Disposition: form-data; name=\"files\"; filename=\""
+                            + file.getKey().substring(file.getKey().lastIndexOf('/') + 1)
+                            + "\"\r\nContent-Type: application/octet-stream\r\n\r\n")
                             .getBytes(StandardCharsets.UTF_8));
             output.write(file.getValue());
             output.write("\r\n".getBytes());
@@ -715,12 +717,12 @@ class WorkspaceManagementConfiguredLiveTest {
             if (!process.isAlive()) throw new IllegalStateException("Acceptance process exited");
             try {
                 if (http.send(
-                                        HttpRequest.newBuilder(URI.create(url))
-                                                .timeout(Duration.ofSeconds(1))
-                                                .GET()
-                                                .build(),
-                                        HttpResponse.BodyHandlers.discarding())
-                                .statusCode()
+                                HttpRequest.newBuilder(URI.create(url))
+                                        .timeout(Duration.ofSeconds(1))
+                                        .GET()
+                                        .build(),
+                                HttpResponse.BodyHandlers.discarding())
+                        .statusCode()
                         == 200) return;
             } catch (IOException ignored) {
             }

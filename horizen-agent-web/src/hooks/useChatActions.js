@@ -1,9 +1,10 @@
-import { request as apiRequest } from '../api/client.js';
-import { createId } from '../utils/chat.js';
+import {request as apiRequest} from '../api/client.js';
+import {createId} from '../utils/chat.js';
+
 /** 管理用户消息发送、显式取消与手动重试；取消已提交与实际执行停止分开判断。 */
-export function useChatActions({ composer, session, execution, artifacts }) {
-    const { inputValue, setInputValue, inputRef } = composer;
-    const { activeSession, running, messages, updateSession, appendMessage, upsertActivity } =
+export function useChatActions({composer, session, execution, artifacts}) {
+    const {inputValue, setInputValue, inputRef} = composer;
+    const {activeSession, running, messages, updateSession, appendMessage, upsertActivity} =
         session;
     const {
         recoveryJson,
@@ -13,7 +14,7 @@ export function useChatActions({ composer, session, execution, artifacts }) {
         streamSequencesRef,
         followSessionResponse,
     } = execution;
-    const { attachments, setAttachments } = artifacts;
+    const {attachments, setAttachments} = artifacts;
     const handleStop = async () => {
         if (!activeSession) return;
         try {
@@ -23,7 +24,7 @@ export function useChatActions({ composer, session, execution, artifacts }) {
             if (!turnId) throw new Error('turn is unknown');
             const response = await apiRequest('/api/session/cancel', {
                 method: 'POST',
-                body: JSON.stringify({ sessionId: activeSession.id, expectedTurnId: turnId }),
+                body: JSON.stringify({sessionId: activeSession.id, expectedTurnId: turnId}),
             });
             if (!response.ok) throw new Error('cancel failed');
             const execution = await response.json();
@@ -46,7 +47,7 @@ export function useChatActions({ composer, session, execution, artifacts }) {
                     activeSession.id,
                     assistantMessageId,
                     `cancel-${turnId}`,
-                    { activityType: 'notice' },
+                    {activityType: 'notice'},
                     (message) => ({
                         ...message,
                         title: '取消请求已提交',
@@ -88,7 +89,7 @@ export function useChatActions({ composer, session, execution, artifacts }) {
         const controller = streams.begin(sessionId);
         const assistantMessageId = createId();
         streamSequencesRef.current.set(sessionId, 0);
-        updateSession(sessionId, (session) => ({ ...session, streamSequence: 0 }));
+        updateSession(sessionId, (session) => ({...session, streamSequence: 0}));
         try {
             const response = await apiRequest('/api/chat/stream', {
                 method: 'POST',
@@ -147,5 +148,5 @@ export function useChatActions({ composer, session, execution, artifacts }) {
             sendMessage(lastUserMessage.content, lastUserMessage.attachments || []);
         }
     };
-    return { handleStop, sendMessage, handleKeyDown, retryLastMessage };
+    return {handleStop, sendMessage, handleKeyDown, retryLastMessage};
 }

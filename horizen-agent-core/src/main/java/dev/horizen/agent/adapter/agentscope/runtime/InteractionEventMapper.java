@@ -19,13 +19,15 @@ import io.agentscope.harness.agent.HarnessAgent;
 import java.util.List;
 import java.util.Map;
 
-/** InteractionEventMapper 仅转换自身负责的原生事件类型。 */
+/**
+ * InteractionEventMapper 仅转换自身负责的原生事件类型。
+ */
 final class InteractionEventMapper {
     /**
      * 映射交互事件映射器。
      *
      * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param source 待解析或转换的来源对象。
+     * @param source  待解析或转换的来源对象。
      * @return 本次操作返回的Agent运行时事件结果。
      */
     static AgentRuntimeEvent map(RuntimeEventMappingContext context, AgentEvent source) {
@@ -62,11 +64,11 @@ final class InteractionEventMapper {
                                                 // 展示失败不能导致待审批操作被执行或丢失。
                                                 notices.add(
                                                         event(
-                                                                        request,
-                                                                        AgentRuntimeEvent.Type
-                                                                                .EXECUTION_NOTICE,
-                                                                        "approval-display-"
-                                                                                + tool.getId())
+                                                                request,
+                                                                AgentRuntimeEvent.Type
+                                                                        .EXECUTION_NOTICE,
+                                                                "approval-display-"
+                                                                        + tool.getId())
                                                                 .text(
                                                                         "审批详情展示出现异常，已使用基础信息展示，操作仍需确认。")
                                                                 .status("error")
@@ -96,7 +98,7 @@ final class InteractionEventMapper {
                                             result ->
                                                     Map.of(
                                                             "toolCallId",
-                                                                    result.getToolCall().getId(),
+                                                            result.getToolCall().getId(),
                                                             "approved", result.isConfirmed()))
                                     .toList())
                     .build();

@@ -59,13 +59,20 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-/** AgentScope、模型、工具和基础设施适配器的组装工厂。 */
+/**
+ * AgentScope、模型、工具和基础设施适配器的组装工厂。
+ */
 public final class AgentRuntimeFactory {
-    /** Agent键的固定取值，用于相应策略和边界判断。 */
+    /**
+     * Agent键的固定取值，用于相应策略和边界判断。
+     */
     public static final String AGENT_KEY = AgentProperties.AGENT_KEY;
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private AgentRuntimeFactory() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private AgentRuntimeFactory() {
+    }
 
     /**
      * 创建Agent运行时工厂。
@@ -73,7 +80,7 @@ public final class AgentRuntimeFactory {
      * @param assembly 当前Agent运行时工厂持有的组装对象，供相应处理步骤使用。
      * @return 本次操作返回的HarnessAgent运行时结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
-     * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
+     * @throws IllegalStateException    当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public static HarnessAgentRuntime create(RuntimeAssembly assembly) {
         AgentProperties properties = assembly.getProperties();
@@ -107,16 +114,16 @@ public final class AgentRuntimeFactory {
                 infrastructure == null
                         ? AgentModelFactory.primary(properties, contextProperties)
                         : AgentModelFactory.primary(
-                                properties, contextProperties, infrastructure.getModelTransport());
+                        properties, contextProperties, infrastructure.getModelTransport());
         Model compactionModel =
                 new ConfiguredCompactionModel(
                         infrastructure == null
                                 ? AgentModelFactory.compaction(properties, contextProperties, model)
                                 : AgentModelFactory.compaction(
-                                        properties,
-                                        contextProperties,
-                                        model,
-                                        infrastructure.getModelTransport()),
+                                properties,
+                                contextProperties,
+                                model,
+                                infrastructure.getModelTransport()),
                         contextProperties.getCompressionMaxOutputTokens(),
                         contextProperties.getCompressionTemperature(),
                         contextProperties.getCompressionTimeout(),
@@ -139,7 +146,7 @@ public final class AgentRuntimeFactory {
                 gateway == null
                         ? null
                         : AgentToolRegistry.registerGatewayTools(
-                                toolkit, gateway, gatewayProperties, descriptors);
+                        toolkit, gateway, gatewayProperties, descriptors);
 
         HarnessAgent.Builder builder =
                 HarnessAgent.builder()
@@ -147,8 +154,8 @@ public final class AgentRuntimeFactory {
                         .sysPrompt(
                                 systemPrompt(gatewayProperties)
                                         + (workspaceDocuments == null
-                                                ? ""
-                                                : "\n" + CloudMemoryRecallTools.POLICY))
+                                        ? ""
+                                        : "\n" + CloudMemoryRecallTools.POLICY))
                         .model(model)
                         .toolkit(toolkit)
                         .maxIters(properties.getMaxIters())
@@ -219,8 +226,8 @@ public final class AgentRuntimeFactory {
                 descriptors,
                 infrastructure == null
                         ? (workspaceDocuments == null
-                                ? null
-                                : new CloudMemoryService(workspaceDocuments))
+                        ? null
+                        : new CloudMemoryService(workspaceDocuments))
                         : infrastructure.getMemory(),
                 infrastructure == null ? null : infrastructure.getWebExtractClient());
         questionTool.set(agent.getToolkit().getTool("ask_user"));
@@ -308,23 +315,23 @@ public final class AgentRuntimeFactory {
         return "你是一个可靠、简洁的中文助手。回答用户问题，并在需要时使用工作区能力。"
                 + "工具调用超时或通信异常不代表业务没有执行，结果未确认时不重复写入，必要时请用户核实。"
                 + (gateway.mock()
-                        ? "当前是本地 Mock 演示模式，工具返回固定合成样本，未查询真实店铺或业务系统。"
-                                + "必须先加载匹配的 skill，再调用与任务匹配的已声明业务工具读取演示数据。"
-                                + "以工具声明的演示对象、可用日期和返回数据为准，不将样本冒充用户店铺的真实情况。"
-                                + "若用户未指定对象，可明确采用工具目录中给出的演示对象。"
-                                + "未提供 ask_user 能力时用文字澄清替代；需要答复时结束本轮等用户回答。"
-                                + "报告直接输出在对话中；不编造链接、图像证据或成功执行业务动作，不请求真实网关。"
-                        : gateway.configured()
-                                ? "业务能力由已声明的外部工具提供。若缺少 Provider 授权，明确说明配置缺失，"
-                                        + "不要用本地脚本或自行发送网络请求替代网关。"
-                                : "");
+                ? "当前是本地 Mock 演示模式，工具返回固定合成样本，未查询真实店铺或业务系统。"
+                + "必须先加载匹配的 skill，再调用与任务匹配的已声明业务工具读取演示数据。"
+                + "以工具声明的演示对象、可用日期和返回数据为准，不将样本冒充用户店铺的真实情况。"
+                + "若用户未指定对象，可明确采用工具目录中给出的演示对象。"
+                + "未提供 ask_user 能力时用文字澄清替代；需要答复时结束本轮等用户回答。"
+                + "报告直接输出在对话中；不编造链接、图像证据或成功执行业务动作，不请求真实网关。"
+                : gateway.configured()
+                ? "业务能力由已声明的外部工具提供。若缺少 Provider 授权，明确说明配置缺失，"
+                + "不要用本地脚本或自行发送网络请求替代网关。"
+                : "");
     }
 
     /**
      * 完成当前操作的configureScriptedRuntime步骤，按实现更新相应状态或依赖。
      *
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
-     * @param builder 当前Agent运行时工厂持有的构造器对象，供相应处理步骤使用。
+     * @param builder    当前Agent运行时工厂持有的构造器对象，供相应处理步骤使用。
      */
     private static void configureScriptedRuntime(
             AgentProperties properties, HarnessAgent.Builder builder) {
@@ -379,7 +386,7 @@ public final class AgentRuntimeFactory {
      * 确保提供方工具分组。
      *
      * @param toolkit 当前Agent运行时工厂持有的工具集对象，供相应处理步骤使用。
-     * @param group 当前Agent运行时工厂持有的分组对象，供相应处理步骤使用。
+     * @param group   当前Agent运行时工厂持有的分组对象，供相应处理步骤使用。
      */
     public static void ensureProviderToolGroup(Toolkit toolkit, ToolGroupDefinition group) {
         AgentToolRegistry.ensureProviderToolGroup(toolkit, group);

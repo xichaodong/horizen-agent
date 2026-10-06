@@ -40,7 +40,8 @@ import java.util.List;
 import java.util.Optional;
 
 class SandboxSnapshotCheckpointTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void uploadFailureProducesFailureInsteadOfSuccessfulTurn() {
@@ -136,11 +137,13 @@ class SandboxSnapshotCheckpointTest {
     }
 
     private static RuntimeContext bindings(String owner, boolean fail) {
-        SandboxState state = new SandboxState() {};
+        SandboxState state = new SandboxState() {
+        };
         state.setSessionId(owner);
         WorkspaceSnapshotRepository snapshots =
                 new WorkspaceSnapshotRepository() {
-                    public void upload(String id, InputStream archive) {}
+                    public void upload(String id, InputStream archive) {
+                    }
 
                     public InputStream download(String id) {
                         return InputStream.nullInputStream();
@@ -156,7 +159,7 @@ class SandboxSnapshotCheckpointTest {
                 (Sandbox)
                         Proxy.newProxyInstance(
                                 Sandbox.class.getClassLoader(),
-                                new Class[] {Sandbox.class},
+                                new Class[]{Sandbox.class},
                                 (proxy, method, args) -> {
                                     if (method.getName().equals("getState")) return state;
                                     if (method.getName().equals("stop") && fail)
@@ -175,7 +178,8 @@ class SandboxSnapshotCheckpointTest {
                         return sandbox;
                     }
 
-                    public void delete(Sandbox s) {}
+                    public void delete(Sandbox s) {
+                    }
 
                     public String serializeState(SandboxState s) {
                         return s.getSessionId();

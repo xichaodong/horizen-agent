@@ -100,8 +100,8 @@ class CrossInstanceInteractionRecoveryLiveTest {
                                             event ->
                                                     "done".equals(event.getType())
                                                             && event.getText()
-                                                                    .contains(
-                                                                            "scripted-tool:approved:approval cross instance")));
+                                                            .contains(
+                                                                    "scripted-tool:approved:approval cross instance")));
                     assertEquals(
                             "completed", second.sessionExecution(IDENTITY, sessionId).getStatus());
                     var history = first.sessionMessages(IDENTITY, sessionId);
@@ -110,13 +110,13 @@ class CrossInstanceInteractionRecoveryLiveTest {
                                     .noneMatch(
                                             item ->
                                                     "tool_input_delta"
-                                                                    .equals(
-                                                                            item.getEvent()
-                                                                                    .getType())
+                                                            .equals(
+                                                                    item.getEvent()
+                                                                            .getType())
                                                             || "tool_output_delta"
-                                                                    .equals(
-                                                                            item.getEvent()
-                                                                                    .getType())));
+                                                            .equals(
+                                                                    item.getEvent()
+                                                                            .getType())));
                     var tool =
                             history.getTimelineEvents().stream()
                                     .map(SessionApi.TimelineEventResponse::getEvent)
@@ -195,8 +195,8 @@ class CrossInstanceInteractionRecoveryLiveTest {
                                             event ->
                                                     "subagent_result".equals(event.getType())
                                                             && event.getText()
-                                                                    .contains(
-                                                                            "child delegated task")));
+                                                            .contains(
+                                                                    "child delegated task")));
                     assertTrue(
                             tree.stream()
                                     .anyMatch(event -> "subagent_end".equals(event.getType())));
@@ -206,7 +206,7 @@ class CrossInstanceInteractionRecoveryLiveTest {
                                             event ->
                                                     sessionId.equals(event.getParentSessionId())
                                                             && "general_worker"
-                                                                    .equals(event.getAgentId())));
+                                                            .equals(event.getAgentId())));
                     assertEquals(
                             1,
                             history.getTimelineEvents().stream()
@@ -298,8 +298,8 @@ class CrossInstanceInteractionRecoveryLiveTest {
                                             event ->
                                                     "done".equals(event.getType())
                                                             && event.getText()
-                                                                    .contains(
-                                                                            "approved:child approval delegated task")));
+                                                            .contains(
+                                                                    "approved:child approval delegated task")));
                     var history = first.sessionMessages(IDENTITY, sessionId);
                     assertEquals(
                             1,
@@ -308,11 +308,11 @@ class CrossInstanceInteractionRecoveryLiveTest {
                                             item ->
                                                     "tool_end".equals(item.getEvent().getType())
                                                             && "scripted-parent-action-call"
-                                                                    .equals(item.getEvent().getId())
+                                                            .equals(item.getEvent().getId())
                                                             && "success"
-                                                                    .equals(
-                                                                            item.getEvent()
-                                                                                    .getStatus()))
+                                                            .equals(
+                                                                    item.getEvent()
+                                                                            .getStatus()))
                                     .count());
                 });
     }
@@ -450,7 +450,7 @@ class CrossInstanceInteractionRecoveryLiveTest {
                                             event ->
                                                     "done".equals(event.getType())
                                                             && event.getText()
-                                                                    .contains("scripted-tool")));
+                                                            .contains("scripted-tool")));
                     assertEquals(
                             "completed", second.sessionExecution(IDENTITY, sessionId).getStatus());
                 });
@@ -520,14 +520,14 @@ class CrossInstanceInteractionRecoveryLiveTest {
         String turnId = "lost-turn-" + suffix;
         Instant now = Instant.now();
         try (RuntimeStorage lost =
-                RuntimeStorage.open(
-                        storageProperties(
-                                jdbcUrl,
-                                redisPrefix,
-                                "lost-instance",
-                                Duration.ofSeconds(30),
-                                Duration.ofMillis(50)),
-                        InMemoryWorkspaceContentRepository.shared("runtime-storage-tests"))) {
+                     RuntimeStorage.open(
+                             storageProperties(
+                                     jdbcUrl,
+                                     redisPrefix,
+                                     "lost-instance",
+                                     Duration.ofSeconds(30),
+                                     Duration.ofMillis(50)),
+                             InMemoryWorkspaceContentRepository.shared("runtime-storage-tests"))) {
             lost.getSessionTurns()
                     .startTurn(
                             new StartTurnCommand(
@@ -543,12 +543,12 @@ class CrossInstanceInteractionRecoveryLiveTest {
                                     now.minusSeconds(1)));
         }
         try (ConfigurableApplicationContext second =
-                host(
-                        jdbcUrl,
-                        redisPrefix,
-                        "instance-b",
-                        Duration.ofSeconds(1),
-                        Duration.ofMillis(50))) {
+                     host(
+                             jdbcUrl,
+                             redisPrefix,
+                             "instance-b",
+                             Duration.ofSeconds(1),
+                             Duration.ofMillis(50))) {
             AgentService service = second.getBean(AgentService.class);
             waitUntil(
                     () ->
@@ -569,7 +569,7 @@ class CrossInstanceInteractionRecoveryLiveTest {
                                             "error".equals(event.getType())
                                                     && event.getDetails() != null
                                                     && event.getDetails()
-                                                            .contains("EXECUTOR_LOST")));
+                                                    .contains("EXECUTOR_LOST")));
         }
     }
 
@@ -583,19 +583,19 @@ class CrossInstanceInteractionRecoveryLiveTest {
         new ResourceDatabasePopulator(new ClassPathResource("schema/mysql.sql"))
                 .execute(new DriverManagerDataSource(jdbcUrl, "sa", ""));
         try (ConfigurableApplicationContext first =
-                        host(
-                                jdbcUrl,
-                                redisPrefix,
-                                "instance-a",
-                                Duration.ofSeconds(30),
-                                Duration.ofSeconds(10));
-                ConfigurableApplicationContext second =
-                        host(
-                                jdbcUrl,
-                                redisPrefix,
-                                "instance-b",
-                                Duration.ofSeconds(30),
-                                Duration.ofSeconds(10))) {
+                     host(
+                             jdbcUrl,
+                             redisPrefix,
+                             "instance-a",
+                             Duration.ofSeconds(30),
+                             Duration.ofSeconds(10));
+             ConfigurableApplicationContext second =
+                     host(
+                             jdbcUrl,
+                             redisPrefix,
+                             "instance-b",
+                             Duration.ofSeconds(30),
+                             Duration.ofSeconds(10))) {
             scenario.run(
                     first.getBean(AgentService.class),
                     second.getBean(AgentService.class),
@@ -633,7 +633,7 @@ class CrossInstanceInteractionRecoveryLiveTest {
         properties.put("horizen.agent.sandbox.snapshot.bos.enabled", "false");
         properties.put("horizen.agent.artifact.bos.enabled", "false");
         return new SpringApplicationBuilder(
-                        AgentWebApplication.class, WorkspaceTestConfiguration.class)
+                AgentWebApplication.class, WorkspaceTestConfiguration.class)
                 .web(WebApplicationType.NONE)
                 .initializers(
                         context ->
@@ -685,7 +685,8 @@ class CrossInstanceInteractionRecoveryLiveTest {
     private static String askUserId(ChatApi.ChatStreamEvent event) {
         try {
             Map<String, Object> details =
-                    JSON.readValue(event.getDetails(), new TypeReference<Map<String, Object>>() {});
+                    JSON.readValue(event.getDetails(), new TypeReference<Map<String, Object>>() {
+                    });
             Object askUserId = details.get("askUserId");
             if (askUserId == null || askUserId.toString().isBlank()) {
                 throw new IllegalStateException("ask_user event has no askUserId");

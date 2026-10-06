@@ -22,43 +22,59 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** 仅提取显式展示信封，不将普通工具 JSON 猜测为界面内容。 */
+/**
+ * 仅提取显式展示信封，不将普通工具 JSON 猜测为界面内容。
+ */
 public final class PresentationToolResultMapper {
-    /** 当前Schema版本的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 当前Schema版本的固定取值，用于相应策略和边界判断。
+     */
     public static final int CURRENT_SCHEMA_VERSION = 1;
 
-    /** 最大块集合的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大块集合的固定取值，用于相应策略和边界判断。
+     */
     public static final int MAX_BLOCKS = 32;
 
-    /** 最大呈现字节的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 最大呈现字节的固定取值，用于相应策略和边界判断。
+     */
     public static final int MAX_PRESENTATION_BYTES = 256 * 1024;
 
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 日志的固定取值，用于相应策略和边界判断。 */
+    /**
+     * 日志的固定取值，用于相应策略和边界判断。
+     */
     private static final System.Logger LOG =
             System.getLogger(PresentationToolResultMapper.class.getName());
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private PresentationToolResultMapper() {}
-
     /**
-     * 提取呈现工具结果映射器。
-     *
-     * @param result 本次处理已有的结果。
-     * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
-     * @return 本次处理得到的结果集合。
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
      */
-    public static List<PresentationBlock> extract(ToolResultBlock result, String toolCallId) {
-        return extract(result, toolCallId, () -> {});
+    private PresentationToolResultMapper() {
     }
 
     /**
      * 提取呈现工具结果映射器。
      *
-     * @param result 本次处理已有的结果。
+     * @param result     本次处理已有的结果。
      * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
+     * @return 本次处理得到的结果集合。
+     */
+    public static List<PresentationBlock> extract(ToolResultBlock result, String toolCallId) {
+        return extract(result, toolCallId, () -> {
+        });
+    }
+
+    /**
+     * 提取呈现工具结果映射器。
+     *
+     * @param result                本次处理已有的结果。
+     * @param toolCallId            一次工具调用的标识，用于配对参数、结果和审批事件。
      * @param onInvalidPresentation 需要在当前执行边界内运行的工作回调。
      * @return 本次处理得到的结果集合。
      */
@@ -66,7 +82,7 @@ public final class PresentationToolResultMapper {
             ToolResultBlock result, String toolCallId, Runnable onInvalidPresentation) {
         if (result == null
                 || (result.getState() != ToolResultState.SUCCESS
-                        && result.getState() != ToolResultState.RUNNING)) return List.of();
+                && result.getState() != ToolResultState.RUNNING)) return List.of();
         String text =
                 result.getOutput().stream()
                         .filter(TextBlock.class::isInstance)
@@ -99,7 +115,7 @@ public final class PresentationToolResultMapper {
     /**
      * 解析协议包。
      *
-     * @param envelope 当前呈现工具结果映射器持有的协议包对象，供相应处理步骤使用。
+     * @param envelope   当前呈现工具结果映射器持有的协议包对象，供相应处理步骤使用。
      * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
      * @return 本次处理得到的结果集合。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -149,8 +165,8 @@ public final class PresentationToolResultMapper {
      * 生成当前操作所需的stableId文本，供调用方继续处理。
      *
      * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
-     * @param index 当前呈现工具结果映射器使用的索引，供其处理与状态记录使用。
-     * @param block 当前呈现工具结果映射器持有的块对象，供相应处理步骤使用。
+     * @param index      当前呈现工具结果映射器使用的索引，供其处理与状态记录使用。
+     * @param block      当前呈现工具结果映射器持有的块对象，供相应处理步骤使用。
      * @return 本次处理生成或读取的文本。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */

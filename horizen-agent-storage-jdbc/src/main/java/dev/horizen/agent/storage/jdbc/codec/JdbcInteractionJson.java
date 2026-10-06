@@ -6,13 +6,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import dev.horizen.agent.common.json.JsonUtils;
 
-/** JDBC 适配器中按类型区分的不可变请求与可变响应信封。 */
+/**
+ * JDBC 适配器中按类型区分的不可变请求与可变响应信封。
+ */
 public final class JdbcInteractionJson {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private JdbcInteractionJson() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private JdbcInteractionJson() {
+    }
 
     /**
      * 编码JDBC交互JSON。
@@ -49,7 +56,7 @@ public final class JdbcInteractionJson {
      * 生成当前操作所需的text文本，供调用方继续处理。
      *
      * @param object 当前JDBC交互JSON持有的对象对象，供相应处理步骤使用。
-     * @param key 当前对象的查找或写入键。
+     * @param key    当前对象的查找或写入键。
      * @return 本次处理生成或读取的文本。
      */
     public static String text(ObjectNode object, String key) {

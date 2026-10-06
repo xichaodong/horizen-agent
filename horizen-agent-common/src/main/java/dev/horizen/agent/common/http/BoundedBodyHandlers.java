@@ -15,8 +15,11 @@ import java.util.concurrent.Flow;
  * 传输过程中终止过大的 HTTP 响应体，同时保留 HttpClient 截止时间与取消语义。
  */
 public final class BoundedBodyHandlers {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private BoundedBodyHandlers() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private BoundedBodyHandlers() {
+    }
 
     /**
      * 计算或取得本方法声明的结果，供当前BoundedBodyHandlers处理步骤使用。
@@ -45,23 +48,35 @@ public final class BoundedBodyHandlers {
                         value -> new String(value, StandardCharsets.UTF_8));
     }
 
-    /** 有界正文Handlers内部的受限订阅者，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 有界正文Handlers内部的受限订阅者，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     private static final class LimitedSubscriber implements HttpResponse.BodySubscriber<byte[]> {
-        /** 被包装的原始实现，由本组件补充隔离、观测或恢复行为。 */
+        /**
+         * 被包装的原始实现，由本组件补充隔离、观测或恢复行为。
+         */
         private final HttpResponse.BodySubscriber<byte[]> delegate =
                 HttpResponse.BodySubscribers.ofByteArray();
 
-        /** 最大的字节数，用于容量或传输限制。 */
+        /**
+         * 最大的字节数，用于容量或传输限制。
+         */
         private final long maximumBytes;
 
-        /** 当前响应或事件输入流的订阅，取消时终止后续数据接收。 */
+        /**
+         * 当前响应或事件输入流的订阅，取消时终止后续数据接收。
+         */
         private Flow.Subscription subscription;
 
-        /** 当前响应已经接收的字节数，用于检查读取容量。 */
+        /**
+         * 当前响应已经接收的字节数，用于检查读取容量。
+         */
         private long received;
 
-        /** done的状态标记，用于选择当前组件的处理路径。 */
+        /**
+         * done的状态标记，用于选择当前组件的处理路径。
+         */
         private boolean done;
 
         /**
@@ -116,7 +131,9 @@ public final class BoundedBodyHandlers {
             delegate.onError(error);
         }
 
-        /** 响应Complete。 */
+        /**
+         * 响应Complete。
+         */
         @Override
         public void onComplete() {
             if (done) return;

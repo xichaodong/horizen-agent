@@ -97,14 +97,15 @@ class ArtifactHistoryRecoveryTest {
                     }
 
                     public byte[] get(String ref) {
-                        return new byte[] {1, 2, 3};
+                        return new byte[]{1, 2, 3};
                     }
 
                     public URI createDownloadUrl(String ref, int seconds) {
                         return URI.create("https://assets.example/test");
                     }
 
-                    public void delete(String ref) {}
+                    public void delete(String ref) {
+                    }
                 };
         new ArtifactTurnInputService(artifacts, content)
                 .resolve("owner", "session", "turn", List.of("file-a"), false, 1, 1024, 1024, 60);

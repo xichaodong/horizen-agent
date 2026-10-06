@@ -11,10 +11,14 @@ import lombok.RequiredArgsConstructor;
 import java.net.URI;
 import java.util.Map;
 
-/** BCE Java SDK 的 BOS 调用实现。 */
+/**
+ * BCE Java SDK 的 BOS 调用实现。
+ */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class BceBosObjectClient implements BosObjectClient {
-    /** 当前适配器使用的远端客户端，供实际网络或服务请求使用。 */
+    /**
+     * 当前适配器使用的远端客户端，供实际网络或服务请求使用。
+     */
     private final BosClient client;
 
     /**
@@ -34,10 +38,10 @@ final class BceBosObjectClient implements BosObjectClient {
     /**
      * 写入BCEBOS对象客户端。
      *
-     * @param bucket 对象存储桶名称，限定内容对象的存储位置。
-     * @param key 当前对象的查找或写入键。
-     * @param content 当前记录或资源的正文内容；与资源标识和存储引用分开保存。
-     * @param mediaType 当前BCEBOS对象客户端使用的媒体类型，供其处理与状态记录使用。
+     * @param bucket         对象存储桶名称，限定内容对象的存储位置。
+     * @param key            当前对象的查找或写入键。
+     * @param content        当前记录或资源的正文内容；与资源标识和存储引用分开保存。
+     * @param mediaType      当前BCEBOS对象客户端使用的媒体类型，供其处理与状态记录使用。
      * @param checksumSha256 内容的 SHA-256 校验值，用于完整性校验。
      */
     @Override
@@ -54,7 +58,7 @@ final class BceBosObjectClient implements BosObjectClient {
      * 读取BCEBOS对象客户端。
      *
      * @param bucket 对象存储桶名称，限定内容对象的存储位置。
-     * @param key 当前对象的查找或写入键。
+     * @param key    当前对象的查找或写入键。
      * @return 本次处理取得或生成的内容字节。
      */
     @Override
@@ -65,8 +69,8 @@ final class BceBosObjectClient implements BosObjectClient {
     /**
      * 创建下载URL。
      *
-     * @param bucket 对象存储桶名称，限定内容对象的存储位置。
-     * @param key 当前对象的查找或写入键。
+     * @param bucket           对象存储桶名称，限定内容对象的存储位置。
+     * @param key              当前对象的查找或写入键。
      * @param expiresInSeconds 资源访问的有效时长，单位为秒。
      * @return 本次操作返回的URI结果。
      */
@@ -79,7 +83,7 @@ final class BceBosObjectClient implements BosObjectClient {
      * 删除BCEBOS对象客户端。
      *
      * @param bucket 对象存储桶名称，限定内容对象的存储位置。
-     * @param key 当前对象的查找或写入键。
+     * @param key    当前对象的查找或写入键。
      */
     @Override
     public void delete(String bucket, String key) {

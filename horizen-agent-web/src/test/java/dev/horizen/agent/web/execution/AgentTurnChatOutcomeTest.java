@@ -37,12 +37,12 @@ class AgentTurnChatOutcomeTest {
                         Flux.just(event(Type.TURN_STARTED))
                                 .concatWith(Flux.error(new IllegalStateException(detail))));
         try (var coordinator =
-                new AgentTurnCoordinator(
-                        Duration.ofSeconds(1),
-                        Optional.of(services),
-                        new AgentApiMapper(false),
-                        mock(AgentSessionApiService.class),
-                        text -> text.replace("synthetic-private-key", "***"))) {
+                     new AgentTurnCoordinator(
+                             Duration.ofSeconds(1),
+                             Optional.of(services),
+                             new AgentApiMapper(false),
+                             mock(AgentSessionApiService.class),
+                             text -> text.replace("synthetic-private-key", "***"))) {
             var error = assertThrows(ApiException.class, () -> coordinator.chat(identity, request));
             var response = new ApiExceptionHandler().handleApiException(error);
             assertEquals(HttpStatus.BAD_GATEWAY, response.getStatusCode());

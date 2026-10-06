@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 class ReadOnlyAgentsMdBaseStoreTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void readsPublishedAgentsMdButRejectsAgentMutations() {

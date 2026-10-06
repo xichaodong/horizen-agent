@@ -17,7 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.UUID;
 
-/** 真实 BOS 验证；只在显式传入凭证并开启开关时运行。 */
+/**
+ * 真实 BOS 验证；只在显式传入凭证并开启开关时运行。
+ */
 @EnabledIfSystemProperty(named = "horizen.bos.live", matches = "true")
 class BosArtifactContentStoreLiveTest {
     @Test

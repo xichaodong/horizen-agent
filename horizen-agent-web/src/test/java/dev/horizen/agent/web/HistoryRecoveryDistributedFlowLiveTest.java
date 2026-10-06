@@ -28,28 +28,30 @@ import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
-/** 验证 Redis 状态丢失后，可从 JDBC 对话记录恢复已完成的对话。 */
+/**
+ * 验证 Redis 状态丢失后，可从 JDBC 对话记录恢复已完成的对话。
+ */
 @EnabledIfSystemProperty(named = "horizen.redis.live", matches = "true")
 @Import(WorkspaceTestConfiguration.class)
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = {
-            "horizen.agent.model-mode=SCRIPTED",
-            "horizen.agent.storage.mode=DISTRIBUTED",
-            "horizen.agent.storage.jdbc-username=sa",
-            "horizen.agent.storage.jdbc-password=",
-            "horizen.agent.storage.redis-url=redis://127.0.0.1:6379",
-            "horizen.agent.storage.redis-key-prefix=horizen-history-recovery-test:",
-            "horizen.agent.storage.instance-id=history-recovery-instance",
-            "horizen.agent.gateway.mode=remote",
-            "horizen.agent.gateway.url=",
-            "horizen.agent.gateway.token=",
-            "horizen.trace.enabled=false",
-            "horizen.agent.skill-release.enabled=false",
-            "horizen.agent.workspace-release.enabled=false",
-            "horizen.agent.sandbox.e2b.enabled=false",
-            "horizen.agent.sandbox.snapshot.bos.enabled=false",
-            "horizen.agent.artifact.bos.enabled=false"
+                "horizen.agent.model-mode=SCRIPTED",
+                "horizen.agent.storage.mode=DISTRIBUTED",
+                "horizen.agent.storage.jdbc-username=sa",
+                "horizen.agent.storage.jdbc-password=",
+                "horizen.agent.storage.redis-url=redis://127.0.0.1:6379",
+                "horizen.agent.storage.redis-key-prefix=horizen-history-recovery-test:",
+                "horizen.agent.storage.instance-id=history-recovery-instance",
+                "horizen.agent.gateway.mode=remote",
+                "horizen.agent.gateway.url=",
+                "horizen.agent.gateway.token=",
+                "horizen.trace.enabled=false",
+                "horizen.agent.skill-release.enabled=false",
+                "horizen.agent.workspace-release.enabled=false",
+                "horizen.agent.sandbox.e2b.enabled=false",
+                "horizen.agent.sandbox.snapshot.bos.enabled=false",
+                "horizen.agent.artifact.bos.enabled=false"
         })
 class HistoryRecoveryDistributedFlowLiveTest {
     private static final String DATABASE =
@@ -63,7 +65,8 @@ class HistoryRecoveryDistributedFlowLiveTest {
             "horizen-history-recovery-test:" + UUID.randomUUID() + ":";
     private static final String REDIS_PREFIX = REDIS_ROOT + "session:";
 
-    @Autowired private AgentService service;
+    @Autowired
+    private AgentService service;
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {

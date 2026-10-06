@@ -9,35 +9,49 @@ import dev.horizen.agent.web.config.WorkspaceStorageProperties;
 
 import java.util.function.Function;
 
-/** 集中应用所有已配置适配器的敏感信息脱敏规则。 */
+/**
+ * 集中应用所有已配置适配器的敏感信息脱敏规则。
+ */
 public final class AgentSecretRedactor implements Function<String, String> {
-    /** 当前配置的 Agent 实例，承担模型与工具循环执行。 */
+    /**
+     * 当前配置的 Agent 实例，承担模型与工具循环执行。
+     */
     private final AgentProperties agent;
 
-    /** 外部工具目录与调用的网关适配器。 */
+    /**
+     * 外部工具目录与调用的网关适配器。
+     */
     private final GatewayProperties gateway;
 
-    /** 当前观测服务配置，用于识别需要清理的服务凭据。 */
+    /**
+     * 当前观测服务配置，用于识别需要清理的服务凭据。
+     */
     private final HorizenProperties horizen;
 
-    /** 沙箱启用与隔离参数配置。 */
+    /**
+     * 沙箱启用与隔离参数配置。
+     */
     private final E2bSandboxProperties sandbox;
 
-    /** 当前工作区发布服务访问令牌，错误文本输出前需要脱敏。 */
+    /**
+     * 当前工作区发布服务访问令牌，错误文本输出前需要脱敏。
+     */
     private final String publicationToken;
 
-    /** 当前 Agent 使用的工作区配置或管理入口。 */
+    /**
+     * 当前 Agent 使用的工作区配置或管理入口。
+     */
     private final WorkspaceStorageProperties workspace;
 
     /**
      * 创建Agent密钥脱敏器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param gateway 外部工具目录与调用的网关适配器。
-     * @param horizen 当前Agent密钥脱敏器持有的Horizen对象，供相应处理步骤使用。
-     * @param sandbox 当前Agent密钥脱敏器持有的沙箱对象，供相应处理步骤使用。
+     * @param agent        当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param gateway      外部工具目录与调用的网关适配器。
+     * @param horizen      当前Agent密钥脱敏器持有的Horizen对象，供相应处理步骤使用。
+     * @param sandbox      当前Agent密钥脱敏器持有的沙箱对象，供相应处理步骤使用。
      * @param publications 当前Agent密钥脱敏器持有的发布集合对象，供相应处理步骤使用。
-     * @param workspace 当前Agent密钥脱敏器持有的工作区对象，供相应处理步骤使用。
+     * @param workspace    当前Agent密钥脱敏器持有的工作区对象，供相应处理步骤使用。
      */
     public AgentSecretRedactor(
             AgentProperties agent,

@@ -13,22 +13,28 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
-/** 只用于上下文摘要的模型包装，统一限制输出长度、随机性和调用超时。 */
+/**
+ * 只用于上下文摘要的模型包装，统一限制输出长度、随机性和调用超时。
+ */
 public final class ConfiguredCompactionModel implements Model {
-    /** 被包装的原始实现，由本组件补充隔离、观测或恢复行为。 */
+    /**
+     * 被包装的原始实现，由本组件补充隔离、观测或恢复行为。
+     */
     private final Model delegate;
 
-    /** 创建当前模型或沙箱对象时使用的默认策略配置。 */
+    /**
+     * 创建当前模型或沙箱对象时使用的默认策略配置。
+     */
     private final GenerateOptions defaults;
 
     /**
      * 创建已配置压缩模型，初始化该组件所需的状态、配置或依赖。
      *
-     * @param delegate 被包装的原始实现，由本组件补充隔离、观测或恢复行为。
+     * @param delegate        被包装的原始实现，由本组件补充隔离、观测或恢复行为。
      * @param maxOutputTokens 最大输出的 token 数量或预算。
-     * @param temperature 当前已配置压缩模型使用的temperature，供其处理与状态记录使用。
-     * @param timeout 本次等待允许持续的最长时间。
-     * @param maxAttempts 当前已配置压缩模型使用的最大尝试次数，供其处理与状态记录使用。
+     * @param temperature     当前已配置压缩模型使用的temperature，供其处理与状态记录使用。
+     * @param timeout         本次等待允许持续的最长时间。
+     * @param maxAttempts     当前已配置压缩模型使用的最大尝试次数，供其处理与状态记录使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public ConfiguredCompactionModel(
@@ -68,8 +74,8 @@ public final class ConfiguredCompactionModel implements Model {
      * 产生执行流并返回已配置压缩模型。
      *
      * @param messages 消息集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param tools 工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
-     * @param options 可供当前请求选择的选项或策略集合。
+     * @param tools    工具集合的有序集合，保留当前组件处理或协议输出所需的顺序。
+     * @param options  可供当前请求选择的选项或策略集合。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override

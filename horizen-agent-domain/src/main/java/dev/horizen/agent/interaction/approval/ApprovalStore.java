@@ -2,7 +2,9 @@ package dev.horizen.agent.interaction.approval;
 
 import java.util.List;
 
-/** 产品审批记录的持久化边界。 */
+/**
+ * 产品审批记录的持久化边界。
+ */
 public interface ApprovalStore {
 
     /**
@@ -15,9 +17,9 @@ public interface ApprovalStore {
     /**
      * 查找待处理。
      *
-     * @param ownerKey 宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
+     * @param ownerKey  宿主提供的不透明数据隔离键；与会话标识一起定位数据，不解释为业务账号。
      * @param sessionId 会话标识；同名会话在不同 ownerKey 下属于不同的隔离范围。
-     * @param turnId 单次用户输入触发的执行标识，用于关联状态、消息和事件。
+     * @param turnId    单次用户输入触发的执行标识，用于关联状态、消息和事件。
      * @return 本次处理得到的结果集合。
      */
     List<ApprovalRequest> findPending(String ownerKey, String sessionId, String turnId);

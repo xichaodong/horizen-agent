@@ -32,16 +32,16 @@ class StoredIdentityBoundaryTest {
         assertEquals(
                 max,
                 new StartTurnCommand(
-                                identity,
-                                max,
-                                max,
-                                max,
-                                max,
-                                max,
-                                "hello",
-                                now,
-                                now.plusSeconds(30),
-                                now.plusSeconds(10))
+                        identity,
+                        max,
+                        max,
+                        max,
+                        max,
+                        max,
+                        "hello",
+                        now,
+                        now.plusSeconds(30),
+                        now.plusSeconds(10))
                         .getSessionId());
         String tooLong = "a".repeat(192);
         assertThrows(

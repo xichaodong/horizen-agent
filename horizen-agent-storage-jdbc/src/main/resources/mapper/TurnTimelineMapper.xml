@@ -7,16 +7,16 @@
         resultType="java.lang.String"
     >
         SELECT
-            record_id
+        record_id
         FROM
-            ha_conversation_history
+        ha_conversation_history
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND turn_id = #{turnId}
-            AND record_type = 'MESSAGE'
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND turn_id = #{turnId}
+        AND record_type = 'MESSAGE'
         ORDER BY
-            message_sequence DESC
+        message_sequence DESC
     </select>
 
     <select
@@ -24,30 +24,30 @@
         resultType="java.lang.String"
     >
         SELECT
-            payload_json
+        payload_json
         FROM
-            ha_conversation_history
+        ha_conversation_history
         WHERE
-            owner_key = #{ownerKey}
-            AND record_type = #{recordType}
-            AND record_id = #{recordId}
-            AND session_id = #{sessionId}
-            AND turn_id = #{turnId}
+        owner_key = #{ownerKey}
+        AND record_type = #{recordType}
+        AND record_id = #{recordId}
+        AND session_id = #{sessionId}
+        AND turn_id = #{turnId}
     </select>
 
     <update id="attachTimelineEvent">
         UPDATE ha_conversation_history
         SET
-            timeline_sequence = history_sequence,
-            timeline_payload_json = #{timelinePayloadJson},
-            timeline_created_at = #{timelineCreatedAt}
+        timeline_sequence = history_sequence,
+        timeline_payload_json = #{timelinePayloadJson},
+        timeline_created_at = #{timelineCreatedAt}
         WHERE
-            owner_key = #{ownerKey}
-            AND record_type = #{recordType}
-            AND record_id = #{recordId}
-            AND session_id = #{sessionId}
-            AND turn_id = #{turnId}
-            AND timeline_sequence IS NULL
+        owner_key = #{ownerKey}
+        AND record_type = #{recordType}
+        AND record_id = #{recordId}
+        AND session_id = #{sessionId}
+        AND turn_id = #{turnId}
+        AND timeline_sequence IS NULL
     </update>
 
     <select
@@ -55,16 +55,16 @@
         resultType="dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow"
     >
         SELECT
-            *,
-            COALESCE(timeline_sequence, history_sequence) AS event_sequence
+        *,
+        COALESCE(timeline_sequence, history_sequence) AS event_sequence
         FROM
-            ha_conversation_history
+        ha_conversation_history
         WHERE
-            owner_key = #{ownerKey}
-            AND record_type = #{recordType}
-            AND record_id = #{recordId}
-            AND session_id = #{sessionId}
-            AND turn_id = #{turnId}
+        owner_key = #{ownerKey}
+        AND record_type = #{recordType}
+        AND record_id = #{recordId}
+        AND session_id = #{sessionId}
+        AND turn_id = #{turnId}
     </select>
 
     <select
@@ -72,19 +72,19 @@
         resultType="dev.horizen.agent.storage.jdbc.model.ConversationHistoryRow"
     >
         SELECT
-            *,
-            COALESCE(timeline_sequence, history_sequence) AS event_sequence
+        *,
+        COALESCE(timeline_sequence, history_sequence) AS event_sequence
         FROM
-            ha_conversation_history
+        ha_conversation_history
         WHERE
-            owner_key = #{ownerKey}
-            AND session_id = #{sessionId}
-            AND (
-                record_type = 'EVENT'
-                OR timeline_sequence IS NOT NULL
-            )
+        owner_key = #{ownerKey}
+        AND session_id = #{sessionId}
+        AND (
+        record_type = 'EVENT'
+        OR timeline_sequence IS NOT NULL
+        )
         ORDER BY
-            event_sequence
+        event_sequence
     </select>
     <insert
         id="insertEvent"
@@ -93,26 +93,26 @@
         keyColumn="history_sequence"
     >
         INSERT INTO
-            ha_conversation_history (
-                owner_key,
-                session_id,
-                turn_id,
-                record_type,
-                record_id,
-                payload_json,
-                created_at,
-                updated_at
-            )
+        ha_conversation_history (
+        owner_key,
+        session_id,
+        turn_id,
+        record_type,
+        record_id,
+        payload_json,
+        created_at,
+        updated_at
+        )
         VALUES
-            (
-                #{row.ownerKey},
-                #{row.sessionId},
-                #{row.turnId},
-                'EVENT',
-                #{row.recordId},
-                #{row.payloadJson},
-                #{row.createdAt},
-                #{row.updatedAt}
-            )
+        (
+        #{row.ownerKey},
+        #{row.sessionId},
+        #{row.turnId},
+        'EVENT',
+        #{row.recordId},
+        #{row.payloadJson},
+        #{row.createdAt},
+        #{row.updatedAt}
+        )
     </insert>
 </mapper>

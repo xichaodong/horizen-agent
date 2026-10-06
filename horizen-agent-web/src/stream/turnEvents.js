@@ -1,5 +1,5 @@
-import { finishTool, appendToolOutput, finishSubagent } from '../toolHistory.js';
-import { taskIdFromOutput, createId, withoutMockLabel } from '../utils/chat.js';
+import {finishTool, appendToolOutput, finishSubagent} from '../toolHistory.js';
+import {taskIdFromOutput, createId, withoutMockLabel} from '../utils/chat.js';
 
 /** 创建按会话和过程记录标识更新活动项的函数，保留已有工具输入与输出。 */
 export function createActivityUpdater(updateSession) {
@@ -36,18 +36,18 @@ export function createActivityUpdater(updateSession) {
 
 /** 将执行事件投影为消息、工具过程和交互卡片，维护会话级游标与执行身份。 */
 export function createTurnEventProcessor({
-    upsertActivity,
-    updateSession,
-    streamSequencesRef,
-    turnIdsRef,
-    queueTextDelta,
-    loadSubtasks,
-    appendMessage,
-    upsertPresentation,
-    loadApprovals,
-    flushQueuedText,
-    clearQueuedText,
-}) {
+                                             upsertActivity,
+                                             updateSession,
+                                             streamSequencesRef,
+                                             turnIdsRef,
+                                             queueTextDelta,
+                                             loadSubtasks,
+                                             appendMessage,
+                                             upsertPresentation,
+                                             loadApprovals,
+                                             flushQueuedText,
+                                             clearQueuedText,
+                                         }) {
     const updateSubagentExecution = (sessionId, assistantMessageId, event, updater) => {
         const executionId = event.taskId || event.source || event.agentId || event.id;
         const messageId = `subagent-execution-${executionId}`;
@@ -56,19 +56,19 @@ export function createTurnEventProcessor({
             const current =
                 index < 0
                     ? {
-                          id: messageId,
-                          role: 'subagent_execution',
-                          turnId: assistantMessageId,
-                          executionId,
-                          source: event.source,
-                          taskId: event.taskId,
-                          parentSessionId: event.parentSessionId,
-                          agentId: event.agentId,
-                          depth: event.depth || 1,
-                          status: 'running',
-                          startedAt: Date.now(),
-                          steps: [],
-                      }
+                        id: messageId,
+                        role: 'subagent_execution',
+                        turnId: assistantMessageId,
+                        executionId,
+                        source: event.source,
+                        taskId: event.taskId,
+                        parentSessionId: event.parentSessionId,
+                        agentId: event.agentId,
+                        depth: event.depth || 1,
+                        status: 'running',
+                        startedAt: Date.now(),
+                        steps: [],
+                    }
                     : session.messages[index];
             const next = updater({
                 ...current,
@@ -85,8 +85,8 @@ export function createTurnEventProcessor({
                     index < 0
                         ? [...session.messages, next]
                         : session.messages.map((message, messageIndex) =>
-                              messageIndex === index ? next : message
-                          ),
+                            messageIndex === index ? next : message
+                        ),
             };
         });
     };
@@ -98,14 +98,14 @@ export function createTurnEventProcessor({
             const current =
                 index < 0
                     ? {
-                          id: stepId,
-                          role: 'activity',
-                          activityType: kind,
-                          title: event.title || (kind === 'tool' ? '调用工具' : '分析与推理'),
-                          toolName: event.toolName,
-                          status: 'running',
-                          startedAt: Date.now(),
-                      }
+                        id: stepId,
+                        role: 'activity',
+                        activityType: kind,
+                        title: event.title || (kind === 'tool' ? '调用工具' : '分析与推理'),
+                        toolName: event.toolName,
+                        status: 'running',
+                        startedAt: Date.now(),
+                    }
                     : execution.steps[index];
             const next = updater(current);
             return {
@@ -114,8 +114,8 @@ export function createTurnEventProcessor({
                     index < 0
                         ? [...(execution.steps || []), next]
                         : execution.steps.map((step, stepIndex) =>
-                              stepIndex === index ? next : step
-                          ),
+                            stepIndex === index ? next : step
+                        ),
             };
         });
     };
@@ -219,7 +219,7 @@ export function createTurnEventProcessor({
         }
     };
 
-    const applyTurnEvent = (sessionId, assistantMessageId, event, options = { animate: true }) => {
+    const applyTurnEvent = (sessionId, assistantMessageId, event, options = {animate: true}) => {
         const streamSequence = Number(event.streamSequence);
         if (Number.isSafeInteger(streamSequence) && streamSequence > 0) {
             const previous = streamSequencesRef.current.get(sessionId) || 0;
@@ -307,22 +307,22 @@ export function createTurnEventProcessor({
                 const messages = exists
                     ? session.messages
                     : [
-                          ...session.messages,
-                          {
-                              id: assistantMessageId,
-                              role: 'assistant',
-                              turnId: assistantMessageId,
-                              content: '',
-                              isStreaming: true,
-                          },
-                      ];
-                if (options.animate) return { ...session, updatedAt: Date.now(), messages };
+                        ...session.messages,
+                        {
+                            id: assistantMessageId,
+                            role: 'assistant',
+                            turnId: assistantMessageId,
+                            content: '',
+                            isStreaming: true,
+                        },
+                    ];
+                if (options.animate) return {...session, updatedAt: Date.now(), messages};
                 return {
                     ...session,
                     updatedAt: Date.now(),
                     messages: messages.map((message) =>
                         message.id === assistantMessageId
-                            ? { ...message, content: `${message.content || ''}${delta}` }
+                            ? {...message, content: `${message.content || ''}${delta}`}
                             : message
                     ),
                 };
@@ -355,11 +355,11 @@ export function createTurnEventProcessor({
                 messages: session.messages.map((message) =>
                     message.id === `reasoning-${event.id}`
                         ? {
-                              ...message,
-                              status: event.status || 'success',
-                              details: event.details,
-                              durationMs: event.durationMs,
-                          }
+                            ...message,
+                            status: event.status || 'success',
+                            details: event.details,
+                            durationMs: event.durationMs,
+                        }
                         : message
                 ),
             }));
@@ -395,7 +395,7 @@ export function createTurnEventProcessor({
                     title: event.title || '调用工具',
                     toolName: event.toolName,
                 },
-                (message) => ({ ...message, input: `${message.input || ''}${event.details || ''}` })
+                (message) => ({...message, input: `${message.input || ''}${event.details || ''}`})
             );
         }
         if (event.type === 'tool_output_delta') {
@@ -424,7 +424,7 @@ export function createTurnEventProcessor({
                     updateSession(sessionId, (session) =>
                         session.messages.some((message) => message.id === card.id)
                             ? session
-                            : { ...session, messages: [...session.messages, card] }
+                            : {...session, messages: [...session.messages, card]}
                     );
                     loadSubtasks(sessionId);
                 }
@@ -460,8 +460,8 @@ export function createTurnEventProcessor({
                         updatedAt: Date.now(),
                         messages: exists
                             ? session.messages.map((message) =>
-                                  message.id === card.id ? { ...message, ...card } : message
-                              )
+                                message.id === card.id ? {...message, ...card} : message
+                            )
                             : [...session.messages, card],
                     };
                 });
@@ -508,7 +508,7 @@ export function createTurnEventProcessor({
                         updateSubagentStep(
                             sessionId,
                             assistantMessageId,
-                            { ...event, id: request.toolCallId, toolName: request.toolName },
+                            {...event, id: request.toolCallId, toolName: request.toolName},
                             'tool',
                             (step) => ({
                                 ...step,
@@ -576,8 +576,8 @@ export function createTurnEventProcessor({
                         updatedAt: Date.now(),
                         messages: exists
                             ? session.messages.map((message) =>
-                                  message.id === card.id ? { ...message, ...card } : message
-                              )
+                                message.id === card.id ? {...message, ...card} : message
+                            )
                             : [...session.messages, card],
                     };
                 });
@@ -595,7 +595,7 @@ export function createTurnEventProcessor({
                 ...session,
                 messages: session.messages.map((message) =>
                     message.role === 'ask_user' && message.askUserId === askUserId
-                        ? { ...message, status: 'resolved' }
+                        ? {...message, status: 'resolved'}
                         : message
                 ),
             }));
@@ -611,8 +611,8 @@ export function createTurnEventProcessor({
                     message.turnId === assistantMessageId && message.role === 'subagent_execution'
                         ? finishSubagent(message, cancelled ? 'cancelled' : 'error')
                         : message.turnId === assistantMessageId && message.status === 'running'
-                          ? { ...message, status: cancelled ? 'cancelled' : 'error' }
-                          : message
+                            ? {...message, status: cancelled ? 'cancelled' : 'error'}
+                            : message
                 ),
             }));
             upsertActivity(
@@ -646,7 +646,7 @@ export function createTurnEventProcessor({
                         message.role === 'subagent_execution'
                             ? finishSubagent(message, 'ended')
                             : message.turnId === assistantMessageId && message.status === 'running'
-                              ? {
+                                ? {
                                     ...message,
                                     status: 'success',
                                     durationMs:
@@ -654,7 +654,7 @@ export function createTurnEventProcessor({
                                             ? event.durationMs
                                             : message.durationMs,
                                 }
-                              : message
+                                : message
                     )
                     .filter(
                         (message) =>
@@ -701,13 +701,13 @@ export function createTurnEventProcessor({
                 title: restored
                     ? '连接已恢复'
                     : unknown
-                      ? '执行状态尚未确认'
-                      : '连接中断，正在恢复',
+                        ? '执行状态尚未确认'
+                        : '连接中断，正在恢复',
                 content: restored
                     ? '已恢复执行状态。'
                     : unknown
-                      ? '当前执行状态尚未确认，请重新加载会话查看结果。'
-                      : '正在恢复连接，当前任务状态尚未确认。',
+                        ? '当前执行状态尚未确认，请重新加载会话查看结果。'
+                        : '正在恢复连接，当前任务状态尚未确认。',
                 status: restored ? 'success' : unknown ? 'unknown' : 'running',
             })
         );
@@ -717,7 +717,7 @@ export function createTurnEventProcessor({
                 ...session,
                 executionStatus: 'unknown',
                 messages: session.messages.map((message) =>
-                    message.id === assistantMessageId ? { ...message, isStreaming: false } : message
+                    message.id === assistantMessageId ? {...message, isStreaming: false} : message
                 ),
             }));
         }

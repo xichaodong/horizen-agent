@@ -31,15 +31,23 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-/** 从宿主指定的样本文件读取离线、不可变的响应，不会执行任何真实业务操作。 */
+/**
+ * 从宿主指定的样本文件读取离线、不可变的响应，不会执行任何真实业务操作。
+ */
 public final class FixtureGateway implements GatewayBackend {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** NOTICE使用的固定标识或协议文本。 */
+    /**
+     * NOTICE使用的固定标识或协议文本。
+     */
     private static final String NOTICE = "模拟数据，仅用于测试 Skill 流程；未查询真实业务或执行任何操作。";
 
-    /** 工具集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 工具集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, FixtureTool> tools;
 
     /**
@@ -74,7 +82,8 @@ public final class FixtureGateway implements GatewayBackend {
             if (!entry.has("response")) {
                 throw invalidFixture("tool " + name + " is missing its response");
             }
-            Map<String, Object> inputSchema = JSON.convertValue(schema, new TypeReference<>() {});
+            Map<String, Object> inputSchema = JSON.convertValue(schema, new TypeReference<>() {
+            });
             ObjectNode metadata = JSON.createObjectNode();
             for (String field :
                     Set.of(
@@ -157,10 +166,10 @@ public final class FixtureGateway implements GatewayBackend {
     /**
      * 调用样本网关。
      *
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param context    当前执行上下文，提供关联标识和宿主绑定信息。
      * @param toolCallId 一次工具调用的标识，用于配对参数、结果和审批事件。
-     * @param toolName 可调用工具的注册名称，须与目录中声明的名称一致。
-     * @param input 本次处理的输入。
+     * @param toolName   可调用工具的注册名称，须与目录中声明的名称一致。
+     * @param input      本次处理的输入。
      * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
      */
     @Override
@@ -203,12 +212,13 @@ public final class FixtureGateway implements GatewayBackend {
      * 构造并返回当前操作所需的结果对象。
      *
      * @param status 当前记录或执行的状态，具体取值由所属领域或协议约定。
-     * @param body 当前样本网关持有的正文对象，供相应处理步骤使用。
+     * @param body   当前样本网关持有的正文对象，供相应处理步骤使用。
      * @return 本次操作返回的网关结果结果。
      */
     private static GatewayResult result(ProviderResultStatus status, JsonNode body) {
         return new GatewayResult(
-                status, JSON.convertValue(body, new TypeReference<Map<String, Object>>() {}));
+                status, JSON.convertValue(body, new TypeReference<Map<String, Object>>() {
+        }));
     }
 
     /**
@@ -229,7 +239,7 @@ public final class FixtureGateway implements GatewayBackend {
     /**
      * 计算或取得本方法声明的结果，供当前FixtureGateway处理步骤使用。
      *
-     * @param code 当前样本网关使用的代码，供其处理与状态记录使用。
+     * @param code    当前样本网关使用的代码，供其处理与状态记录使用。
      * @param message 用户输入、响应说明或诊断消息，含义由所属协议对象限定。
      * @return 本次操作返回的网关结果结果。
      */
@@ -266,30 +276,46 @@ public final class FixtureGateway implements GatewayBackend {
         }
     }
 
-    /** 样本网关内部的样本工具，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 样本网关内部的样本工具，封装该步骤需要的状态或输入输出。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     private static class FixtureTool {
-        /** 当前样本工具的名称，用于目录、调用或展示中的识别。 */
+        /**
+         * 当前样本工具的名称，用于目录、调用或展示中的识别。
+         */
         private String name;
 
-        /** 当前样本工具的用途说明，供目录或配置阅读者理解。 */
+        /**
+         * 当前样本工具的用途说明，供目录或配置阅读者理解。
+         */
         private String description;
 
-        /** 工具输入 JSON Schema，供参数校验与模型工具声明使用。 */
+        /**
+         * 工具输入 JSON Schema，供参数校验与模型工具声明使用。
+         */
         private Map<String, Object> inputSchema;
 
-        /** 工具目录声明的风险级别，供宿主执行治理使用。 */
+        /**
+         * 工具目录声明的风险级别，供宿主执行治理使用。
+         */
         private String riskLevel;
 
-        /** requires审批的状态标记，用于选择当前组件的处理路径。 */
+        /**
+         * requires审批的状态标记，用于选择当前组件的处理路径。
+         */
         private boolean requiresApproval;
 
-        /** 与当前对象关联的附加元数据，不替代领域状态或授权校验。 */
+        /**
+         * 与当前对象关联的附加元数据，不替代领域状态或授权校验。
+         */
         private ObjectNode metadata;
 
-        /** 本次协议调用或固定样本产生的返回结果。 */
+        /**
+         * 本次协议调用或固定样本产生的返回结果。
+         */
         private JsonNode response;
     }
 }

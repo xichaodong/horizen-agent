@@ -8,13 +8,20 @@ import dev.horizen.agent.evaluation.model.EvaluationCase;
 
 import java.util.*;
 
-/** 评测用例 JSON 的统一校验与解码边界。 */
+/**
+ * 评测用例 JSON 的统一校验与解码边界。
+ */
 final class EvaluationCaseParser {
-    /** 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。 */
+    /**
+     * 本组件独立的 JSON 编解码器，用于维护对应的持久化或协议格式。
+     */
     private static final ObjectMapper JSON = JsonUtils.newMapper();
 
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private EvaluationCaseParser() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private EvaluationCaseParser() {
+    }
 
     /**
      * 解析评测用例Parser。
@@ -29,19 +36,20 @@ final class EvaluationCaseParser {
         var steps =
                 ((List<?>) layer.get("steps"))
                         .stream()
-                                .map(raw -> JSON.convertValue(raw, EvaluationProtocol.Step.class))
-                                .toList();
+                        .map(raw -> JSON.convertValue(raw, EvaluationProtocol.Step.class))
+                        .toList();
         var interactions =
                 (layer.get("interactions") instanceof List<?> values ? values : List.of())
                         .stream()
-                                .map(
-                                        raw ->
-                                                JSON.convertValue(
-                                                        raw, EvaluationProtocol.Interaction.class))
-                                .toList();
+                        .map(
+                                raw ->
+                                        JSON.convertValue(
+                                                raw, EvaluationProtocol.Interaction.class))
+                        .toList();
         List<Map<String, Object>> faults = new ArrayList<>();
         for (Object raw : layer.get("faults") instanceof List<?> values ? values : List.of())
-            faults.add(JSON.convertValue(raw, new TypeReference<Map<String, Object>>() {}));
+            faults.add(JSON.convertValue(raw, new TypeReference<Map<String, Object>>() {
+            }));
         Map<String, Integer> limits = new LinkedHashMap<>();
         if (layer.get("maxLiveCalls") instanceof Map<?, ?> values)
             values.forEach(
@@ -104,8 +112,8 @@ final class EvaluationCaseParser {
                             "Only questions may be optional; approval must remain explicit");
                 if ("approval".equals(interaction.getType())
                         && (interaction.getApproved() == null
-                                || interaction.getToolNames() == null
-                                || interaction.getToolNames().isEmpty()))
+                        || interaction.getToolNames() == null
+                        || interaction.getToolNames().isEmpty()))
                     throw new IllegalArgumentException(
                             "Approval script requires explicit toolNames and approved");
             }

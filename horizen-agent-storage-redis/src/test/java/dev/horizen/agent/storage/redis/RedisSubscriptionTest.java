@@ -25,7 +25,7 @@ class RedisSubscriptionTest {
     @Test
     void deliversDeferredDemandWithoutWaitingForBlockingSubscribeToReturn() throws Exception {
         try (var commands = new JedisPooled("127.0.0.1", 1);
-                var pool = new FakePool()) {
+             var pool = new FakePool()) {
             var subscriber = new ManualSubscriber();
             bus(commands, pool).subscribe("turn").subscribe(subscriber);
             assertTrue(pool.connection.ready.await(2, TimeUnit.SECONDS));
@@ -44,7 +44,7 @@ class RedisSubscriptionTest {
     @Test
     void overflowClosesTheConnectionAndRetainsOnlyTheBoundedBacklog() throws Exception {
         try (var commands = new JedisPooled("127.0.0.1", 1);
-                var pool = new FakePool()) {
+             var pool = new FakePool()) {
             var subscriber = new ManualSubscriber();
             bus(commands, pool).subscribe("turn").subscribe(subscriber);
             assertTrue(pool.connection.ready.await(2, TimeUnit.SECONDS));
@@ -72,7 +72,8 @@ class RedisSubscriptionTest {
         volatile Throwable error;
 
         @Override
-        protected void hookOnSubscribe(Subscription subscription) {}
+        protected void hookOnSubscribe(Subscription subscription) {
+        }
 
         @Override
         protected void hookOnNext(Map<String, Object> value) {

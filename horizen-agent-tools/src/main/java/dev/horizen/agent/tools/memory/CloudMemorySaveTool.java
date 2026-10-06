@@ -13,18 +13,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/** 为 AgentScope 的本地、后写覆盖式 memory_save 工具提供适用于云端的替代实现。 */
+/**
+ * 为 AgentScope 的本地、后写覆盖式 memory_save 工具提供适用于云端的替代实现。
+ */
 public final class CloudMemorySaveTool extends ToolBase {
-    /** 当前归属范围内的记忆读取或写入服务。 */
+    /**
+     * 当前归属范围内的记忆读取或写入服务。
+     */
     private final CloudMemoryService memory;
 
-    /** 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。 */
+    /**
+     * 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
+     */
     private final String agentKey;
 
     /**
      * 创建云端记忆保存工具，初始化该组件所需的状态、配置或依赖。
      *
-     * @param memory 提供记忆能力的依赖，具体实现由当前组件的组装方传入。
+     * @param memory   提供记忆能力的依赖，具体实现由当前组件的组装方传入。
      * @param agentKey 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
      */
     public CloudMemorySaveTool(CloudMemoryService memory, String agentKey) {

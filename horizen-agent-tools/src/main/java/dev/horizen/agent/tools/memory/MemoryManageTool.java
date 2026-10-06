@@ -15,23 +15,31 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-/** 对经过整理的长期记忆执行精确匹配更新和删除。 */
+/**
+ * 对经过整理的长期记忆执行精确匹配更新和删除。
+ */
 public final class MemoryManageTool extends ToolBase {
-    /** 当前 Agent 使用的工作区配置或管理入口。 */
+    /**
+     * 当前 Agent 使用的工作区配置或管理入口。
+     */
     private final WorkspaceManager workspace;
 
-    /** 把跨会话记忆写入持久工作区文档的服务。 */
+    /**
+     * 把跨会话记忆写入持久工作区文档的服务。
+     */
     private final CloudMemoryService cloudMemory;
 
-    /** 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。 */
+    /**
+     * 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
+     */
     private final String agentKey;
 
     /**
      * 创建记忆管理工具，初始化该组件所需的状态、配置或依赖。
      *
-     * @param workspace 当前记忆管理工具持有的工作区对象，供相应处理步骤使用。
+     * @param workspace   当前记忆管理工具持有的工作区对象，供相应处理步骤使用。
      * @param cloudMemory 提供云端记忆能力的依赖，具体实现由当前组件的组装方传入。
-     * @param agentKey 宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
+     * @param agentKey    宿主约定的 Agent 标识，用于限定工作区、发布和记忆的归属。
      */
     public MemoryManageTool(
             WorkspaceManager workspace, CloudMemoryService cloudMemory, String agentKey) {
@@ -46,17 +54,17 @@ public final class MemoryManageTool extends ToolBase {
                                         "properties",
                                         Map.of(
                                                 "current",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "description",
-                                                                "要替换或删除的完整原文"),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "description",
+                                                        "要替换或删除的完整原文"),
                                                 "replacement",
-                                                        Map.of(
-                                                                "type",
-                                                                "string",
-                                                                "description",
-                                                                "新内容；空字符串表示遗忘")),
+                                                Map.of(
+                                                        "type",
+                                                        "string",
+                                                        "description",
+                                                        "新内容；空字符串表示遗忘")),
                                         "required",
                                         List.of("current", "replacement"),
                                         "additionalProperties",

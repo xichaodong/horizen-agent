@@ -7,12 +7,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** 线程安全的工具执行元数据和当前宿主可用性来源。 */
+/**
+ * 线程安全的工具执行元数据和当前宿主可用性来源。
+ */
 public final class ToolDescriptorRegistry {
-    /** 描述集合的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 描述集合的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, ToolDescriptor> descriptors = new ConcurrentHashMap<>();
 
-    /** 可用性的索引映射，供按键查找或归并当前组件的数据。 */
+    /**
+     * 可用性的索引映射，供按键查找或归并当前组件的数据。
+     */
     private final Map<String, Availability> availability = new ConcurrentHashMap<>();
 
     /**
@@ -63,9 +69,9 @@ public final class ToolDescriptorRegistry {
     /**
      * 设置可用性。
      *
-     * @param name 需要定位或处理的名称。
+     * @param name      需要定位或处理的名称。
      * @param available 可用的状态标记，用于选择当前组件的处理路径。
-     * @param reason 当前工具描述注册表使用的原因，供其处理与状态记录使用。
+     * @param reason    当前工具描述注册表使用的原因，供其处理与状态记录使用。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     public void setAvailability(String name, boolean available, String reason) {
@@ -85,13 +91,19 @@ public final class ToolDescriptorRegistry {
         return value == null ? "not_registered" : value.reason;
     }
 
-    /** 工具描述注册表内部的可用性，封装该步骤需要的状态或输入输出。 */
+    /**
+     * 工具描述注册表内部的可用性，封装该步骤需要的状态或输入输出。
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class Availability {
-        /** 可用的状态标记，用于选择当前组件的处理路径。 */
+        /**
+         * 可用的状态标记，用于选择当前组件的处理路径。
+         */
         private final boolean available;
 
-        /** 当前限制、治理或审批要求的可读原因。 */
+        /**
+         * 当前限制、治理或审批要求的可读原因。
+         */
         private final String reason;
     }
 }

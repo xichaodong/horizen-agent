@@ -21,16 +21,21 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-/** 将适配器快照转换为模型可直接调用的 AgentScope 工具。 */
+/**
+ * 将适配器快照转换为模型可直接调用的 AgentScope 工具。
+ */
 public final class ToolAdapterTools {
-    /** 工具类私有构造器，避免创建没有独立运行状态的实例。 */
-    private ToolAdapterTools() {}
+    /**
+     * 工具类私有构造器，避免创建没有独立运行状态的实例。
+     */
+    private ToolAdapterTools() {
+    }
 
     /**
      * 注册工具适配器工具集合。
      *
-     * @param toolkit 当前工具适配器工具集合持有的工具集对象，供相应处理步骤使用。
-     * @param adapter 当前工具适配器工具集合持有的适配器对象，供相应处理步骤使用。
+     * @param toolkit     当前工具适配器工具集合持有的工具集对象，供相应处理步骤使用。
+     * @param adapter     当前工具适配器工具集合持有的适配器对象，供相应处理步骤使用。
      * @param definitions definitions的有序集合，保留当前组件处理或协议输出所需的顺序。
      * @return 本次操作返回的工具目录解析器结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -56,22 +61,30 @@ public final class ToolAdapterTools {
         return resolver;
     }
 
-    /** 将 Provider SPI 工具定义与调用结果接入 AgentScope 工具循环。 */
+    /**
+     * 将 Provider SPI 工具定义与调用结果接入 AgentScope 工具循环。
+     */
     private static final class AdapterTool extends ToolBase {
-        /** 把外部 Provider 契约连接到当前运行时的调用适配器。 */
+        /**
+         * 把外部 Provider 契约连接到当前运行时的调用适配器。
+         */
         private final ToolProvider adapter;
 
-        /** 按当前版本和访问范围解析工具目录的组件。 */
+        /**
+         * 按当前版本和访问范围解析工具目录的组件。
+         */
         private final ToolCatalogResolver resolver;
 
-        /** 当前工具的 Schema、治理属性与执行元数据。 */
+        /**
+         * 当前工具的 Schema、治理属性与执行元数据。
+         */
         private final ToolDefinition definition;
 
         /**
          * 创建适配器工具，初始化该组件所需的状态、配置或依赖。
          *
-         * @param adapter 当前适配器工具持有的适配器对象，供相应处理步骤使用。
-         * @param resolver 提供解析器能力的依赖，具体实现由当前组件的组装方传入。
+         * @param adapter    当前适配器工具持有的适配器对象，供相应处理步骤使用。
+         * @param resolver   提供解析器能力的依赖，具体实现由当前组件的组装方传入。
          * @param definition 当前适配器工具持有的定义对象，供相应处理步骤使用。
          */
         private AdapterTool(
@@ -91,7 +104,7 @@ public final class ToolAdapterTools {
         /**
          * 检查权限集合。
          *
-         * @param input 本次处理的输入。
+         * @param input   本次处理的输入。
          * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
          * @return 承接本次处理结果与失败的异步对象，实际执行由订阅或完成流程推进。
          */
@@ -158,10 +171,10 @@ public final class ToolAdapterTools {
                                                                 result -> {
                                                                     PresentationEventCollector
                                                                             collector =
-                                                                                    param.getRuntimeContext()
-                                                                                            .get(
-                                                                                                    PresentationEventCollector
-                                                                                                            .class);
+                                                                            param.getRuntimeContext()
+                                                                                    .get(
+                                                                                            PresentationEventCollector
+                                                                                                    .class);
                                                                     if (collector == null) return;
                                                                     for (var block :
                                                                             PresentationToolResultMapper

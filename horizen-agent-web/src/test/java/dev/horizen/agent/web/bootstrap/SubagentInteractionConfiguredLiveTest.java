@@ -35,10 +35,13 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/** 真实 LLM 交接验收；获批操作仅修改进程内的合成计数器。 */
+/**
+ * 真实 LLM 交接验收；获批操作仅修改进程内的合成计数器。
+ */
 @EnabledIfSystemProperty(named = "horizen.subagent.model.live", matches = "true")
 class SubagentInteractionConfiguredLiveTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void realModelDelegatesThenAsksTheParentToApproveBeforeExecuting() throws Exception {
@@ -132,13 +135,13 @@ class SubagentInteractionConfiguredLiveTest {
                         .disableTranscript()
                         .build();
         try (var runtime =
-                new HarnessAgentRuntime(
-                        agent,
-                        context -> {
-                            context.put(AgentSpawnTool.CTX_FORCE_SYNC, true);
-                            context.put(AgentSpawnTool.CTX_FORCE_SYNC_TIMEOUT_SECONDS, 90);
-                        },
-                        null)) {
+                     new HarnessAgentRuntime(
+                             agent,
+                             context -> {
+                                 context.put(AgentSpawnTool.CTX_FORCE_SYNC, true);
+                                 context.put(AgentSpawnTool.CTX_FORCE_SYNC_TIMEOUT_SECONDS, 90);
+                             },
+                             null)) {
             var events =
                     runtime.stream(
                                     AgentTurnRequest.builder()

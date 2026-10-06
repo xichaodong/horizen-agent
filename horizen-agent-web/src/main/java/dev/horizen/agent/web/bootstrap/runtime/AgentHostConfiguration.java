@@ -45,10 +45,14 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.net.URI;
 import java.net.http.HttpClient;
 
-/** 组装运行时、模型和工具；API 与持久化组件由独立 IoC 配置组装。 */
+/**
+ * 组装运行时、模型和工具；API 与持久化组件由独立 IoC 配置组装。
+ */
 @Configuration(proxyBeanMethods = false)
 public class AgentHostConfiguration {
-    /** Agent键的固定取值，用于相应策略和边界判断。 */
+    /**
+     * Agent键的固定取值，用于相应策略和边界判断。
+     */
     private static final String AGENT_KEY = AgentProperties.AGENT_KEY;
 
     /**
@@ -83,7 +87,7 @@ public class AgentHostConfiguration {
     /**
      * 计算或取得本方法声明的结果，供当前AgentHostConfiguration处理步骤使用。
      *
-     * @param storage 当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
+     * @param storage    当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
      * @return 本次操作返回的产物支持结果。
      */
@@ -96,7 +100,7 @@ public class AgentHostConfiguration {
     /**
      * 计算或取得本方法声明的结果，供当前AgentHostConfiguration处理步骤使用。
      *
-     * @param storage 当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
+     * @param storage    当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
      * @return 本次操作返回的Redis执行事件桥接器结果。
      */
@@ -110,15 +114,15 @@ public class AgentHostConfiguration {
     /**
      * 构造并返回当前操作所需的结果对象。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param workspace 当前Agent宿主组装持有的工作区对象，供相应处理步骤使用。
-     * @param settings 当前Agent宿主组装持有的settings对象，供相应处理步骤使用。
-     * @param storage 当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
+     * @param agent      当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param workspace  当前Agent宿主组装持有的工作区对象，供相应处理步骤使用。
+     * @param settings   当前Agent宿主组装持有的settings对象，供相应处理步骤使用。
+     * @param storage    当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
      * @param management 当前Agent宿主组装持有的管理对象，供相应处理步骤使用。
-     * @param catalog 当前资源目录或目录定位键，用于查找可用发布与工具。
-     * @param contents 资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
-     * @param http 提供HTTP能力的依赖，具体实现由当前组件的组装方传入。
-     * @param readers 当前Agent宿主组装持有的readers对象，供相应处理步骤使用。
+     * @param catalog    当前资源目录或目录定位键，用于查找可用发布与工具。
+     * @param contents   资源内容服务或已持有的内容集合，供读取与写入实际内容使用。
+     * @param http       提供HTTP能力的依赖，具体实现由当前组件的组装方传入。
+     * @param readers    当前Agent宿主组装持有的readers对象，供相应处理步骤使用。
      * @return 本次操作返回的Agent发布服务结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -146,14 +150,14 @@ public class AgentHostConfiguration {
                 local
                         ? null
                         : new HorizenSkillReleaseClient(
-                                URI.create(workspace.getEndpoint()),
-                                workspace.getToken(),
-                                workspace.getArtifactHosts(),
-                                workspace.isAllowHttp(),
-                                workspace.getRequestTimeout(),
-                                20L * 1024 * 1024,
-                                http,
-                                readers.getThreadPoolExecutor());
+                        URI.create(workspace.getEndpoint()),
+                        workspace.getToken(),
+                        workspace.getArtifactHosts(),
+                        workspace.isAllowHttp(),
+                        workspace.getRequestTimeout(),
+                        20L * 1024 * 1024,
+                        http,
+                        readers.getThreadPoolExecutor());
         return new AgentReleaseService(
                 new AgentCatalogKey(workspace.getProjectId(), AGENT_KEY),
                 new HorizenAgentReleaseRepository(
@@ -168,21 +172,21 @@ public class AgentHostConfiguration {
     /**
      * 计算或取得本方法声明的结果，供当前AgentHostConfiguration处理步骤使用。
      *
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param context 当前执行上下文，提供关联标识和宿主绑定信息。
-     * @param gateway 外部工具目录与调用的网关适配器。
-     * @param sandbox 当前Agent宿主组装持有的沙箱对象，供相应处理步骤使用。
-     * @param settings 当前Agent宿主组装持有的settings对象，供相应处理步骤使用。
-     * @param multimodal 当前Agent宿主组装持有的多模态对象，供相应处理步骤使用。
-     * @param snapshots 当前Agent宿主组装持有的快照集合对象，供相应处理步骤使用。
-     * @param workspace 当前Agent宿主组装持有的工作区对象，供相应处理步骤使用。
-     * @param skills 当前Agent宿主组装持有的Skill集合对象，供相应处理步骤使用。
-     * @param storage 当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
-     * @param artifacts 产物管理依赖或产物集合，用于引用、读取与交付资源。
-     * @param archives 当前Agent宿主组装持有的归档集合对象，供相应处理步骤使用。
-     * @param tracing 当前Agent宿主组装持有的观测对象，供相应处理步骤使用。
-     * @param exporter 当前Agent宿主组装持有的上报器对象，供相应处理步骤使用。
-     * @param publications 当前Agent宿主组装持有的发布集合对象，供相应处理步骤使用。
+     * @param agent          当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param context        当前执行上下文，提供关联标识和宿主绑定信息。
+     * @param gateway        外部工具目录与调用的网关适配器。
+     * @param sandbox        当前Agent宿主组装持有的沙箱对象，供相应处理步骤使用。
+     * @param settings       当前Agent宿主组装持有的settings对象，供相应处理步骤使用。
+     * @param multimodal     当前Agent宿主组装持有的多模态对象，供相应处理步骤使用。
+     * @param snapshots      当前Agent宿主组装持有的快照集合对象，供相应处理步骤使用。
+     * @param workspace      当前Agent宿主组装持有的工作区对象，供相应处理步骤使用。
+     * @param skills         当前Agent宿主组装持有的Skill集合对象，供相应处理步骤使用。
+     * @param storage        当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
+     * @param artifacts      产物管理依赖或产物集合，用于引用、读取与交付资源。
+     * @param archives       当前Agent宿主组装持有的归档集合对象，供相应处理步骤使用。
+     * @param tracing        当前Agent宿主组装持有的观测对象，供相应处理步骤使用。
+     * @param exporter       当前Agent宿主组装持有的上报器对象，供相应处理步骤使用。
+     * @param publications   当前Agent宿主组装持有的发布集合对象，供相应处理步骤使用。
      * @param infrastructure 当前Agent宿主组装持有的基础设施对象，供相应处理步骤使用。
      * @return 本次操作返回的Agent运行时结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
@@ -283,7 +287,7 @@ public class AgentHostConfiguration {
                                                             archive == null
                                                                     ? null
                                                                     : new RepositorySnapshotSpec(
-                                                                            archive))
+                                                                    archive))
                                                     .snapshotProperties(snapshots)
                                                     .snapshotPointers(data.getSnapshotPointers())
                                                     .publishedWorkspace(root)
@@ -295,7 +299,7 @@ public class AgentHostConfiguration {
     /**
      * 创建产物支持。
      *
-     * @param storage 当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
+     * @param storage    当前Agent宿主组装持有的存储对象，供相应处理步骤使用。
      * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
      * @return 本次操作返回的产物支持结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。

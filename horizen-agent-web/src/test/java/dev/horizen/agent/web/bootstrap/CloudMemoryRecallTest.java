@@ -37,7 +37,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 class CloudMemoryRecallTest {
-    @TempDir Path workspace;
+    @TempDir
+    Path workspace;
 
     @Test
     void correctedAndForgottenFactsAreNotRecalledFromStructuredAudit() {
@@ -63,10 +64,10 @@ class CloudMemoryRecallTest {
                         .contains("output_preference: beta"));
         assertFalse(
                 invoke(
-                                agent,
-                                "memory_get",
-                                Map.of("path", "MEMORY.md", "startLine", 1, "endLine", 50),
-                                "owner")
+                        agent,
+                        "memory_get",
+                        Map.of("path", "MEMORY.md", "startLine", 1, "endLine", 50),
+                        "owner")
                         .contains("beta"));
         assertTrue(
                 documents
@@ -93,10 +94,10 @@ class CloudMemoryRecallTest {
         assertFalse(audit.contains("private-fact"));
         assertTrue(
                 invoke(
-                                agent,
-                                "memory_get",
-                                Map.of("path", "../MEMORY.md", "startLine", 1, "endLine", 20),
-                                "owner")
+                        agent,
+                        "memory_get",
+                        Map.of("path", "../MEMORY.md", "startLine", 1, "endLine", 20),
+                        "owner")
                         .contains("only recalls current MEMORY.md"));
     }
 
@@ -114,18 +115,18 @@ class CloudMemoryRecallTest {
         assertEquals(20, matches.lines().filter(line -> line.startsWith("MEMORY.md#")).count());
         assertTrue(
                 invoke(
-                                agent,
-                                "memory_get",
-                                Map.of("path", "MEMORY.md", "startLine", 1, "endLine", 201),
-                                "owner")
+                        agent,
+                        "memory_get",
+                        Map.of("path", "MEMORY.md", "startLine", 1, "endLine", 201),
+                        "owner")
                         .contains("at most 200 lines"));
         assertTrue(
                 invoke(
-                                        agent,
-                                        "memory_get",
-                                        Map.of("path", "MEMORY.md", "startLine", 1, "endLine", 200),
-                                        "owner")
-                                .length()
+                        agent,
+                        "memory_get",
+                        Map.of("path", "MEMORY.md", "startLine", 1, "endLine", 200),
+                        "owner")
+                        .length()
                         <= 32_768);
         assertTrue(
                 invoke(agent, "memory_search", Map.of("query", ""), "owner")

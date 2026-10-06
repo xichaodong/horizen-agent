@@ -60,7 +60,7 @@
                     <executable>${java.home}/bin/java</executable>
                     <arguments>
                         <argument>-classpath</argument>
-                        <classpath />
+                        <classpath/>
                         <argument>${demo.mainClass}</argument>
                         <argument>${trace.file}</argument>
                         <argument>${demo.mode}</argument>

@@ -24,34 +24,46 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-/** 仅供服务使用的管理接口；浏览器身份和项目访问权限由 Server 检查。 */
+/**
+ * 仅供服务使用的管理接口；浏览器身份和项目访问权限由 Server 检查。
+ */
 @RestController
 @RequestMapping("/api/internal/workspaces")
 @ConditionalOnProperty(name = "horizen.agent.workspace-management.enabled", havingValue = "true")
 public class WorkspaceManagementController {
-    /** 本组件调用的 {@code WorkspaceManagementService} 依赖，负责 service 对应的处理步骤。 */
+    /**
+     * 本组件调用的 {@code WorkspaceManagementService} 依赖，负责 service 对应的处理步骤。
+     */
     private final WorkspaceManagementService service;
 
-    /** 完整工作区发布服务，提供会话绑定版本的准备与状态。 */
+    /**
+     * 完整工作区发布服务，提供会话绑定版本的准备与状态。
+     */
     private final WorkspacePublicationService publications;
 
-    /** 宿主绑定的配置对象，供组件组装与策略校验使用。 */
+    /**
+     * 宿主绑定的配置对象，供组件组装与策略校验使用。
+     */
     private final WorkspaceManagementProperties properties;
 
-    /** 当前远端协议的 JSON 编解码器。 */
+    /**
+     * 当前远端协议的 JSON 编解码器。
+     */
     private final ObjectMapper json;
 
-    /** 按工作区归属读取修改操作与前后内容引用的审计仓储。 */
+    /**
+     * 按工作区归属读取修改操作与前后内容引用的审计仓储。
+     */
     @Setter(onMethod_ = @Autowired)
     private WorkspaceAuditService audit;
 
     /**
      * 创建工作区管理接口控制器，初始化该组件所需的状态、配置或依赖。
      *
-     * @param service 提供服务能力的依赖，具体实现由当前组件的组装方传入。
+     * @param service      提供服务能力的依赖，具体实现由当前组件的组装方传入。
      * @param publications 提供发布集合能力的依赖，具体实现由当前组件的组装方传入。
-     * @param properties 宿主绑定的配置对象，供组件组装与策略校验使用。
-     * @param json 提供JSON能力的依赖，具体实现由当前组件的组装方传入。
+     * @param properties   宿主绑定的配置对象，供组件组装与策略校验使用。
+     * @param json         提供JSON能力的依赖，具体实现由当前组件的组装方传入。
      */
     @Autowired
     public WorkspaceManagementController(
@@ -68,9 +80,9 @@ public class WorkspaceManagementController {
     /**
      * 调用工作区管理接口控制器。
      *
-     * @param operation 当前工作区管理接口控制器使用的操作，供其处理与状态记录使用。
+     * @param operation     当前工作区管理接口控制器使用的操作，供其处理与状态记录使用。
      * @param authorization 当前工作区管理接口控制器使用的授权，供其处理与状态记录使用。
-     * @param body 当前工作区管理接口控制器持有的正文对象，供相应处理步骤使用。
+     * @param body          当前工作区管理接口控制器持有的正文对象，供相应处理步骤使用。
      * @return 本次操作返回的JSON节点结果。
      * @throws ApiException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -86,61 +98,53 @@ public class WorkspaceManagementController {
         String agent = body.path("agentKey").asText();
         if (project <= 0
                 || !properties.getProjectIds().isEmpty()
-                        && !properties.getProjectIds().contains(project))
+                && !properties.getProjectIds().contains(project))
             throw new ApiException(HttpStatus.FORBIDDEN, "Workspace project is not allowed");
         try {
             new AgentCatalogKey(project, agent);
             return switch (operation) {
                 case "draft" -> draft(project, agent);
                 case "save" -> save(project, agent, body);
-                case "current" ->
-                        publications
-                                .current(project, agent)
-                                .map(r -> release(r, true).path("manifest"))
-                                .orElse(NullNode.instance);
-                case "by-id" ->
-                        publications
-                                .find(project, agent, body.path("releaseId").asLong())
-                                .map(r -> release(r, true).path("manifest"))
-                                .orElse(NullNode.instance);
-                case "releases" ->
-                        json.valueToTree(
-                                publications.list(project, agent).stream()
-                                        .map(r -> release(r, false))
-                                        .toList());
+                case "current" -> publications
+                        .current(project, agent)
+                        .map(r -> release(r, true).path("manifest"))
+                        .orElse(NullNode.instance);
+                case "by-id" -> publications
+                        .find(project, agent, body.path("releaseId").asLong())
+                        .map(r -> release(r, true).path("manifest"))
+                        .orElse(NullNode.instance);
+                case "releases" -> json.valueToTree(
+                        publications.list(project, agent).stream()
+                                .map(r -> release(r, false))
+                                .toList());
                 case "publish" -> publish(project, agent, body);
-                case "archive-links" ->
-                        archiveLinks(project, agent, body.path("releaseId").asLong());
-                case "audit-list" ->
-                        json.valueToTree(
-                                audit.list(
-                                        project,
-                                        agent,
-                                        body.path("path").asText(),
-                                        body.path("ownerKey").asText(null),
-                                        body.path("beforeSequence").asLong(0),
-                                        body.path("pageSize").asInt(25)));
-                case "audit-detail" ->
-                        json.valueToTree(
-                                audit.detail(
-                                        project,
-                                        agent,
-                                        body.path("path").asText(),
-                                        body.path("ownerKey").asText(null),
-                                        body.path("sequence").asLong()));
-                case "memory" ->
-                        audit.memory(project, agent, body.path("ownerKey").asText())
-                                .<JsonNode>map(
-                                        d ->
-                                                json.valueToTree(
-                                                        Map.of(
-                                                                "content",
-                                                                d.getContent(),
-                                                                "version",
-                                                                d.getVersion())))
-                                .orElse(json.valueToTree(Map.of("content", "", "version", 0)));
-                default ->
-                        throw new ApiException(HttpStatus.NOT_FOUND, "Unknown workspace operation");
+                case "archive-links" -> archiveLinks(project, agent, body.path("releaseId").asLong());
+                case "audit-list" -> json.valueToTree(
+                        audit.list(
+                                project,
+                                agent,
+                                body.path("path").asText(),
+                                body.path("ownerKey").asText(null),
+                                body.path("beforeSequence").asLong(0),
+                                body.path("pageSize").asInt(25)));
+                case "audit-detail" -> json.valueToTree(
+                        audit.detail(
+                                project,
+                                agent,
+                                body.path("path").asText(),
+                                body.path("ownerKey").asText(null),
+                                body.path("sequence").asLong()));
+                case "memory" -> audit.memory(project, agent, body.path("ownerKey").asText())
+                        .<JsonNode>map(
+                                d ->
+                                        json.valueToTree(
+                                                Map.of(
+                                                        "content",
+                                                        d.getContent(),
+                                                        "version",
+                                                        d.getVersion())))
+                        .orElse(json.valueToTree(Map.of("content", "", "version", 0)));
+                default -> throw new ApiException(HttpStatus.NOT_FOUND, "Unknown workspace operation");
             };
         } catch (ApplicationError error) {
             throw AgentApiMapper.apiError(error);
@@ -159,7 +163,7 @@ public class WorkspaceManagementController {
      * 计算或取得本方法声明的结果，供当前WorkspaceManagementController处理步骤使用。
      *
      * @param project 当前工作区管理接口控制器使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
      * @return 本次操作返回的JSON节点结果。
      */
     public JsonNode draft(long project, String agent) {
@@ -186,8 +190,8 @@ public class WorkspaceManagementController {
      * 保存工作区管理接口控制器。
      *
      * @param project 当前工作区管理接口控制器使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param body 当前工作区管理接口控制器持有的正文对象，供相应处理步骤使用。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param body    当前工作区管理接口控制器持有的正文对象，供相应处理步骤使用。
      * @return 本次操作返回的JSON节点结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
@@ -206,8 +210,8 @@ public class WorkspaceManagementController {
                     asset.hasNonNull("content")
                             ? asset.path("content").asText().getBytes(StandardCharsets.UTF_8)
                             : asset.hasNonNull("base64")
-                                    ? Base64.getDecoder().decode(asset.path("base64").asText())
-                                    : null;
+                            ? Base64.getDecoder().decode(asset.path("base64").asText())
+                            : null;
             String type =
                     asset.hasNonNull("content")
                             ? "text/plain; charset=utf-8"
@@ -227,8 +231,8 @@ public class WorkspaceManagementController {
      * 发布工作区管理接口控制器。
      *
      * @param project 当前工作区管理接口控制器使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param body 当前工作区管理接口控制器持有的正文对象，供相应处理步骤使用。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param body    当前工作区管理接口控制器持有的正文对象，供相应处理步骤使用。
      * @return 本次操作返回的JSON节点结果。
      */
     private JsonNode publish(long project, String agent, JsonNode body) {
@@ -246,8 +250,8 @@ public class WorkspaceManagementController {
      * 计算或取得本方法声明的结果，供当前WorkspaceManagementController处理步骤使用。
      *
      * @param project 当前工作区管理接口控制器使用的Project，供其处理与状态记录使用。
-     * @param agent 当前配置的 Agent 实例，承担模型与工具循环执行。
-     * @param id 目标对象的标识。
+     * @param agent   当前配置的 Agent 实例，承担模型与工具循环执行。
+     * @param id      目标对象的标识。
      * @return 本次操作返回的JSON节点结果。
      */
     private JsonNode archiveLinks(long project, String agent, long id) {
@@ -257,7 +261,7 @@ public class WorkspaceManagementController {
     /**
      * 释放工作区管理接口控制器。
      *
-     * @param release 当前工作区管理接口控制器持有的发布对象，供相应处理步骤使用。
+     * @param release         当前工作区管理接口控制器持有的发布对象，供相应处理步骤使用。
      * @param includeManifest include清单的状态标记，用于选择当前组件的处理路径。
      * @return 本次操作返回的对象节点结果。
      * @throws IllegalStateException 当前输入或运行状态不满足本方法的处理条件时抛出。

@@ -9,88 +9,119 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.beans.ConstructorProperties;
 import java.time.Duration;
 
-/** Web 宿主的分布式存储配置；Core 不理解具体数据库地址。 */
+/**
+ * Web 宿主的分布式存储配置；Core 不理解具体数据库地址。
+ */
 @ConfigurationProperties(prefix = "horizen.agent.storage")
 @Getter
 @EqualsAndHashCode
 @ToString
 public class RuntimeStorageProperties {
-    /** 当前功能模式，控制所选适配器或处理策略。 */
+    /**
+     * 当前功能模式，控制所选适配器或处理策略。
+     */
     private final Mode mode;
 
-    /** 共享事实数据库的 JDBC 连接地址。 */
+    /**
+     * 共享事实数据库的 JDBC 连接地址。
+     */
     private final String jdbcUrl;
 
-    /** 连接共享事实数据库使用的服务端账号。 */
+    /**
+     * 连接共享事实数据库使用的服务端账号。
+     */
     private final String jdbcUsername;
 
-    /** 连接共享事实数据库使用的服务端凭据。 */
-    @ToString.Exclude private final String jdbcPassword;
+    /**
+     * 连接共享事实数据库使用的服务端凭据。
+     */
+    @ToString.Exclude
+    private final String jdbcPassword;
 
-    /** JDBC 连接池允许创建的最大连接数量。 */
+    /**
+     * JDBC 连接池允许创建的最大连接数量。
+     */
     private final int jdbcMaximumPoolSize;
 
-    /** 每个 Redis 连接池允许保留的最大连接数量。 */
+    /**
+     * 每个 Redis 连接池允许保留的最大连接数量。
+     */
     private final int redisMaximumPoolSize;
 
-    /** Redis 状态与事件存储的连接地址。 */
+    /**
+     * Redis 状态与事件存储的连接地址。
+     */
     private final String redisUrl;
 
-    /** Redis键使用的公共前缀，用于分组或存储寻址。 */
+    /**
+     * Redis键使用的公共前缀，用于分组或存储寻址。
+     */
     private final String redisKeyPrefix;
 
-    /** 当前服务实例标识，用于区分分布式执行与资源统计。 */
+    /**
+     * 当前服务实例标识，用于区分分布式执行与资源统计。
+     */
     private final String instanceId;
 
-    /** 当前执行增量事件的保留时间，供断线回放使用。 */
+    /**
+     * 当前执行增量事件的保留时间，供断线回放使用。
+     */
     private final Duration eventTtl;
 
-    /** 会话工作状态的不活跃保留时间，与持久会话历史分开管理。 */
+    /**
+     * 会话工作状态的不活跃保留时间，与持久会话历史分开管理。
+     */
     private final Duration sessionStateTtl;
 
-    /** 执行实例租约的有效时长。 */
+    /**
+     * 执行实例租约的有效时长。
+     */
     private final Duration leaseTtl;
 
-    /** 执行租约续期的调度间隔。 */
+    /**
+     * 执行租约续期的调度间隔。
+     */
     private final Duration leaseHeartbeat;
 
-    /** 跨实例执行控制消息的轮询间隔。 */
+    /**
+     * 跨实例执行控制消息的轮询间隔。
+     */
     private final Duration controlPollInterval;
 
     /**
      * 创建运行时存储配置，初始化该组件所需的状态、配置或依赖。
      *
-     * @param mode 当前功能模式，控制所选适配器或处理策略。
-     * @param jdbcUrl 当前运行时存储配置使用的JDBCURL，供其处理与状态记录使用。
-     * @param jdbcUsername 当前运行时存储配置使用的JDBC账号，供其处理与状态记录使用。
-     * @param jdbcPassword 当前运行时存储配置使用的JDBC密码，供其处理与状态记录使用。
-     * @param jdbcMaximumPoolSize 当前运行时存储配置使用的JDBC最大连接池大小，供其处理与状态记录使用。
+     * @param mode                 当前功能模式，控制所选适配器或处理策略。
+     * @param jdbcUrl              当前运行时存储配置使用的JDBCURL，供其处理与状态记录使用。
+     * @param jdbcUsername         当前运行时存储配置使用的JDBC账号，供其处理与状态记录使用。
+     * @param jdbcPassword         当前运行时存储配置使用的JDBC密码，供其处理与状态记录使用。
+     * @param jdbcMaximumPoolSize  当前运行时存储配置使用的JDBC最大连接池大小，供其处理与状态记录使用。
      * @param redisMaximumPoolSize 当前运行时存储配置使用的Redis最大连接池大小，供其处理与状态记录使用。
-     * @param redisUrl 当前运行时存储配置使用的RedisURL，供其处理与状态记录使用。
-     * @param redisKeyPrefix Redis键使用的公共前缀，用于分组或存储寻址。
-     * @param instanceId 当前服务实例标识，用于区分分布式执行与资源统计。
-     * @param eventTtl 当前执行增量事件的保留时间，供断线回放使用。
-     * @param sessionStateTtl 会话工作状态的不活跃保留时间，与持久会话历史分开管理。
-     * @param leaseTtl 执行实例租约的有效时长。
-     * @param leaseHeartbeat 执行租约续期的调度间隔。
-     * @param controlPollInterval 跨实例执行控制消息的轮询间隔。
+     * @param redisUrl             当前运行时存储配置使用的RedisURL，供其处理与状态记录使用。
+     * @param redisKeyPrefix       Redis键使用的公共前缀，用于分组或存储寻址。
+     * @param instanceId           当前服务实例标识，用于区分分布式执行与资源统计。
+     * @param eventTtl             当前执行增量事件的保留时间，供断线回放使用。
+     * @param sessionStateTtl      会话工作状态的不活跃保留时间，与持久会话历史分开管理。
+     * @param leaseTtl             执行实例租约的有效时长。
+     * @param leaseHeartbeat       执行租约续期的调度间隔。
+     * @param controlPollInterval  跨实例执行控制消息的轮询间隔。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
     @ConstructorProperties({
-        "mode",
-        "jdbcUrl",
-        "jdbcUsername",
-        "jdbcPassword",
-        "jdbcMaximumPoolSize",
-        "redisMaximumPoolSize",
-        "redisUrl",
-        "redisKeyPrefix",
-        "instanceId",
-        "eventTtl",
-        "sessionStateTtl",
-        "leaseTtl",
-        "leaseHeartbeat",
-        "controlPollInterval"
+            "mode",
+            "jdbcUrl",
+            "jdbcUsername",
+            "jdbcPassword",
+            "jdbcMaximumPoolSize",
+            "redisMaximumPoolSize",
+            "redisUrl",
+            "redisKeyPrefix",
+            "instanceId",
+            "eventTtl",
+            "sessionStateTtl",
+            "leaseTtl",
+            "leaseHeartbeat",
+            "controlPollInterval"
     })
     public RuntimeStorageProperties(
             Mode mode,
@@ -162,11 +193,17 @@ public class RuntimeStorageProperties {
         return mode == Mode.DISTRIBUTED;
     }
 
-    /** 宿主存储模式，区分单机开发状态与分布式持久化。 */
+    /**
+     * 宿主存储模式，区分单机开发状态与分布式持久化。
+     */
     public enum Mode {
-        /** 使用单机开发环境中的本地适配器。 */
+        /**
+         * 使用单机开发环境中的本地适配器。
+         */
         LOCAL,
-        /** 使用共享状态与持久化适配器，支持多个宿主实例。 */
+        /**
+         * 使用共享状态与持久化适配器，支持多个宿主实例。
+         */
         DISTRIBUTED
     }
 
@@ -183,7 +220,7 @@ public class RuntimeStorageProperties {
     /**
      * 生成当前操作所需的text文本，供调用方继续处理。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value    待校验、转换或保存的原始值。
      * @param fallback 当前运行时存储配置使用的回退，供其处理与状态记录使用。
      * @return 本次处理生成或读取的文本。
      */
@@ -194,9 +231,9 @@ public class RuntimeStorageProperties {
     /**
      * 计算或取得本方法声明的结果，供当前RuntimeStorageProperties处理步骤使用。
      *
-     * @param value 待校验、转换或保存的原始值。
+     * @param value    待校验、转换或保存的原始值。
      * @param fallback 回退的时间配置，供等待、调度或失效判断使用。
-     * @param name 需要定位或处理的名称。
+     * @param name     需要定位或处理的名称。
      * @return 本次操作返回的耗时结果。
      * @throws IllegalArgumentException 当前输入或运行状态不满足本方法的处理条件时抛出。
      */
