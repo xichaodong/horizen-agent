@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased — 0.1.0 preview preparation
+## v0.1.0-preview.2 — 2026-10-06
+
+- Preserve the completed Turn status when the host releases its source subscription after receiving the final reply. Resource cleanup no longer changes a successful real-model conversation into a cancelled Turn.
+- Verify real-model chat, multi-turn context, native tool execution, SSE reconnection, cancellation during generation, and a subsequent turn after cancellation using synthetic inputs.
+- Show the four YAML model settings and the configured published-image command in both getting-started guides. Clarify that persistent conversation history and human-interaction recovery require the distributed storage integrations.
+
+## v0.1.0-preview.1 — 2026-10-06
 
 - AgentScope-based runtime with owner/session isolation, Turn lifecycle and correlated events.
 - Local Web/SSE host, deterministic demos and an independent console design with bundled SVG assets.
@@ -17,4 +23,4 @@
 
 - Preserve the evaluation admission limit while handing completed worker slots to the next request. Completion callbacks can submit a successor without transient executor rejection, and shutdown settles queued handoffs.
 
-Compatibility: Java APIs, stream contracts and persistence schemas are provisional. The Maven version remains `0.1.0-SNAPSHOT`; this entry does not declare a published release.
+Compatibility: Java APIs, stream contracts and persistence schemas are provisional. The Maven version remains `0.1.0-SNAPSHOT`; the preview tags identify published artifacts.

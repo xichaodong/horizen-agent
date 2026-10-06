@@ -863,6 +863,38 @@ class HarnessAgentRuntimeTest {
     }
 
     @Test
+    void disposingSourceAfterCompletedEventPreservesCompletionAndAllowsNextTurn() {
+        try (HarnessAgentRuntime runtime = runtime(new ConversationModel(), true)) {
+            // 宿主收到终态后会释放源订阅；资源清理不能把已完成的执行改成取消。
+            AgentRuntimeEvent reply =
+                    runtime.stream(
+                                    request(
+                                            "turn-done",
+                                            "alice",
+                                            "done-session",
+                                            "remember:completion-marker"))
+                            .takeUntil(
+                                    event ->
+                                            event.getType()
+                                                    == AgentRuntimeEvent.Type.TURN_COMPLETED)
+                            .blockLast(Duration.ofSeconds(2));
+            assertEquals(AgentRuntimeEvent.Type.TURN_COMPLETED, reply.getType());
+            assertEquals(
+                    TurnStatus.COMPLETED,
+                    runtime.sessionExecution("alice", "done-session").orElseThrow().getStatus());
+
+            assertEquals(
+                    "completion-marker",
+                    finalReply(runtime, request("turn-next", "alice", "done-session", "recall"))
+                            .block(Duration.ofSeconds(2))
+                            .getText());
+            assertEquals(
+                    TurnStatus.COMPLETED,
+                    runtime.sessionExecution("alice", "done-session").orElseThrow().getStatus());
+        }
+    }
+
+    @Test
     void cancellationImmediatelyAfterTurnStartedDoesNotLeaveSessionBusy() {
         try (HarnessAgentRuntime runtime = runtime(new ConversationModel(), true)) {
             runtime.stream(request("turn-early-cancel", "alice", "early-cancel-session", "hello"))

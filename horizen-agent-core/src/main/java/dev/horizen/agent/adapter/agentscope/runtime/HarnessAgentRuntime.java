@@ -304,6 +304,17 @@ public final class HarnessAgentRuntime implements AgentRuntime {
                                                 if (event.getType()
                                                         == AgentRuntimeEvent.Type.TURN_COMPLETED) {
                                                     sawCompletedEvent.set(true);
+                                                    // 宿主收到完成事件后可立即释放源订阅，须先提交完成状态。
+                                                    if (terminalRecorded.compareAndSet(
+                                                            false, true)) {
+                                                        sessionExecution.finish(
+                                                                request.getOwnerKey(),
+                                                                request.getSessionId(),
+                                                                request.getTurnId(),
+                                                                TurnStatus.COMPLETED,
+                                                                Instant.now(),
+                                                                null);
+                                                    }
                                                 }
                                                 if (event.getType()
                                                         == AgentRuntimeEvent.Type

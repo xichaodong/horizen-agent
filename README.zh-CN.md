@@ -25,19 +25,38 @@ docker compose up --build -d
 
 打开 <http://127.0.0.1:8787/>。镜像包含构建后的前端和 Java 后端，默认启动无需凭据的脚本模型 demo。Compose 端口只绑定本机，工作区文件使用 `agent-data` 数据卷。
 
-接入真实模型时，如果还没有本地配置，先复制模板，编辑 `model-mode`、`api-key`、`base-url` 和 `model-name`，再加载配置覆盖文件：
+接入真实模型时，先复制配置模板（已有 `.env.yml` 时保留原文件）：
 
 ```sh
 cp -n .env.yml.example .env.yml
-docker compose -f compose.yml -f compose.configured.yml up --build -d
 ```
+
+在 `.env.yml` 中修改这四项，其余配置可以保持模板默认值：
+
+```yaml
+horizen:
+  agent:
+    model-mode: remote
+    api-key: '填写你自己的模型服务 Key'
+    base-url: 'https://your-model-provider.example/v1'
+    model-name: '填写服务商提供的模型标识'
+```
+
+`base-url` 使用服务商的 OpenAI-compatible API 基础地址，不包含 `/chat/completions`。然后直接运行已发布镜像，无需安装 Java、Node.js 或在本机编译：
+
+```sh
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.2 \
+  docker compose -f compose.yml -f compose.configured.yml up -d --no-build
+```
+
+如需从当前源码构建，使用 `docker compose -f compose.yml -f compose.configured.yml up --build -d`。
 
 启动时只读挂载 `.env.yml`，镜像构建不会包含该文件。启动入口准备好私有权限的配置后，以 UID 10001 运行 Java。可选外部服务也在这一份 YAML 中配置。
 
-版本发布后，可以直接使用对应镜像：
+只想体验无凭据 demo 时，可以直接使用对应镜像：
 
 ```sh
-HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.1 docker compose up -d --no-build
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.2 docker compose up -d --no-build
 ```
 
 用 `docker compose logs -f agent` 查看启动状态，用 `docker compose down` 停止。文件见 [Compose](compose.yml)、[配置覆盖](compose.configured.yml) 和 [Dockerfile](Dockerfile)。
@@ -108,6 +127,8 @@ cp -n .env.yml.example .env.yml
 | 观测上报 | 关闭；CLI 示例输出 JSONL | Horizen Trace 上报 |
 | 工作区发布 | 关闭 | 工作区发布服务 |
 | 云端评测 | 关闭 | 云端评测服务 |
+
+`local` 模式支持模型聊天、同一进程内的上下文、活跃执行的 SSE 重连和取消，但不保存正式会话目录或消息历史；刷新页面、重启应用后不保证恢复聊天记录。持久化历史、审批/澄清恢复和跨实例恢复需要配置 MySQL + Redis，并切换为 `distributed` 模式。Docker 的 `agent-data` 卷用于工作区文件，不会自动保存会话数据库。
 
 构建会编译这些适配器，使用基础 Runtime 不要求接通对应服务。配置模板位于仓库根目录，命名为 `.env.yml.example`，应用不会自动导入模板文件。
 

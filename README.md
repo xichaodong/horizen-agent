@@ -25,19 +25,38 @@ docker compose up --build -d
 
 Open <http://127.0.0.1:8787/>. The image includes the production frontend and Java backend and starts the credential-free scripted demo by default. The Compose port is bound to loopback, and workspace files use the `agent-data` volume.
 
-For a real model, copy the template if you do not already have local settings, edit `model-mode`, `api-key`, `base-url` and `model-name`, then use the configured override:
+For a real model, copy the template first (an existing `.env.yml` is preserved):
 
 ```sh
 cp -n .env.yml.example .env.yml
-docker compose -f compose.yml -f compose.configured.yml up --build -d
 ```
+
+Set these four fields in `.env.yml`. Leave the other template settings at their defaults:
+
+```yaml
+horizen:
+  agent:
+    model-mode: remote
+    api-key: 'your-own-model-service-key'
+    base-url: 'https://your-model-provider.example/v1'
+    model-name: 'your-provider-model-id'
+```
+
+Use your provider's OpenAI-compatible API base URL, without `/chat/completions`. Start the published image directly; Java, Node.js and a local build are not required:
+
+```sh
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.2 \
+  docker compose -f compose.yml -f compose.configured.yml up -d --no-build
+```
+
+To build from the current source instead, use `docker compose -f compose.yml -f compose.configured.yml up --build -d`.
 
 The override mounts `.env.yml` read-only at startup; it is excluded from the image build. The startup process prepares the configuration with private permissions, then runs Java as UID 10001. Optional external services remain controlled by the same YAML file.
 
-After a release is published, use its image without a local build:
+To try the credential-free demo, use the published image without a local build:
 
 ```sh
-HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.1 docker compose up -d --no-build
+HORIZEN_AGENT_IMAGE=ghcr.io/xichaodong/horizen-agent:v0.1.0-preview.2 docker compose up -d --no-build
 ```
 
 Use `docker compose logs -f agent` to inspect startup and `docker compose down` to stop. See [Compose](compose.yml), [configured override](compose.configured.yml) and [Dockerfile](Dockerfile).
@@ -107,6 +126,8 @@ Use the same frontend command as above. The Java host reads the credential; it i
 | Trace export | Disabled; CLI demo writes JSONL | Horizen trace-contract exporter |
 | Workspace publications | Disabled | Workspace release service |
 | Cloud evaluation | Disabled | Cloud-evaluation service |
+
+`local` mode supports model chat, conversation context within the running process, SSE reconnection to an active turn, and cancellation. It does not store the formal session directory or message history; reloading the page or restarting the application does not guarantee chat-history recovery. Persistent history, approval/clarification recovery, and cross-instance recovery require MySQL + Redis with `distributed` mode. The Docker `agent-data` volume stores workspace files and does not automatically provide a conversation database.
 
 The Maven reactor compiles these adapters, but using the basic runtime does not require their services. The YAML template is in the repository root as `.env.yml.example`; the host does not automatically import them.
 
